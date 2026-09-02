@@ -16,7 +16,6 @@
     "check": "oxlint && oxfmt --write"
   },
   "dependencies": {
-    "@my-better-t-app/env": "workspace:*",
     "dotenv": "catalog:",
     "zod": "catalog:"
   },

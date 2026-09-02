@@ -1,4 +1,4 @@
-import { env } from "@my-better-t-app/env/web";
+import { env } from "@/env";
 import { RouterProvider, createRouter } from "@tanstack/react-router";
 import { ConvexReactClient } from "convex/react";
 import { ConvexProvider } from "convex/react";
