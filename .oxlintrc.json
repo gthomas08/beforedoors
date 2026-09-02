@@ -4,6 +4,7 @@
   "categories": {
     "correctness": "error"
   },
+  "ignorePatterns": [".agents/**"],
   "rules": {},
   "env": {
     "builtin": true
