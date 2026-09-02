@@ -10,8 +10,7 @@
     "types": ["vite/client"],
     "rootDirs": ["."],
     "paths": {
-      "@/*": ["./src/*"],
-      "@my-better-t-app/ui/*": ["../../packages/ui/src/*"]
+      "@/*": ["./src/*"]
     }
   }
 }

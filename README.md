@@ -7,7 +7,7 @@ This project was created with [Better-T-Stack](https://github.com/AmanVarshney01
 - **TypeScript** - For type safety and improved developer experience
 - **TanStack Router** - File-based routing with full type safety
 - **TailwindCSS** - Utility-first CSS for rapid UI development
-- **Shared UI package** - shadcn/ui primitives live in `packages/ui`
+- **shadcn/ui** - UI primitives live alongside the web app in `apps/web/src`
 - **Convex** - Reactive backend-as-a-service platform
 - **Oxlint** - Oxlint + Oxfmt (linting & formatting)
 
@@ -42,24 +42,24 @@ Your app will connect to the Convex cloud backend automatically.
 
 ## UI Customization
 
-React web apps in this stack share shadcn/ui primitives through `packages/ui`.
+The web app keeps its shadcn/ui primitives in `apps/web/src`.
 
-- Change design tokens and global styles in `packages/ui/src/styles/globals.css`
-- Update shared primitives in `packages/ui/src/components/*`
-- Adjust shadcn aliases or style config in `packages/ui/components.json` and `apps/web/components.json`
+- Change design tokens and global styles in `apps/web/src/styles/globals.css`
+- Update UI primitives in `apps/web/src/components/*`
+- Adjust shadcn aliases or style config in `apps/web/components.json`
 
 ### Add more shared components
 
-Run this from the project root to add more primitives to the shared UI package:
+Run this from the project root to add more primitives to the web app:
 
 ```bash
-npx shadcn@latest add accordion dialog popover sheet table -c packages/ui
+npx shadcn@latest add accordion dialog popover sheet table -c apps/web
 ```
 
 Import shared components like this:
 
 ```tsx
-import { Button } from "@my-better-t-app/ui/components/button";
+import { Button } from "@/components/button";
 ```
 
 ### Add app-specific blocks
@@ -75,9 +75,8 @@ If you want to add app-specific blocks instead of shared primitives, run the sha
 ```
 my-better-t-app/
 ├── apps/
-│   ├── web/         # Frontend application (React + TanStack Router)
+│   ├── web/         # Frontend application and UI components
 ├── packages/
-│   ├── ui/          # Shared shadcn/ui components and styles
 │   ├── backend/     # Convex backend functions and schema
 ```
 
