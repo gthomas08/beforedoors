@@ -14,11 +14,11 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
   head: () => ({
     meta: [
       {
-        title: "my-better-t-app",
+        title: "BeforeDoors · System status",
       },
       {
         name: "description",
-        content: "my-better-t-app is a web application",
+        content: "Live connection status for the BeforeDoors development environment.",
       },
     ],
     links: [
@@ -40,7 +40,7 @@ function RootComponent() {
         disableTransitionOnChange
         storageKey="vite-ui-theme"
       >
-        <div className="grid grid-rows-[auto_1fr] h-svh">
+        <div className="grid h-svh grid-rows-[auto_1fr]">
           <Header />
           <Outlet />
         </div>
