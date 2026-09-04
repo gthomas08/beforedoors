@@ -1,6 +1,6 @@
 # Hackathon log
 
-- **Project:** beforedoors
+- **Project:** BeforeDoors
 - **Event:** Convex All Gas Hackathon
 - **What it does:** A TanStack Router web app that displays the status of a Convex health-check query.
 - **Live app:** not deployed
@@ -12,7 +12,7 @@
 - **Auth:** none
 - **AI models:** none
 - **Started:** 2026-09-02T18:35:17Z
-- **Last updated:** 2026-09-02T18:53:55Z
+- **Last updated:** 2026-09-04T21:50:38Z
 
 ## Log
 
@@ -27,3 +27,7 @@ Simplified the workspace by moving shadcn/ui components, styles, utilities, and 
 ### 2026-09-02 - a62cc70
 
 Moved web environment validation into `apps/web/src/env.ts` and removed the standalone env package. The web app continues to connect to Convex through `VITE_CONVEX_URL`; no new Convex backend behavior was added.
+
+### 2026-09-04 - bc16984
+
+Rebranded the status page as BeforeDoors and documented the product and Access Field Guide design system. Replaced the scaffold banner and rounded health panel with a responsive diagnostic receipt that preserves the live Convex `healthCheck` query and separates confirmed connection state from unverified integrations (`apps/web/src/routes/index.tsx`, `apps/web/src/components/header.tsx`, `apps/web/src/routes/__root.tsx`, `apps/web/src/styles/globals.css`, `PRODUCT.md`, `DESIGN.md`). Convex features: realtime query.

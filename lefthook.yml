@@ -4,9 +4,14 @@
 pre-commit:
   parallel: true
   jobs:
+    # Only run when staged files are lintable; oxlint exits 1 with
+    # "No files found to lint" when given only non-code files (e.g. .md),
+    # which would block otherwise-valid commits.
     - name: oxlint
+      glob: "*.{js,jsx,ts,tsx,cjs,mjs,cts,mts}"
       run: pnpm oxlint --fix {staged_files}
       stage_fixed: true
     - name: oxfmt
+      glob: "*.{js,jsx,ts,tsx,cjs,mjs,cts,mts,json,md,yml,yaml}"
       run: pnpm oxfmt --write {staged_files}
       stage_fixed: true
