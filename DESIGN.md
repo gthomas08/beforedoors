@@ -2,41 +2,55 @@
 name: BeforeDoors
 description: Know before you go.
 colors:
-  paper: "oklch(1 0 0)"
-  ink: "oklch(0.145 0 0)"
-  quiet-gray: "oklch(0.97 0 0)"
-  quiet-gray-foreground: "oklch(0.556 0 0)"
-  line: "oklch(0.922 0 0)"
-  focus: "oklch(0.708 0 0)"
-  dark-surface: "oklch(0.205 0 0)"
-  dark-muted: "oklch(0.269 0 0)"
-  destructive-red: "oklch(0.58 0.22 27)"
-  signal-red: "oklch(63.7% 0.237 25.331)"
+  trailhead-paper: "oklch(0.965 0.025 88)"
+  evergreen-ink: "oklch(0.28 0.075 151)"
+  evergreen-muted: "oklch(0.4 0.05 145)"
+  route-orange: "oklch(0.69 0.2 52)"
+  route-orange-hover: "oklch(0.62 0.2 49)"
+  route-orange-ink: "oklch(0.2 0.05 145)"
+  map-line: "oklch(0.34 0.06 145 / 24%)"
+  field-paper: "oklch(0.99 0.01 88 / 94%)"
+  field-ink: "oklch(0.25 0.06 145)"
+  field-placeholder: "oklch(0.47 0.04 145)"
+  field-border: "oklch(0.31 0.07 145)"
+  focus-orange: "oklch(0.69 0.2 52)"
+  night-evergreen: "oklch(0.24 0.025 151)"
+  night-paper: "oklch(0.96 0.025 88)"
+  night-muted: "oklch(0.82 0.035 94)"
+  night-field: "oklch(0.96 0.018 88)"
   verified-green: "oklch(72.3% 0.219 149.579)"
   pending-amber: "oklch(75% 0.183 55.934)"
+  signal-red: "oklch(63.7% 0.237 25.331)"
+  destructive-red: "oklch(0.58 0.22 27)"
 typography:
-  navigation:
+  display:
     fontFamily: "Inter Variable, sans-serif"
-    fontSize: "0.875rem"
+    fontSize: "clamp(2rem, 7vw, 5rem)"
     fontWeight: 600
-    lineHeight: 1.4286
-    letterSpacing: "-0.015em"
+    lineHeight: 0.9
+    letterSpacing: "-0.04em"
+  diagnostic:
+    fontFamily: "Inter Variable, sans-serif"
+    fontSize: "clamp(3.25rem, 13vw, 6rem)"
+    fontWeight: 600
+    lineHeight: 0.88
+    letterSpacing: "-0.04em"
   body:
     fontFamily: "Inter Variable, sans-serif"
     fontSize: "1rem"
     fontWeight: 400
-    lineHeight: 1.5
-    letterSpacing: "normal"
-  title:
-    fontFamily: "Inter Variable, sans-serif"
-    fontSize: "0.875rem"
-    fontWeight: 500
-    lineHeight: 1.4286
+    lineHeight: 1.75
     letterSpacing: "normal"
   label:
     fontFamily: "Inter Variable, sans-serif"
     fontSize: "0.75rem"
-    fontWeight: 500
+    fontWeight: 600
+    lineHeight: 1.3333
+    letterSpacing: "0.14em"
+  data:
+    fontFamily: "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace"
+    fontSize: "0.75rem"
+    fontWeight: 400
     lineHeight: 1.3333
     letterSpacing: "normal"
 rounded:
@@ -44,9 +58,7 @@ rounded:
   full: "9999px"
 spacing:
   1: "4px"
-  1-5: "6px"
   2: "8px"
-  2-5: "10px"
   3: "12px"
   4: "16px"
   5: "20px"
@@ -54,206 +66,189 @@ spacing:
   8: "32px"
 components:
   button-primary:
-    backgroundColor: "{colors.ink}"
-    textColor: "{colors.paper}"
+    backgroundColor: "{colors.route-orange}"
+    textColor: "{colors.route-orange-ink}"
     typography: "{typography.label}"
     rounded: "{rounded.none}"
     padding: "6px 10px"
     height: "32px"
+  button-trailhead-cta:
+    backgroundColor: "{colors.route-orange}"
+    textColor: "{colors.route-orange-ink}"
+    typography: "{typography.label}"
+    rounded: "{rounded.none}"
+    padding: "16px 20px"
+    height: "64px"
   button-outline:
-    backgroundColor: "{colors.paper}"
-    textColor: "{colors.ink}"
+    backgroundColor: "transparent"
+    textColor: "{colors.evergreen-ink}"
     typography: "{typography.label}"
     rounded: "{rounded.none}"
     padding: "6px 10px"
     height: "32px"
   input:
-    backgroundColor: "transparent"
-    textColor: "{colors.ink}"
-    typography: "{typography.label}"
+    backgroundColor: "{colors.field-paper}"
+    textColor: "{colors.field-ink}"
+    typography: "{typography.body}"
     rounded: "{rounded.none}"
-    padding: "4px 10px"
-    height: "32px"
-  card:
-    backgroundColor: "{colors.paper}"
-    textColor: "{colors.ink}"
-    typography: "{typography.label}"
-    rounded: "{rounded.none}"
-    padding: "16px"
-  tooltip:
-    backgroundColor: "{colors.ink}"
-    textColor: "{colors.paper}"
-    typography: "{typography.label}"
-    rounded: "{rounded.none}"
-    padding: "6px 12px"
+    padding: "16px 20px"
+    height: "64px"
 ---
 
 # Design System: BeforeDoors
 
 ## Overview
 
-**Creative North Star: "The Access Field Guide"**
+**Creative North Star: “The Trailhead Field Guide”**
 
-BeforeDoors should feel like a practical field reference prepared before a real journey: calm, exacting, utilitarian, and candid. Its visual language favors legibility, explicit state, and compact tools over brand spectacle. Information should appear inspectable rather than persuasive, supporting the product's evidence-first trust model without implying certainty the evidence does not contain.
+BeforeDoors now uses one visual world across the homepage and system status route. The page feels like a calm field guide at the start of a journey: warm map paper, deep evergreen ink, a bright orange route signal, and precise square instruments. The homepage uses that world to make a venue URL feel like a trailhead; the status page uses the same surface and controls to make system evidence easy to inspect.
 
-The incumbent reusable system is a monochrome, semantic-token interface with light and dark modes, thin structural borders, compact typography, square controls, and restrained state motion. The built diagnostic surface demonstrates this language as a full-height service record: the live state leads, an itemized specification follows, and factual scope notes close the record. New work should extend the same precise-instrument language without treating this route-specific receipt composition as a universal page template.
+The design is expressive in its material and restrained in its information treatment. Contour lines and route marks provide orientation, while text, borders, and explicit state labels carry meaning. The same light and dark semantic tokens drive both routes through `--app-*` variables; route-specific composition may differ, but color, type, shape, focus, and navigation behavior stay shared.
 
 **Key Characteristics:**
 
-- Calm, exacting, utilitarian, and candid.
-- Compact square controls that behave like precise instruments.
-- Monochrome surfaces with color reserved for explicit status meaning.
-- Flat structural separation through borders and rings.
-- Equivalent semantic hierarchy in light and dark modes.
+- Warm contour-map paper with a deep evergreen reading voice.
+- Bright orange reserved for the primary route action and directional linework.
+- Square, one-pixel instruments with visible focus and pressed states.
+- Inter Variable for all interface text; monospace only for diagnostic values.
+- Evidence-first status labels that remain explicit in both themes.
+- Full-height, low-clutter entry view on `/`; readable, scrollable diagnostic record on `/status`.
 
 ## Colors
 
-The palette is deliberately achromatic at rest; chromatic color appears only when it communicates a concrete status or destructive consequence.
+The shared palette pairs warm ivory and evergreen with a single vivid orange route accent. The status colors remain semantic and never become decoration.
 
 ### Primary
 
-- **Ink** (`oklch(0.145 0 0)`): Primary light-mode text and filled controls; it becomes the dark-mode page ground through semantic token inversion.
+- **Route Orange** (`oklch(0.69 0.2 52)`): The homepage CTA, focus treatment, and route line. Hover deepens to `oklch(0.62 0.2 49)`.
+- **Route Orange Ink** (`oklch(0.2 0.05 145)`): Text and icons placed on orange controls.
 
 ### Neutral
 
-- **Paper** (`oklch(1 0 0)`): Light-mode page, card, and popover surfaces; also the high-contrast foreground reference for dark surfaces.
-- **Quiet Gray** (`oklch(0.97 0 0)`): Secondary, muted, and hover surfaces in light mode.
-- **Quiet Gray Foreground** (`oklch(0.556 0 0)`): De-emphasized explanatory text in light mode.
-- **Line** (`oklch(0.922 0 0)`): Light-mode borders and input strokes.
-- **Focus** (`oklch(0.708 0 0)`): Focus-ring color; pair it with a one-pixel ring and a visible border shift.
-- **Dark Surface** (`oklch(0.205 0 0)`): Raised cards and popovers in dark mode.
-- **Dark Muted** (`oklch(0.269 0 0)`): Secondary and muted dark-mode surfaces.
+- **Trailhead Paper** (`oklch(0.965 0.025 88)`): Light-mode page ground for both `/` and `/status`.
+- **Evergreen Ink** (`oklch(0.28 0.075 151)`): Primary text, product identity, and structural emphasis.
+- **Evergreen Muted** (`oklch(0.4 0.05 145)`): Supporting copy, route labels, and quiet metadata.
+- **Map Line** (`oklch(0.34 0.06 145 / 24%)`): One-pixel borders and low-contrast contour structure.
+- **Field Paper** (`oklch(0.99 0.01 88 / 94%)`): URL input surface and raised paper-toned controls.
+- **Field Border** (`oklch(0.31 0.07 145)`): URL instrument stroke.
+- **Night Evergreen** (`oklch(0.24 0.025 151)`): Dark-mode page ground.
+- **Night Paper** (`oklch(0.96 0.025 88)`): Dark-mode text and warm contrast reference.
 
 ### Status
 
-- **Verified Green** (`oklch(72.3% 0.219 149.579)`): A positive, explicitly verified or connected state—not general decoration.
-- **Pending Amber** (`oklch(75% 0.183 55.934)`): Work in progress, checking, or evidence still pending.
-- **Signal Red** (`oklch(63.7% 0.237 25.331)`): Failed or conflicting system status when the state is represented by an indicator.
-- **Destructive Red** (`oklch(0.58 0.22 27)`): Destructive actions, invalid fields, and error emphasis in light mode; dark mode uses the existing lighter red token.
+- **Verified Green** (`oklch(72.3% 0.219 149.579)`): A confirmed live connection only.
+- **Pending Amber** (`oklch(75% 0.183 55.934)`): A query that is still checking or awaiting evidence.
+- **Signal Red** (`oklch(63.7% 0.237 25.331)`): A failed or conflicting system state.
+- **Destructive Red** (`oklch(0.58 0.22 27)`): Invalid or destructive consequences.
 
 ### Named Rules
 
-**The Status Reserve Rule.** Verified Green, Pending Amber, and Signal Red communicate named states only; never spend them on decoration or generic brand emphasis.
+**The Shared Trailhead Rule.** Homepage and status use the same `--app-*` palette, contour surface, header, border, focus, and control treatment. A route may change composition, but it does not invent a second theme.
 
-**The Evidence Before Atmosphere Rule.** Neutral surfaces carry the interface so evidence, provenance, and uncertainty labels remain the visual focus.
+**The Signal Reserve Rule.** Green, amber, and red communicate named state only. Orange is the brand route accent and is not a substitute for status meaning.
+
+**The Evidence Before Atmosphere Rule.** Map texture stays quiet behind content; provenance, uncertainty, and current state always win the contrast hierarchy.
 
 ## Typography
 
-**Display Font:** No display face is committed in the incumbent system.
-**Body Font:** Inter Variable (with `sans-serif` fallback)
+**Display Font:** Inter Variable (with `sans-serif`)
+**Body Font:** Inter Variable (with `sans-serif`)
+**Label/Mono Font:** Inter Variable for labels; `ui-monospace` for diagnostic values and tabular data.
 
-**Character:** The type system is compact and matter-of-fact. It uses size, medium weight, and muted foreground color to establish hierarchy without theatrical contrast. Monospace is reserved for exact identifiers, query names, and tabular results rather than brand voice.
+**Character:** Typography is direct and compact, with a large, tightly tracked promise on the homepage and an equally confident live-state word on the status page. Supporting copy remains readable and matter-of-fact so visual confidence never implies evidence certainty.
 
 ### Hierarchy
 
-- **Navigation** (600, `0.875rem`, `1.4286`, `-0.015em`): The compact product identity link in the current app shell.
-- **Body** (400, `1rem`, `1.5`): Default reading and page copy. Keep longer prose within approximately 65–75 characters per line.
-- **Title** (500, `0.875rem`, `1.4286`): Card titles, compact section headings, and empty-state titles.
-- **Label** (500, `0.75rem`, `1.3333`): Buttons, inputs, menu items, evidence metadata, and dense operational controls.
-
-The current diagnostic uses a route-specific state display (`clamp(3.25rem, 13vw, 6rem)`, 600 weight, `0.88` line height, `-0.04em` tracking) and a 12-pixel monospace specification. These values serve the service-record hierarchy and are not general display or brand-heading tokens.
+- **Display** (600, `clamp(2rem, 7vw, 5rem)`, `0.9`): The homepage promise, held to one line in the normal desktop viewport.
+- **Diagnostic** (600, `clamp(3.25rem, 13vw, 6rem)`, `0.88`): The live status state such as Connected or Checking.
+- **Body** (400, `1rem`, `1.75` on the homepage): Explanatory copy, kept near 46–58ch for comfortable reading.
+- **Label** (600, `0.75rem`, uppercase with `0.14em` tracking): Field labels, compact route labels, buttons, and metadata.
+- **Data** (400, `0.75rem`, `1.3333`): Diagnostic keys and values where exact strings matter.
 
 ### Named Rules
 
-**The Plain Statement Rule.** Use type to make meaning easier to scan, not to make uncertain information sound authoritative.
+**The Plain Promise Rule.** Let the headline invite action, while supporting copy names what the product can actually verify and leaves room for unknowns.
 
 ## Layout
 
-The reusable components follow Tailwind's four-pixel base rhythm, most often using 6, 8, 10, 12, 16, and 24 pixel steps. Controls are intentionally compact: primary inputs and buttons are 32 pixels high, while smaller variants step down to 24 or 28 pixels. Component groups use tight 4–8 pixel internal gaps; major content groups use 16–24 pixels.
+Both routes share a 56px product bar, responsive horizontal padding of 20px below 640px and 32px from the `sm` breakpoint, square side rules, and the same centered 5xl header alignment. The homepage fills the viewport beneath the bar and keeps its single URL action in the visual center; its stage intentionally does not scroll in the normal viewport. The status route uses the same map stage but places a readable 44rem diagnostic record inside it, allowing the record to scroll when its specification exceeds the viewport.
 
-The current shell aligns a 56-pixel product bar and a full-height service record on the same centered `44rem` column. One-pixel side rules hold the column against a quiet page ground; internal horizontal padding is `20px` on narrow screens and `32px` from the 640-pixel breakpoint. The receipt retains logical source order, lets its content scroll beneath the fixed-height shell, and changes the two-column scope notes only when width permits. This is a proven diagnostic expression, not the complete application grid. Dense evidence views may use compact spacing, but touch targets must remain comfortably operable through padding, adjacent hit areas, or responsive expansion.
+The core spacing rhythm follows 4px steps, with 12–20px control internals, 24px group gaps, and 32–40px section separation. Content that explains evidence stays within roughly 48–58ch even when the surrounding stage is wider.
 
 ## Elevation & Depth
 
-The system is flat and structurally separated. Resting surfaces, including input groups, use background contrast, one-pixel borders, or low-opacity rings rather than floating shadows. Shadows are reserved for transient overlays such as dropdown menus and tooltips.
+The system is flat at rest. Warm paper, a one-pixel evergreen line, and a lightly contrasting field provide depth without floating cards. Shadows appear only on transient menus and tooltips, where they communicate temporary elevation.
 
 ### Shadow Vocabulary
 
-- **Overlay Medium** (`0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)`): Dropdowns and short-lived menus.
+- **Overlay Medium** (`0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)`): Dropdown menus and short-lived overlays.
 - **Overlay Large** (`0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)`): Nested or higher-order transient menus only.
 
 ### Named Rules
 
-**The Flat-by-Default Rule.** If a surface is present at rest, separate it with tone or a one-pixel line; reserve shadow for something temporarily above the document.
+**The Flat-by-Default Rule.** Resting surfaces use paper tone or a one-pixel line. Shadow belongs to temporary overlays, never to a content card at rest.
 
 ## Shapes
 
-Square corners are the dominant component signature. Buttons, cards, inputs, menus, tooltips, attachments, message bubbles, empty states, checkboxes, and structural records all resolve to `0px` corners. Fully circular geometry is reserved for objects that are intrinsically round, such as avatars or small status dots; the diagnostic receipt uses a 12-pixel circle only as its state signal.
-
-Borders are one pixel and semantic. Focus adds a one-pixel ring at 50% ring opacity plus a border-color shift. Pressed buttons move down by one pixel, giving the otherwise flat geometry a small tactile response.
+Square corners (`0px`) define buttons, fields, records, menus, and structural borders. Fully round geometry is reserved for intrinsically round status signals. Contour paths and the dashed route line are crisp vector geometry, not a replacement for content. Focus adds a one-pixel orange ring, and pressed controls move down one pixel.
 
 ## Components
 
-Components should feel like precise instruments rather than soft promotional UI.
+Components are precise trail instruments: compact where they support inspection, larger where they invite the first action.
 
 ### Buttons
 
-- **Shape:** Square (`0px`) with a compact 32-pixel default height and `10px` horizontal padding.
-- **Primary:** Ink background with Paper foreground in light mode; semantic primary tokens invert appropriately in dark mode.
-- **Hover / Focus:** Hover reduces primary opacity to 80%; focus shifts the border to Focus and adds a one-pixel 50%-opacity ring; active non-popup buttons translate down one pixel.
-- **Outline:** Paper or transparent background with a Line border; hover uses Quiet Gray.
-- **Destructive:** A low-opacity Destructive Red surface with red text, strengthening slightly on hover without becoming a solid alarm block.
+- **Shape:** Square (`0px`) with a 32px shared default height.
+- **Primary:** Route Orange with Route Orange Ink; the homepage CTA expands to 56px on narrow screens and 64px from `sm` upward.
+- **Hover / Focus:** Hover deepens the route orange; focus changes the border and adds a one-pixel ring from `--app-focus`; active controls translate down one pixel.
+- **Outline / Ghost:** Transparent or paper-toned with a one-pixel map-line border; hover uses a warm muted surface.
 
 ### Cards / Containers
 
 - **Corner Style:** Square (`0px`).
-- **Background:** Semantic card surface; Paper in light mode and Dark Surface in dark mode.
-- **Shadow Strategy:** None at rest.
-- **Border:** One-pixel, 10%-foreground ring.
-- **Internal Padding:** `16px` by default and `12px` for the small variant.
+- **Background:** Trailhead Paper for page records; Field Paper for URL instruments.
+- **Shadow Strategy:** No resting shadow; use a one-pixel line and tonal contrast.
+- **Border:** One-pixel `--app-line` or `--app-field-border`.
+- **Internal Padding:** 16px for compact groups, 20–32px for route sections.
 
 ### Inputs / Fields
 
-- **Style:** Square, transparent 32-pixel field with a one-pixel input stroke and `10px` horizontal padding.
-- **Focus:** Border changes to Focus and gains a one-pixel 50%-opacity ring.
-- **Error / Disabled:** Invalid state uses Destructive Red border and ring; disabled fields mute opacity and use a quiet filled surface while preserving readable text.
-
-### Checkboxes
-
-- **Style:** A square `16px` control with a one-pixel input stroke.
-- **State:** Checked state uses semantic primary background and foreground; focus and invalid states follow the field conventions.
-- **Hit Area:** The component adds invisible horizontal and vertical inset area so the visual control can stay compact without making interaction equally small.
-
-### Menus and Tooltips
-
-- **Menus:** Square semantic popovers with compact `12px` items, one-pixel rings, and 100-millisecond fade/zoom/slide transitions.
-- **Tooltips:** Inverted Ink/Paper blocks with `12px` horizontal and `6px` vertical padding; the arrow is a small square rotated 45 degrees.
-- **Elevation:** Use Overlay Medium or Overlay Large only while the overlay is open.
+- **Style:** Square Field Paper surface with a one-pixel field border. The homepage URL instrument is 56px high on narrow screens and 64px from `sm` upward, with 18px text.
+- **Focus:** The full field group shifts to Route Orange and gains a 2px low-opacity ring.
+- **Error / Disabled:** Invalid fields use Destructive Red with an inline, announced message; disabled controls preserve readable text and lower opacity.
 
 ### Navigation
 
-- **Style:** A 56-pixel product bar aligned to the document column, with one-pixel side and bottom rules, the BeforeDoors identity at the start, and a compact outlined theme control at the end.
-- **Typography:** The product identity is `0.875rem` semibold with slightly tightened tracking; supporting phrase and route context use muted `0.75rem` text.
-- **Theme:** Light, dark, and system choices are explicit; the icon transition uses scale and quarter-turn rotation without changing layout.
+- **Style:** Shared 56px product bar with BeforeDoors identity at the start, the phrase “Know before you go” on wider screens, route context at the end, and the square theme menu control.
+- **States:** Both `/` and `/status` use the landing header treatment and the same 5xl alignment. Links underline on hover and retain visible keyboard outlines.
+- **Theme:** Light, dark, and system choices invert the semantic Trailhead tokens without changing layout.
 
 ### Diagnostic Receipt
 
-- **Structure:** A full-height, `44rem`-maximum service record placed directly beneath the product bar, divided by one-pixel rules rather than card elevation.
-- **State:** A named live-query state dominates the upper record and always pairs its chromatic signal with text, an explanation, and a machine-readable result code.
-- **Specification:** A 12-pixel monospace definition list itemizes system, query, expected result, refresh behavior, scope, and current result in a two-column ledger.
-- **Motion:** Only the Pending signal pulses, using the standard two-second pulse; `prefers-reduced-motion` removes it.
-- **Scope:** Plain-language blocks state both what the check confirms and what remains unverified. The record has no primary action because its purpose is inspection.
+- **Structure:** `/status` keeps a 44rem readable record within the Trailhead map stage, with a heading, live state, monospace specification ledger, scope notes, and footer.
+- **State:** Connected, Checking, and Error pair a text label with a semantic signal color and live announcement.
+- **Scope:** “What this confirms” and “What remains unverified” keep the diagnostic honest and preserve the product’s evidence-first voice.
 
-### Message and Evidence Primitives
+### Trailhead Surface
 
-- **Bubbles:** Square, compact, maximum 80% width, with semantic filled, muted, outline, ghost, tinted, and destructive variants.
-- **Attachments:** Square bordered units with clear idle, processing, completed, and error states; thumbnails remain clipped to the component geometry.
-- **Metadata:** Use `12px` text, muted foreground, short gaps, and explicit labels so source, freshness, and confidence can be scanned independently of color.
+- **Material:** A warm contour-map field with a dashed orange route entering from the edges.
+- **Use:** Shared by the homepage and status stage; keep contours behind content and keep the route accent purposeful.
 
 ## Do's and Don'ts
 
 ### Do:
 
-- **Do** keep evidence, provenance, confidence, and status labels explicit and readable in both themes.
-- **Do** use square geometry, compact type, one-pixel borders, and the established 4-pixel spacing rhythm for reusable controls.
-- **Do** reserve Verified Green, Pending Amber, and Signal Red for named status meaning.
-- **Do** use visible focus borders and rings, semantic structure, and non-color status labels.
-- **Do** preserve the same information hierarchy when semantic tokens invert for dark mode.
+- **Do** use the shared `--app-*` tokens for both `/` and `/status`.
+- **Do** keep the Trailhead paper, evergreen ink, orange route, square geometry, and 56px navigation bar consistent across routes.
+- **Do** preserve explicit status labels and use green, amber, and red only for named states.
+- **Do** keep focus visible, errors announced, and explanatory copy readable in both themes.
+- **Do** use contour texture as quiet orientation and keep evidence text above atmosphere.
+- **Do** use monospace only for exact diagnostic values, identifiers, or tabular data.
 
 ### Don't:
 
-- **Don't** collapse exact diagnostic or provenance records into soft floating health cards that hide their scope.
-- **Don't** soften the interface into pill-heavy, oversized, promotional SaaS styling.
-- **Don't** use status colors as decoration or as the only carrier of meaning.
-- **Don't** add resting card shadows where a tonal surface or one-pixel border provides enough separation.
-- **Don't** use typography or visual emphasis to imply certainty beyond the evidence.
+- **Don't** introduce a second route palette or revert `/status` to a monochrome-only shell.
+- **Don't** use orange as a proxy for Connected, Checking, Error, Unknown, or Conflicting.
+- **Don't** add resting card shadows, rounded SaaS cards, gradients, or pill-heavy controls.
+- **Don't** let contour lines reduce text contrast or cross the primary reading path at high opacity.
+- **Don't** use confident copy to hide unknown or conflicting accessibility evidence.

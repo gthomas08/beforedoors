@@ -1,128 +1,202 @@
-import { api } from "@my-better-t-app/backend/convex/_generated/api";
+import Header from "@/components/header";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { useForm } from "@tanstack/react-form";
 import { createFileRoute } from "@tanstack/react-router";
-import { useQuery } from "convex/react";
+import { ArrowRight } from "lucide-react";
 
 export const Route = createFileRoute("/")({
   component: HomeComponent,
+  head: () => ({
+    meta: [
+      {
+        title: "BeforeDoors",
+      },
+      {
+        name: "description",
+        content: "Turn a venue or event link into a clear, evidence-based accessibility brief.",
+      },
+    ],
+  }),
 });
 
-const checkDetails = [
-  ["System", "Convex"],
-  ["Check", "api.healthCheck.get"],
-  ["Expected result", "OK"],
-  ["Refresh", "Live query"],
-  ["Scope", "Connection only"],
-] as const;
+function validateVenueUrl(value: string) {
+  const candidate = value.trim();
+
+  if (!candidate) {
+    return "Paste the venue or event page you want to check.";
+  }
+
+  try {
+    const url = new URL(candidate);
+
+    if (url.protocol !== "http:" && url.protocol !== "https:") {
+      return "Use a web address that starts with http:// or https://.";
+    }
+  } catch {
+    return "Enter a complete web address, such as https://venue.com.";
+  }
+
+  return undefined;
+}
+
+function TrailheadMark() {
+  return (
+    <svg
+      aria-hidden="true"
+      className="h-full w-full"
+      fill="none"
+      viewBox="0 0 96 88"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M25 74V14h46v60"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="4"
+      />
+      <path
+        d="m25 14 16 10v50"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="4"
+      />
+      <path d="M41 24h30" stroke="currentColor" strokeLinecap="round" strokeWidth="4" />
+      <circle cx="57" cy="51" r="4.5" stroke="currentColor" strokeWidth="3.5" />
+      <path
+        d="M57 57v9m0-5 8 3m-8 2-6 8m6-8 8 8m-13-8h-7"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="3.5"
+      />
+      <path d="M20 74h56" stroke="currentColor" strokeLinecap="round" strokeWidth="4" />
+    </svg>
+  );
+}
 
 function HomeComponent() {
-  const healthCheck = useQuery(api.healthCheck.get);
-  const state =
-    healthCheck === undefined
-      ? {
-          label: "Checking",
-          code: "PENDING",
-          explanation: "Waiting for the live Convex query to respond.",
-          signalClass: "bg-status-pending animate-pulse motion-reduce:animate-none",
-          textClass: "text-status-pending",
-        }
-      : healthCheck === "OK"
-        ? {
-            label: "Connected",
-            code: "OK",
-            explanation: "The live Convex health query returned OK.",
-            signalClass: "bg-status-verified",
-            textClass: "text-status-verified",
-          }
-        : {
-            label: "Error",
-            code: "ERROR",
-            explanation: "The live Convex health query returned an unexpected result.",
-            signalClass: "bg-status-signal",
-            textClass: "text-status-signal",
-          };
+  const form = useForm({
+    defaultValues: {
+      venueUrl: "",
+    },
+    onSubmit: ({ value }) => {
+      window.alert(`Thanks — we'll check ${value.venueUrl.trim()}.`);
+    },
+  });
 
   return (
-    <main className="min-h-0 overflow-y-auto bg-muted/30">
-      <article className="mx-auto flex min-h-full w-full max-w-[44rem] flex-col border-x bg-background">
-        <header className="px-5 py-8 sm:px-8 sm:py-10">
-          <h1 className="max-w-[12ch] text-balance text-3xl font-semibold tracking-[-0.025em] sm:text-4xl">
-            System status
-          </h1>
-          <p className="mt-3 max-w-[58ch] text-sm leading-6 text-muted-foreground sm:text-base">
-            A live connection check for the BeforeDoors development environment.
-          </p>
-        </header>
+    <div className="landing-shell grid h-svh grid-rows-[auto_1fr] overflow-hidden">
+      <Header landing linkToStatus wide />
 
-        <section aria-labelledby="connection-status" className="border-y">
-          <div className="px-5 py-12 sm:px-8 sm:py-16">
-            <div
-              className="flex items-center gap-4"
-              role="status"
-              aria-live="polite"
-              aria-atomic="true"
+      <main className="landing-stage trailhead-surface relative min-h-0 overflow-hidden px-5 sm:px-8">
+        <div className="relative z-10 mx-auto flex h-full w-full max-w-5xl items-center justify-center border-x border-[var(--landing-line)] px-5 sm:px-10 lg:px-16">
+          <section
+            aria-labelledby="landing-title"
+            className="landing-hero flex w-full max-w-3xl flex-col items-center py-8 text-center sm:py-10"
+          >
+            <div className="landing-mark mb-5 flex size-16 items-center justify-center text-[var(--landing-ink)] sm:mb-6 sm:size-[4.5rem]">
+              <TrailheadMark />
+            </div>
+
+            <h1
+              id="landing-title"
+              className="max-w-none whitespace-nowrap text-balance text-[clamp(2rem,7vw,5rem)] leading-[0.9] font-semibold tracking-[-0.04em] text-[var(--landing-ink)]"
             >
-              <span
-                aria-hidden="true"
-                className={`size-3 shrink-0 rounded-full ${state.signalClass}`}
-              />
-              <h2
-                id="connection-status"
-                className={`text-[clamp(3.25rem,13vw,6rem)] leading-[0.88] font-semibold tracking-[-0.04em] ${state.textClass}`}
-              >
-                {state.label}
-              </h2>
-            </div>
-            <p className="mt-6 max-w-[48ch] text-base leading-6 text-foreground">
-              {state.explanation}
-            </p>
-          </div>
+              Know before you go.
+            </h1>
 
-          <dl className="border-t font-mono text-xs tabular-nums">
-            {checkDetails.map(([term, description]) => (
-              <div
-                key={term}
-                className="grid min-w-0 grid-cols-[minmax(7rem,0.8fr)_minmax(0,1.2fr)] border-b last:border-b-0"
-              >
-                <dt className="px-5 py-3 font-medium text-muted-foreground sm:px-8">{term}</dt>
-                <dd className="min-w-0 border-l px-5 py-3 text-right break-words text-foreground sm:px-8">
-                  {description}
-                </dd>
-              </div>
-            ))}
-            <div className="grid min-w-0 grid-cols-[minmax(7rem,0.8fr)_minmax(0,1.2fr)] border-t">
-              <dt className="px-5 py-3 font-medium text-muted-foreground sm:px-8">
-                Current result
-              </dt>
-              <dd
-                className={`border-l px-5 py-3 text-right font-semibold sm:px-8 ${state.textClass}`}
-              >
-                {state.code}
-              </dd>
-            </div>
-          </dl>
-        </section>
-
-        <section className="grid gap-8 px-5 py-8 sm:grid-cols-2 sm:px-8 sm:py-10">
-          <div>
-            <h2 className="text-sm font-medium">What this confirms</h2>
-            <p className="mt-2 text-sm leading-6 text-muted-foreground">
-              This page confirms whether the client receives the expected response from the Convex
-              health query. It updates with the live query result.
+            <p className="mt-4 text-xs font-semibold uppercase tracking-[0.22em] text-[var(--landing-muted)] sm:text-sm">
+              Know access · go with confidence
             </p>
-          </div>
-          <div>
-            <h2 className="text-sm font-medium">What remains unverified</h2>
-            <p className="mt-2 text-sm leading-6 text-muted-foreground">
-              This check does not verify Firecrawl, AgentMail, a venue inquiry, or any accessibility
-              evidence.
-            </p>
-          </div>
-        </section>
 
-        <footer className="mt-auto border-t px-5 py-4 text-xs text-muted-foreground sm:px-8">
-          Internal diagnostic · BeforeDoors · Know before you go
-        </footer>
-      </article>
-    </main>
+            <p className="mt-5 max-w-[46ch] text-base leading-7 text-[var(--landing-muted)] sm:text-lg sm:leading-8">
+              Enter a venue or event link to see what its published access information can tell you
+              before you go.
+            </p>
+
+            <form
+              className="landing-url-form mt-8 w-full max-w-3xl sm:mt-10"
+              onSubmit={(event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                form.handleSubmit();
+              }}
+              noValidate
+            >
+              <form.Field
+                name="venueUrl"
+                validators={{
+                  onBlur: ({ value }) => validateVenueUrl(value),
+                  onSubmit: ({ value }) => validateVenueUrl(value),
+                }}
+              >
+                {(field) => {
+                  const error = field.state.meta.isTouched ? field.state.meta.errors[0] : undefined;
+
+                  return (
+                    <div>
+                      <label
+                        htmlFor={field.name}
+                        className="mb-2 block text-left text-xs font-semibold uppercase tracking-[0.14em] text-[var(--landing-ink)]"
+                      >
+                        Venue or event URL
+                      </label>
+
+                      <div className="grid border border-[var(--landing-field-border)] bg-[var(--landing-field)] transition-[border-color,box-shadow] duration-300 focus-within:border-[var(--landing-focus)] focus-within:ring-2 focus-within:ring-[var(--landing-focus)]/30 sm:grid-cols-[1fr_auto]">
+                        <Input
+                          id={field.name}
+                          name={field.name}
+                          type="url"
+                          inputMode="url"
+                          autoComplete="url"
+                          value={field.state.value}
+                          onBlur={field.handleBlur}
+                          onChange={(event) => field.handleChange(event.target.value)}
+                          placeholder="https://venue.com/event"
+                          aria-invalid={Boolean(error)}
+                          aria-describedby={`${field.name}-${error ? "error" : "hint"}`}
+                          className="h-14 border-0 bg-transparent px-4 text-lg text-[var(--landing-field-ink)] shadow-none caret-[var(--landing-accent)] placeholder:text-[var(--landing-field-placeholder)] focus-visible:ring-0 sm:h-16 sm:px-5 sm:text-lg dark:bg-transparent"
+                        />
+
+                        <form.Subscribe selector={(state) => state.isSubmitting}>
+                          {(isSubmitting) => (
+                            <Button
+                              type="submit"
+                              disabled={isSubmitting}
+                              className="group h-14 justify-between border-t border-[var(--landing-field-border)] bg-[var(--landing-accent)] px-4 text-sm text-[var(--landing-accent-ink)] hover:bg-[var(--landing-accent-hover)] sm:h-16 sm:min-w-44 sm:border-t-0 sm:border-l sm:px-5"
+                            >
+                              {isSubmitting ? "Checking…" : "See what’s ahead"}
+                              <ArrowRight
+                                aria-hidden="true"
+                                className="transition-transform duration-300 group-hover:translate-x-1 group-focus-visible:translate-x-1 motion-reduce:transition-none"
+                              />
+                            </Button>
+                          )}
+                        </form.Subscribe>
+                      </div>
+
+                      <div className="mt-3 min-h-5 text-xs leading-5">
+                        {error ? (
+                          <p id={`${field.name}-error`} className="text-destructive" role="alert">
+                            {String(error)}
+                          </p>
+                        ) : (
+                          <p id={`${field.name}-hint`} className="text-[var(--landing-muted)]">
+                            We’ll begin with the venue’s own published information.
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  );
+                }}
+              </form.Field>
+            </form>
+          </section>
+        </div>
+      </main>
+    </div>
   );
 }

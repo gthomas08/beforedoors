@@ -1,157 +1,82 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-09-04T21:37:19Z",
+  "generatedAt": "2026-09-05T18:00:00Z",
   "title": "Design System: BeforeDoors",
   "extensions": {
     "colorMeta": {
-      "paper": {
+      "trailhead-paper": {
         "role": "neutral",
-        "displayName": "Paper",
-        "canonical": "oklch(1 0 0)",
+        "displayName": "Trailhead Paper",
+        "canonical": "oklch(0.965 0.025 88)",
         "tonalRamp": [
-          "oklch(0.15 0 0)",
-          "oklch(0.27 0 0)",
-          "oklch(0.39 0 0)",
-          "oklch(0.51 0 0)",
-          "oklch(0.63 0 0)",
-          "oklch(0.75 0 0)",
-          "oklch(0.87 0 0)",
-          "oklch(0.95 0 0)"
+          "oklch(0.24 0.025 151)",
+          "oklch(0.34 0.035 151)",
+          "oklch(0.44 0.04 145)",
+          "oklch(0.56 0.04 110)",
+          "oklch(0.68 0.035 95)",
+          "oklch(0.78 0.03 92)",
+          "oklch(0.88 0.027 90)",
+          "oklch(0.965 0.025 88)"
         ]
       },
-      "ink": {
+      "evergreen-ink": {
         "role": "primary",
-        "displayName": "Ink",
-        "canonical": "oklch(0.145 0 0)",
+        "displayName": "Evergreen Ink",
+        "canonical": "oklch(0.28 0.075 151)",
         "tonalRamp": [
-          "oklch(0.15 0 0)",
-          "oklch(0.27 0 0)",
-          "oklch(0.39 0 0)",
-          "oklch(0.51 0 0)",
-          "oklch(0.63 0 0)",
-          "oklch(0.75 0 0)",
-          "oklch(0.87 0 0)",
-          "oklch(0.95 0 0)"
+          "oklch(0.18 0.04 145)",
+          "oklch(0.24 0.06 145)",
+          "oklch(0.28 0.075 151)",
+          "oklch(0.36 0.065 148)",
+          "oklch(0.46 0.055 145)",
+          "oklch(0.58 0.045 140)",
+          "oklch(0.72 0.035 136)",
+          "oklch(0.84 0.03 130)"
         ]
       },
-      "quiet-gray": {
+      "route-orange": {
+        "role": "primary",
+        "displayName": "Route Orange",
+        "canonical": "oklch(0.69 0.2 52)",
+        "tonalRamp": [
+          "oklch(0.34 0.12 48)",
+          "oklch(0.44 0.15 49)",
+          "oklch(0.54 0.18 50)",
+          "oklch(0.62 0.2 51)",
+          "oklch(0.69 0.2 52)",
+          "oklch(0.74 0.19 52)",
+          "oklch(0.8 0.17 55)",
+          "oklch(0.86 0.13 58)"
+        ]
+      },
+      "field-paper": {
         "role": "neutral",
-        "displayName": "Quiet Gray",
-        "canonical": "oklch(0.97 0 0)",
+        "displayName": "Field Paper",
+        "canonical": "oklch(0.99 0.01 88)",
         "tonalRamp": [
-          "oklch(0.15 0 0)",
-          "oklch(0.27 0 0)",
-          "oklch(0.39 0 0)",
-          "oklch(0.51 0 0)",
-          "oklch(0.63 0 0)",
-          "oklch(0.75 0 0)",
-          "oklch(0.87 0 0)",
-          "oklch(0.95 0 0)"
+          "oklch(0.24 0.025 151)",
+          "oklch(0.38 0.04 145)",
+          "oklch(0.52 0.035 125)",
+          "oklch(0.66 0.03 105)",
+          "oklch(0.76 0.025 96)",
+          "oklch(0.86 0.02 91)",
+          "oklch(0.94 0.015 89)",
+          "oklch(0.99 0.01 88)"
         ]
       },
-      "quiet-gray-foreground": {
+      "map-line": {
         "role": "neutral",
-        "displayName": "Quiet Gray Foreground",
-        "canonical": "oklch(0.556 0 0)",
+        "displayName": "Map Line",
+        "canonical": "oklch(0.34 0.06 145 / 24%)",
         "tonalRamp": [
-          "oklch(0.15 0 0)",
-          "oklch(0.27 0 0)",
-          "oklch(0.39 0 0)",
-          "oklch(0.51 0 0)",
-          "oklch(0.63 0 0)",
-          "oklch(0.75 0 0)",
-          "oklch(0.87 0 0)",
-          "oklch(0.95 0 0)"
-        ]
-      },
-      "line": {
-        "role": "neutral",
-        "displayName": "Line",
-        "canonical": "oklch(0.922 0 0)",
-        "tonalRamp": [
-          "oklch(0.15 0 0)",
-          "oklch(0.27 0 0)",
-          "oklch(0.39 0 0)",
-          "oklch(0.51 0 0)",
-          "oklch(0.63 0 0)",
-          "oklch(0.75 0 0)",
-          "oklch(0.87 0 0)",
-          "oklch(0.95 0 0)"
-        ]
-      },
-      "focus": {
-        "role": "neutral",
-        "displayName": "Focus",
-        "canonical": "oklch(0.708 0 0)",
-        "tonalRamp": [
-          "oklch(0.15 0 0)",
-          "oklch(0.27 0 0)",
-          "oklch(0.39 0 0)",
-          "oklch(0.51 0 0)",
-          "oklch(0.63 0 0)",
-          "oklch(0.75 0 0)",
-          "oklch(0.87 0 0)",
-          "oklch(0.95 0 0)"
-        ]
-      },
-      "dark-surface": {
-        "role": "neutral",
-        "displayName": "Dark Surface",
-        "canonical": "oklch(0.205 0 0)",
-        "tonalRamp": [
-          "oklch(0.15 0 0)",
-          "oklch(0.27 0 0)",
-          "oklch(0.39 0 0)",
-          "oklch(0.51 0 0)",
-          "oklch(0.63 0 0)",
-          "oklch(0.75 0 0)",
-          "oklch(0.87 0 0)",
-          "oklch(0.95 0 0)"
-        ]
-      },
-      "dark-muted": {
-        "role": "neutral",
-        "displayName": "Dark Muted",
-        "canonical": "oklch(0.269 0 0)",
-        "tonalRamp": [
-          "oklch(0.15 0 0)",
-          "oklch(0.27 0 0)",
-          "oklch(0.39 0 0)",
-          "oklch(0.51 0 0)",
-          "oklch(0.63 0 0)",
-          "oklch(0.75 0 0)",
-          "oklch(0.87 0 0)",
-          "oklch(0.95 0 0)"
-        ]
-      },
-      "destructive-red": {
-        "role": "status",
-        "displayName": "Destructive Red",
-        "canonical": "oklch(0.58 0.22 27)",
-        "tonalRamp": [
-          "oklch(0.15 0.07 27)",
-          "oklch(0.27 0.11 27)",
-          "oklch(0.39 0.15 27)",
-          "oklch(0.51 0.19 27)",
-          "oklch(0.63 0.22 27)",
-          "oklch(0.75 0.18 27)",
-          "oklch(0.87 0.10 27)",
-          "oklch(0.95 0.04 27)"
-        ]
-      },
-      "signal-red": {
-        "role": "status",
-        "displayName": "Signal Red",
-        "canonical": "oklch(63.7% 0.237 25.331)",
-        "tonalRamp": [
-          "oklch(25.8% 0.092 26.042)",
-          "oklch(44.4% 0.177 26.899)",
-          "oklch(50.5% 0.213 27.518)",
-          "oklch(57.7% 0.245 27.325)",
-          "oklch(63.7% 0.237 25.331)",
-          "oklch(70.4% 0.191 22.216)",
-          "oklch(88.5% 0.062 18.334)",
-          "oklch(97.1% 0.013 17.38)"
+          "oklch(0.24 0.025 151 / 20%)",
+          "oklch(0.28 0.05 145 / 22%)",
+          "oklch(0.34 0.06 145 / 24%)",
+          "oklch(0.4 0.06 135 / 25%)",
+          "oklch(0.5 0.05 120 / 26%)",
+          "oklch(0.62 0.04 105 / 26%)",
+          "oklch(0.76 0.03 96 / 25%)",
+          "oklch(0.92 0.035 94 / 24%)"
         ]
       },
       "verified-green": {
@@ -159,14 +84,14 @@
         "displayName": "Verified Green",
         "canonical": "oklch(72.3% 0.219 149.579)",
         "tonalRamp": [
-          "oklch(26.6% 0.065 152.934)",
-          "oklch(44.8% 0.119 151.328)",
-          "oklch(52.7% 0.154 150.069)",
-          "oklch(62.7% 0.194 149.214)",
+          "oklch(0.35 0.12 149)",
+          "oklch(0.45 0.16 149)",
+          "oklch(0.56 0.19 149)",
+          "oklch(0.64 0.21 149)",
           "oklch(72.3% 0.219 149.579)",
-          "oklch(79.2% 0.209 151.711)",
-          "oklch(92.5% 0.084 155.995)",
-          "oklch(98.2% 0.018 155.826)"
+          "oklch(0.78 0.18 149)",
+          "oklch(0.84 0.14 149)",
+          "oklch(0.9 0.1 149)"
         ]
       },
       "pending-amber": {
@@ -174,40 +99,51 @@
         "displayName": "Pending Amber",
         "canonical": "oklch(75% 0.183 55.934)",
         "tonalRamp": [
-          "oklch(26.6% 0.079 36.259)",
-          "oklch(47% 0.157 37.304)",
-          "oklch(55.3% 0.195 38.402)",
-          "oklch(64.6% 0.222 41.116)",
+          "oklch(0.4 0.11 55)",
+          "oklch(0.5 0.14 55)",
+          "oklch(0.62 0.17 55)",
+          "oklch(0.69 0.18 55)",
           "oklch(75% 0.183 55.934)",
-          "oklch(83.7% 0.128 66.29)",
-          "oklch(95.4% 0.038 75.164)",
-          "oklch(98% 0.016 73.684)"
+          "oklch(0.8 0.16 55)",
+          "oklch(0.85 0.13 55)",
+          "oklch(0.9 0.09 55)"
+        ]
+      },
+      "signal-red": {
+        "role": "status",
+        "displayName": "Signal Red",
+        "canonical": "oklch(63.7% 0.237 25.331)",
+        "tonalRamp": [
+          "oklch(0.35 0.15 25)",
+          "oklch(0.45 0.19 25)",
+          "oklch(0.54 0.22 25)",
+          "oklch(0.6 0.23 25)",
+          "oklch(63.7% 0.237 25.331)",
+          "oklch(0.72 0.2 25)",
+          "oklch(0.8 0.15 25)",
+          "oklch(0.88 0.1 25)"
         ]
       }
     },
     "typographyMeta": {
-      "navigation": {
-        "displayName": "Navigation",
-        "purpose": "The compact product identity link in the current app shell."
+      "display": {
+        "displayName": "Trailhead Display",
+        "purpose": "The homepage promise; large, tightly tracked, and direct."
       },
-      "body": {
-        "displayName": "Body",
-        "purpose": "Default reading and page copy."
+      "diagnostic": {
+        "displayName": "Diagnostic State",
+        "purpose": "The live state word on /status."
       },
-      "title": {
-        "displayName": "Title",
-        "purpose": "Compact section, card, and empty-state headings."
-      },
-      "label": {
-        "displayName": "Label",
-        "purpose": "Buttons, fields, menus, evidence metadata, and dense controls."
+      "data": {
+        "displayName": "Diagnostic Data",
+        "purpose": "Exact query names, keys, codes, and tabular values only."
       }
     },
     "shadows": [
       {
         "name": "overlay-medium",
         "value": "0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)",
-        "purpose": "Dropdowns and short-lived menus."
+        "purpose": "Dropdown menus and short-lived overlays."
       },
       {
         "name": "overlay-large",
@@ -217,176 +153,105 @@
     ],
     "motion": [
       {
-        "name": "state-standard",
-        "value": "150ms cubic-bezier(0.4, 0, 0.2, 1)",
-        "purpose": "Default color, opacity, and transform state changes."
+        "name": "ease-standard",
+        "value": "cubic-bezier(0.4, 0, 0.2, 1)",
+        "purpose": "Default hover, focus, and theme-control transitions."
       },
       {
-        "name": "pending-signal",
+        "name": "status-pulse",
         "value": "2s cubic-bezier(0.4, 0, 0.6, 1) infinite",
-        "purpose": "The diagnostic receipt's Pending state pulse; disabled when reduced motion is requested."
-      },
-      {
-        "name": "overlay-quick",
-        "value": "100ms cubic-bezier(0, 0, 0.2, 1)",
-        "purpose": "Menu and tooltip entrance and exit."
-      },
-      {
-        "name": "scroller-enter",
-        "value": "200ms cubic-bezier(0.23, 1, 0.32, 1)",
-        "purpose": "Message-scroller controls entering view."
-      },
-      {
-        "name": "scroller-exit",
-        "value": "400ms cubic-bezier(0.7, 0, 0.84, 0)",
-        "purpose": "Message-scroller controls leaving view."
+        "purpose": "Pending status signal only; removed for reduced motion."
       }
     ],
     "breakpoints": [
-      {
-        "name": "sm",
-        "value": "640px"
-      },
-      {
-        "name": "md",
-        "value": "768px"
-      },
-      {
-        "name": "lg",
-        "value": "1024px"
-      },
-      {
-        "name": "xl",
-        "value": "1280px"
-      },
-      {
-        "name": "2xl",
-        "value": "1536px"
-      }
+      { "name": "sm", "value": "640px" },
+      { "name": "md", "value": "768px" },
+      { "name": "lg", "value": "1024px" },
+      { "name": "xl", "value": "1280px" }
     ]
   },
   "components": [
     {
-      "name": "Primary Button",
+      "name": "Trailhead Primary Button",
       "kind": "button",
-      "refersTo": "button-primary",
-      "description": "The compact default action control.",
-      "html": "<button class=\"ds-btn-primary\">Create brief</button>",
-      "css": ".ds-btn-primary { display:inline-flex; height:32px; align-items:center; justify-content:center; border:1px solid transparent; border-radius:0; background:var(--primary, oklch(0.205 0 0)); color:var(--primary-foreground, oklch(0.985 0 0)); padding:6px 10px; font:500 12px/16px \"Inter Variable\", sans-serif; transition:background-color 150ms cubic-bezier(0.4,0,0.2,1), transform 150ms cubic-bezier(0.4,0,0.2,1), box-shadow 150ms cubic-bezier(0.4,0,0.2,1); } .ds-btn-primary:hover { background:color-mix(in oklch, var(--primary, oklch(0.205 0 0)) 80%, transparent); } .ds-btn-primary:focus-visible { outline:none; border-color:var(--ring, oklch(0.708 0 0)); box-shadow:0 0 0 1px color-mix(in oklch, var(--ring, oklch(0.708 0 0)) 50%, transparent); } .ds-btn-primary:active { transform:translateY(1px); }"
+      "refersTo": "button-trailhead-cta",
+      "description": "The single action that turns a venue link into the next step.",
+      "html": "<button class=\"ds-trailhead-cta\">See what’s ahead <svg aria-hidden=\"true\"></svg></button>",
+      "css": ".ds-trailhead-cta { display:inline-flex; height:56px; align-items:center; justify-content:space-between; gap:12px; border:1px solid transparent; border-radius:0; background:var(--app-accent); color:var(--app-accent-ink); padding:16px 20px; font:600 12px/16px \"Inter Variable\",sans-serif; letter-spacing:.14em; text-transform:uppercase; transition:background-color 150ms cubic-bezier(.4,0,.2,1),transform 150ms cubic-bezier(.4,0,.2,1),box-shadow 150ms cubic-bezier(.4,0,.2,1); }.ds-trailhead-cta:hover { background:var(--app-accent-hover); }.ds-trailhead-cta:focus-visible { outline:none; border-color:var(--app-focus); box-shadow:0 0 0 2px color-mix(in oklch,var(--app-focus) 30%,transparent); }.ds-trailhead-cta:active { transform:translateY(1px); }"
     },
     {
-      "name": "Outline Button",
-      "kind": "button",
-      "refersTo": "button-outline",
-      "description": "A lower-emphasis instrument for secondary actions.",
-      "html": "<button class=\"ds-btn-outline\">View sources</button>",
-      "css": ".ds-btn-outline { display:inline-flex; height:32px; align-items:center; justify-content:center; border:1px solid var(--border, oklch(0.922 0 0)); border-radius:0; background:var(--background, oklch(1 0 0)); color:var(--foreground, oklch(0.145 0 0)); padding:6px 10px; font:500 12px/16px \"Inter Variable\", sans-serif; transition:background-color 150ms cubic-bezier(0.4,0,0.2,1), transform 150ms cubic-bezier(0.4,0,0.2,1), box-shadow 150ms cubic-bezier(0.4,0,0.2,1); } .ds-btn-outline:hover { background:var(--muted, oklch(0.97 0 0)); } .ds-btn-outline:focus-visible { outline:none; border-color:var(--ring, oklch(0.708 0 0)); box-shadow:0 0 0 1px color-mix(in oklch, var(--ring, oklch(0.708 0 0)) 50%, transparent); } .ds-btn-outline:active { transform:translateY(1px); }"
-    },
-    {
-      "name": "Destructive Button",
-      "kind": "button",
-      "description": "A restrained red control for destructive consequences.",
-      "html": "<button class=\"ds-btn-destructive\">Remove source</button>",
-      "css": ".ds-btn-destructive { display:inline-flex; height:32px; align-items:center; justify-content:center; border:1px solid transparent; border-radius:0; background:color-mix(in oklch, var(--destructive, oklch(0.58 0.22 27)) 10%, transparent); color:var(--destructive, oklch(0.58 0.22 27)); padding:6px 10px; font:500 12px/16px \"Inter Variable\", sans-serif; transition:background-color 150ms cubic-bezier(0.4,0,0.2,1), box-shadow 150ms cubic-bezier(0.4,0,0.2,1); } .ds-btn-destructive:hover { background:color-mix(in oklch, var(--destructive, oklch(0.58 0.22 27)) 20%, transparent); } .ds-btn-destructive:focus-visible { outline:none; border-color:color-mix(in oklch, var(--destructive, oklch(0.58 0.22 27)) 40%, transparent); box-shadow:0 0 0 1px color-mix(in oklch, var(--destructive, oklch(0.58 0.22 27)) 20%, transparent); }"
-    },
-    {
-      "name": "Text Input",
+      "name": "Trailhead URL Field",
       "kind": "input",
       "refersTo": "input",
-      "description": "A square compact field with explicit focus and invalid states.",
-      "html": "<input class=\"ds-input\" aria-label=\"Event or venue URL\" placeholder=\"Paste an event or venue URL\">",
-      "css": ".ds-input { width:320px; height:32px; border:1px solid var(--input, oklch(0.922 0 0)); border-radius:0; background:transparent; color:var(--foreground, oklch(0.145 0 0)); padding:4px 10px; font:400 12px/16px \"Inter Variable\", sans-serif; transition:border-color 150ms cubic-bezier(0.4,0,0.2,1), box-shadow 150ms cubic-bezier(0.4,0,0.2,1); } .ds-input::placeholder { color:var(--muted-foreground, oklch(0.556 0 0)); } .ds-input:focus-visible { outline:none; border-color:var(--ring, oklch(0.708 0 0)); box-shadow:0 0 0 1px color-mix(in oklch, var(--ring, oklch(0.708 0 0)) 50%, transparent); } .ds-input[aria-invalid=\"true\"] { border-color:var(--destructive, oklch(0.58 0.22 27)); box-shadow:0 0 0 1px color-mix(in oklch, var(--destructive, oklch(0.58 0.22 27)) 20%, transparent); }"
+      "description": "The centered venue or event URL instrument.",
+      "html": "<input class=\"ds-trailhead-input\" type=\"url\" aria-label=\"Venue or event URL\" placeholder=\"https://venue.com/event\">",
+      "css": ".ds-trailhead-input { height:56px; border:1px solid var(--app-field-border); border-radius:0; background:var(--app-field); color:var(--app-field-ink); padding:16px; font:400 18px/27px \"Inter Variable\",sans-serif; }.ds-trailhead-input::placeholder { color:var(--app-field-placeholder); }.ds-trailhead-input:focus-visible { outline:none; border-color:var(--app-focus); box-shadow:0 0 0 2px color-mix(in oklch,var(--app-focus) 30%,transparent); }"
     },
     {
-      "name": "Evidence Card",
-      "kind": "card",
-      "refersTo": "card",
-      "description": "A flat bordered container for a compact evidence group.",
-      "html": "<article class=\"ds-card\"><h3>Step-free entrance</h3><p>Published by venue · Updated today</p></article>",
-      "css": ".ds-card { width:320px; border:0; border-radius:0; background:var(--card, oklch(1 0 0)); color:var(--card-foreground, oklch(0.145 0 0)); padding:16px; box-shadow:0 0 0 1px color-mix(in oklch, var(--foreground, oklch(0.145 0 0)) 10%, transparent); font-family:\"Inter Variable\", sans-serif; } .ds-card h3 { margin:0 0 4px; font-size:14px; line-height:20px; font-weight:500; } .ds-card p { margin:0; color:var(--muted-foreground, oklch(0.556 0 0)); font-size:12px; line-height:19.5px; } .ds-card:focus-within { box-shadow:0 0 0 1px var(--ring, oklch(0.708 0 0)); }"
-    },
-    {
-      "name": "Checkbox",
-      "kind": "input",
-      "description": "A compact square binary control with a larger invisible hit area in production.",
-      "html": "<button class=\"ds-checkbox\" role=\"checkbox\" aria-checked=\"true\" aria-label=\"Confirm this detail\"><svg viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M20 6 9 17l-5-5\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"3\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg></button>",
-      "css": ".ds-checkbox { display:grid; width:16px; height:16px; place-content:center; border:1px solid var(--primary, oklch(0.205 0 0)); border-radius:0; background:var(--primary, oklch(0.205 0 0)); color:var(--primary-foreground, oklch(0.985 0 0)); padding:0; transition:border-color 150ms cubic-bezier(0.4,0,0.2,1), box-shadow 150ms cubic-bezier(0.4,0,0.2,1); } .ds-checkbox svg { width:14px; height:14px; } .ds-checkbox:focus-visible { outline:none; border-color:var(--ring, oklch(0.708 0 0)); box-shadow:0 0 0 1px color-mix(in oklch, var(--ring, oklch(0.708 0 0)) 50%, transparent); }"
-    },
-    {
-      "name": "App Navigation",
+      "name": "Shared Product Bar",
       "kind": "nav",
-      "description": "A compact product bar aligned to the document column and divided by one-pixel rules.",
-      "html": "<header class=\"ds-product-bar\"><a class=\"ds-product-link\" href=\"#\">BeforeDoors</a><span class=\"ds-product-phrase\">Know before you go</span><span class=\"ds-route-label\">System status</span><button class=\"ds-theme-button\" aria-label=\"Toggle theme\"><svg viewBox=\"0 0 24 24\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"4\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"/><path d=\"M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\"/></svg></button></header>",
-      "css": ".ds-product-bar { display:flex; width:min(100%, 704px); height:56px; align-items:center; margin:0 auto; border-right:1px solid var(--border, oklch(0.922 0 0)); border-bottom:1px solid var(--border, oklch(0.922 0 0)); border-left:1px solid var(--border, oklch(0.922 0 0)); background:var(--background, oklch(1 0 0)); color:var(--foreground, oklch(0.145 0 0)); padding:0 32px; font-family:\"Inter Variable\", sans-serif; } .ds-product-link { color:inherit; font-size:14px; line-height:20px; font-weight:600; letter-spacing:-0.015em; text-decoration:none; text-underline-offset:4px; } .ds-product-link:hover { text-decoration:underline; } .ds-product-link:focus-visible { outline:2px solid var(--ring, oklch(0.708 0 0)); outline-offset:4px; } .ds-product-phrase { margin-left:12px; border-left:1px solid var(--border, oklch(0.922 0 0)); padding-left:12px; color:var(--muted-foreground, oklch(0.556 0 0)); font-size:12px; line-height:16px; } .ds-route-label { margin-right:12px; margin-left:auto; color:var(--muted-foreground, oklch(0.556 0 0)); font-size:12px; line-height:16px; font-weight:500; } .ds-theme-button { display:grid; width:32px; height:32px; place-items:center; border:1px solid var(--border, oklch(0.922 0 0)); border-radius:0; background:var(--background, oklch(1 0 0)); color:inherit; } .ds-theme-button svg { width:19.2px; height:19.2px; } .ds-theme-button:hover { background:var(--muted, oklch(0.97 0 0)); } .ds-theme-button:focus-visible { outline:none; border-color:var(--ring, oklch(0.708 0 0)); box-shadow:0 0 0 1px color-mix(in oklch, var(--ring, oklch(0.708 0 0)) 50%, transparent); } @media (max-width:639px) { .ds-product-bar { padding:0 20px; } .ds-product-phrase { display:none; } }"
+      "description": "The same 56px navigation treatment on / and /status.",
+      "html": "<header class=\"ds-product-bar\"><a href=\"/\">BeforeDoors</a><span>Know before you go</span><a href=\"/status\">System status</a><button aria-label=\"Toggle theme\"></button></header>",
+      "css": ".ds-product-bar { display:flex; height:56px; align-items:center; border-bottom:1px solid var(--app-line); background:var(--app-bg); color:var(--app-ink); padding:0 20px; font-family:\"Inter Variable\",sans-serif; }.ds-product-bar a { color:inherit; }.ds-product-bar button { width:32px; height:32px; border:1px solid var(--app-line); border-radius:0; background:transparent; color:inherit; }"
     },
     {
       "name": "Diagnostic Receipt",
       "kind": "custom",
-      "description": "The live Convex result rendered as a full-height service record with explicit scope.",
-      "html": "<article class=\"ds-receipt\"><header class=\"ds-receipt-heading\"><h2>System status</h2><p>A live connection check for the BeforeDoors development environment.</p></header><section class=\"ds-receipt-state\"><div class=\"ds-state-line\" role=\"status\" aria-live=\"polite\"><span class=\"ds-state-signal\" aria-hidden=\"true\"></span><strong>Checking</strong></div><p>Waiting for the live Convex query to respond.</p></section><dl class=\"ds-receipt-spec\"><div><dt>System</dt><dd>Convex</dd></div><div><dt>Check</dt><dd>api.healthCheck.get</dd></div><div><dt>Scope</dt><dd>Connection only</dd></div><div><dt>Current result</dt><dd>PENDING</dd></div></dl><section class=\"ds-receipt-scope\"><div><h3>What this confirms</h3><p>The client receives the expected response from the live query.</p></div><div><h3>What remains unverified</h3><p>Firecrawl, AgentMail, venue inquiries, and accessibility evidence.</p></div></section></article>",
-      "css": ".ds-receipt { display:flex; width:min(100%, 704px); min-height:640px; flex-direction:column; margin:0 auto; border-right:1px solid var(--border, oklch(0.922 0 0)); border-left:1px solid var(--border, oklch(0.922 0 0)); border-radius:0; background:var(--background, oklch(1 0 0)); color:var(--foreground, oklch(0.145 0 0)); font-family:\"Inter Variable\", sans-serif; } .ds-receipt-heading { padding:40px 32px; } .ds-receipt-heading h2 { max-width:12ch; margin:0; font-size:36px; line-height:40px; font-weight:600; letter-spacing:-0.025em; } .ds-receipt-heading p, .ds-receipt-state > p, .ds-receipt-scope p { margin:12px 0 0; color:var(--muted-foreground, oklch(0.556 0 0)); font-size:14px; line-height:24px; } .ds-receipt-state { border-top:1px solid var(--border, oklch(0.922 0 0)); border-bottom:1px solid var(--border, oklch(0.922 0 0)); padding:64px 32px; } .ds-state-line { display:flex; align-items:center; gap:16px; color:var(--status-pending, oklch(75% 0.183 55.934)); } .ds-state-signal { width:12px; height:12px; flex:none; border-radius:9999px; background:currentColor; animation:ds-pulse 2s cubic-bezier(0.4,0,0.6,1) infinite; } .ds-state-line strong { font-size:clamp(52px,13vw,96px); line-height:0.88; font-weight:600; letter-spacing:-0.04em; } .ds-receipt-state > p { max-width:48ch; margin-top:24px; color:var(--foreground, oklch(0.145 0 0)); font-size:16px; } .ds-receipt-spec { margin:0; border-bottom:1px solid var(--border, oklch(0.922 0 0)); font:400 12px/16px ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-variant-numeric:tabular-nums; } .ds-receipt-spec div { display:grid; grid-template-columns:minmax(112px, 0.8fr) minmax(0, 1.2fr); border-bottom:1px solid var(--border, oklch(0.922 0 0)); } .ds-receipt-spec div:last-child { border-bottom:0; } .ds-receipt-spec dt, .ds-receipt-spec dd { margin:0; padding:12px 32px; } .ds-receipt-spec dt { color:var(--muted-foreground, oklch(0.556 0 0)); font-weight:500; } .ds-receipt-spec dd { min-width:0; border-left:1px solid var(--border, oklch(0.922 0 0)); text-align:right; overflow-wrap:anywhere; } .ds-receipt-spec div:last-child dd { color:var(--status-pending, oklch(75% 0.183 55.934)); font-weight:600; } .ds-receipt-scope { display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:32px; padding:40px 32px; } .ds-receipt-scope h3 { margin:0; font-size:14px; line-height:20px; font-weight:500; } .ds-receipt-scope p { margin-top:8px; } @keyframes ds-pulse { 50% { opacity:0.5; } } @media (prefers-reduced-motion:reduce) { .ds-state-signal { animation:none; } } @media (max-width:639px) { .ds-receipt-heading, .ds-receipt-state, .ds-receipt-scope { padding-right:20px; padding-left:20px; } .ds-receipt-spec dt, .ds-receipt-spec dd { padding-right:20px; padding-left:20px; } .ds-receipt-scope { grid-template-columns:1fr; padding-top:32px; padding-bottom:32px; } }"
-    },
-    {
-      "name": "Tooltip",
-      "kind": "custom",
-      "refersTo": "tooltip",
-      "description": "A square inverted label for brief supplemental context.",
-      "html": "<div class=\"ds-tooltip\" role=\"tooltip\">Source last checked today</div>",
-      "css": ".ds-tooltip { display:inline-flex; max-width:320px; align-items:center; border-radius:0; background:var(--foreground, oklch(0.145 0 0)); color:var(--background, oklch(1 0 0)); padding:6px 12px; font:400 12px/16px \"Inter Variable\", sans-serif; box-shadow:var(--shadow-overlay-medium, 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)); transition:opacity 100ms cubic-bezier(0,0,0.2,1), transform 100ms cubic-bezier(0,0,0.2,1); }"
+      "description": "The live connection record rendered on the shared Trailhead surface.",
+      "html": "<article class=\"ds-status-record\"><h1>System status</h1><div role=\"status\"><strong>Connected</strong></div><dl><div><dt>System</dt><dd>Convex</dd></div></dl></article>",
+      "css": ".ds-status-record { width:min(100%,704px); min-height:100%; margin:0 auto; border-right:1px solid var(--app-line); border-left:1px solid var(--app-line); border-radius:0; background:var(--app-bg); color:var(--app-ink); }.ds-status-record section,.ds-status-record dl { border-color:var(--app-line); }.ds-status-record dt { color:var(--app-muted); }.ds-status-record dd { color:var(--app-ink); border-left:1px solid var(--app-line); }.ds-status-record [role=\"status\"] { color:var(--status-pending); }"
     },
     {
       "name": "Status Indicator",
       "kind": "custom",
-      "description": "A text-first state label with a reserved semantic color marker.",
-      "html": "<span class=\"ds-status ds-status-verified\"><span aria-hidden=\"true\"></span>Confirmed by venue</span>",
-      "css": ".ds-status { display:inline-flex; align-items:center; gap:8px; color:var(--muted-foreground, oklch(0.556 0 0)); font:400 14px/20px \"Inter Variable\", sans-serif; } .ds-status > span { width:8px; height:8px; border-radius:9999px; background:currentColor; } .ds-status-verified > span { color:var(--status-verified, oklch(72.3% 0.219 149.579)); } .ds-status-pending > span { color:var(--status-pending, oklch(75% 0.183 55.934)); } .ds-status-error > span { color:var(--status-signal, oklch(63.7% 0.237 25.331)); } .ds-status:focus-visible { outline:1px solid var(--ring, oklch(0.708 0 0)); outline-offset:2px; }"
+      "description": "A text-first state label with a reserved semantic marker.",
+      "html": "<span class=\"ds-status\"><span aria-hidden=\"true\"></span>Confirmed by venue</span>",
+      "css": ".ds-status { display:inline-flex; align-items:center; gap:8px; color:var(--app-muted); font:400 14px/20px \"Inter Variable\",sans-serif; }.ds-status > span { width:8px; height:8px; border-radius:9999px; background:currentColor; }"
     }
   ],
   "narrative": {
-    "northStar": "The Access Field Guide",
-    "overview": "BeforeDoors should feel like a practical field reference prepared before a real journey: calm, exacting, utilitarian, and candid. Its visual language favors legibility, explicit state, and compact tools over brand spectacle. Information should appear inspectable rather than persuasive, supporting the product's evidence-first trust model without implying certainty the evidence does not contain.\n\nThe incumbent reusable system is a monochrome, semantic-token interface with light and dark modes, thin structural borders, compact typography, square controls, and restrained state motion. The built diagnostic surface demonstrates this language as a full-height service record: the live state leads, an itemized specification follows, and factual scope notes close the record. New work should extend the same precise-instrument language without treating this route-specific receipt composition as a universal page template.",
+    "northStar": "The Trailhead Field Guide",
+    "overview": "BeforeDoors uses one visual world across the homepage and system status route: warm map paper, deep evergreen ink, a bright orange route signal, and precise square instruments. The homepage makes a venue URL feel like a trailhead; the status page uses the same surface and controls to make system evidence easy to inspect. Contours provide orientation while explicit text, borders, and state labels carry meaning.",
     "keyCharacteristics": [
-      "Calm, exacting, utilitarian, and candid.",
-      "Compact square controls that behave like precise instruments.",
-      "Monochrome surfaces with color reserved for explicit status meaning.",
-      "Flat structural separation through borders and rings.",
-      "Equivalent semantic hierarchy in light and dark modes."
+      "Warm contour-map paper with a deep evergreen reading voice.",
+      "Bright orange reserved for the primary route action and directional linework.",
+      "Square, one-pixel instruments with visible focus and pressed states.",
+      "Inter Variable for interface text; monospace only for diagnostic values.",
+      "Evidence-first status labels explicit in both themes."
     ],
     "rules": [
       {
-        "name": "The Status Reserve Rule",
-        "body": "Verified Green, Pending Amber, and Signal Red communicate named states only; never spend them on decoration or generic brand emphasis.",
+        "name": "The Shared Trailhead Rule",
+        "body": "Homepage and status use the same --app-* palette, contour surface, header, border, focus, and control treatment.",
+        "section": "colors"
+      },
+      {
+        "name": "The Signal Reserve Rule",
+        "body": "Green, amber, and red communicate named state only. Orange is the brand route accent.",
         "section": "colors"
       },
       {
         "name": "The Evidence Before Atmosphere Rule",
-        "body": "Neutral surfaces carry the interface so evidence, provenance, and uncertainty labels remain the visual focus.",
+        "body": "Map texture stays quiet behind content; provenance, uncertainty, and state win the contrast hierarchy.",
         "section": "colors"
       },
       {
-        "name": "The Plain Statement Rule",
-        "body": "Use type to make meaning easier to scan, not to make uncertain information sound authoritative.",
-        "section": "typography"
-      },
-      {
         "name": "The Flat-by-Default Rule",
-        "body": "If a surface is present at rest, separate it with tone or a one-pixel line; reserve shadow for something temporarily above the document.",
+        "body": "Resting surfaces use paper tone or a one-pixel line. Shadow belongs to temporary overlays.",
         "section": "elevation"
       }
     ],
     "dos": [
-      "**Do** keep evidence, provenance, confidence, and status labels explicit and readable in both themes.",
-      "**Do** use square geometry, compact type, one-pixel borders, and the established 4-pixel spacing rhythm for reusable controls.",
-      "**Do** reserve Verified Green, Pending Amber, and Signal Red for named status meaning.",
-      "**Do** use visible focus borders and rings, semantic structure, and non-color status labels.",
-      "**Do** preserve the same information hierarchy when semantic tokens invert for dark mode."
+      "Do use the shared --app-* tokens for both / and /status.",
+      "Do keep the Trailhead paper, evergreen ink, orange route, square geometry, and 56px navigation bar consistent.",
+      "Do preserve explicit status labels and use semantic colors only for named states.",
+      "Do keep focus visible, errors announced, and evidence copy readable in both themes."
     ],
     "donts": [
-      "**Don't** collapse exact diagnostic or provenance records into soft floating health cards that hide their scope.",
-      "**Don't** soften the interface into pill-heavy, oversized, promotional SaaS styling.",
-      "**Don't** use status colors as decoration or as the only carrier of meaning.",
-      "**Don't** add resting card shadows where a tonal surface or one-pixel border provides enough separation.",
-      "**Don't** use typography or visual emphasis to imply certainty beyond the evidence."
+      "Don't introduce a second route palette or revert /status to a monochrome-only shell.",
+      "Don't use orange as a proxy for Connected, Checking, Error, Unknown, or Conflicting.",
+      "Don't add resting card shadows, rounded SaaS cards, gradients, or pill-heavy controls.",
+      "Don't let contour lines reduce text contrast or hide uncertainty."
     ]
   }
 }
