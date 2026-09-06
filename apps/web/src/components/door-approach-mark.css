@@ -1,4 +1,8 @@
 .approach-mark {
+  --landing-bg: var(--app-bg);
+  --landing-ink: var(--app-ink);
+  --landing-accent: var(--app-accent);
+  --landing-accent-hover: var(--app-accent-hover);
   cursor: default;
 }
 

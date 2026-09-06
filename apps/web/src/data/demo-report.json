@@ -8,218 +8,76 @@
     "briefId": "RFF-2024-10-12",
     "version": "1.0"
   },
-  "overview": "Step-free entry and accessible parking are documented. Accessible restrooms are listed, but event-specific seating and late-night transport are not mentioned in the available sources.",
   "provenance": {
     "label": "Compiled from venue information",
     "updated": "updated 2 days ago"
   },
-  "categories": [
+  "questions": [
     {
-      "id": "plan-arrive",
-      "number": "01",
-      "name": "Plan & arrive",
-      "preview": ["Parking", "Drop-off", "Public transport"],
-      "coreLabel": "Core questions",
-      "coreQuestions": [
-        {
-          "id": "accessible-parking",
-          "label": "Accessible parking",
-          "claim": "Accessible parking is listed in venue access information.",
-          "status": "Published by venue",
-          "evidence": {
-            "source": "Demo venue access information",
-            "date": "9 October 2024",
-            "excerpt": "Accessible parking is available for visitors near the venue entrance."
-          }
-        },
-        {
-          "id": "drop-off-access",
-          "label": "Drop-off and taxi access",
-          "claim": "The location and arrangements for accessible drop-off or taxi access are not mentioned in available sources.",
-          "status": "Unknown",
-          "unknownReason": "Not mentioned in available sources"
-        },
-        {
-          "id": "public-transport",
-          "label": "Public transport",
-          "claim": "Accessible public transport routes and nearby step-free stops are not mentioned in available sources.",
-          "status": "Unknown",
-          "unknownReason": "Not mentioned in available sources"
-        }
-      ]
-    },
-    {
-      "id": "enter-move",
-      "number": "02",
-      "name": "Enter & move",
-      "preview": ["Step-free route", "Doors", "Crowding", "Seating access"],
-      "coreLabel": "Core questions",
-      "coreQuestions": [
-        {
-          "id": "step-free-route",
-          "label": "Step-free route",
-          "claim": "A continuous step-free route is available from the main entrance to the arena.",
-          "status": "Confirmed by venue",
-          "evidence": {
-            "source": "Demo venue access information",
-            "date": "9 October 2024",
-            "excerpt": "A level route is available from the west gate to the main entrance."
-          }
-        },
-        {
-          "id": "door-widths",
-          "label": "Door widths",
-          "claim": "Most public doors are at least 900mm wide.",
-          "status": "Confirmed by venue",
-          "evidence": {
-            "source": "Demo venue access information",
-            "date": "9 October 2024",
-            "excerpt": "The main public doors provide a clear opening of at least 900mm."
-          }
-        },
-        {
-          "id": "crowding",
-          "label": "Crowding",
-          "claim": "Crowding levels, queuing, and movement at peak times are not mentioned in available sources.",
-          "status": "Unknown",
-          "unknownReason": "Not mentioned in available sources"
-        },
-        {
-          "id": "seating-access",
-          "label": "Seating access",
-          "claim": "Accessibility of seating areas and companion spaces is not mentioned in available sources.",
-          "status": "Unknown",
-          "unknownReason": "Not mentioned in available sources"
-        }
-      ],
-      "additionalDetails": [
-        {
-          "id": "accessible-viewing-platform",
-          "label": "Accessible viewing platform",
-          "claim": "Mentioned in venue access information.",
-          "status": "Published by venue",
-          "evidence": {
-            "source": "Demo venue access information",
-            "date": "9 October 2024",
-            "excerpt": "An accessible viewing platform is planned in front of the Main Stage."
-          }
-        }
-      ],
-      "evidenceNote": {
+      "id": "accessible-parking",
+      "question": "Is accessible parking available?",
+      "answer": "Yes. Accessible parking is available near the venue entrance.",
+      "status": "Published by venue",
+      "evidence": {
         "source": "Demo venue access information",
         "date": "9 October 2024",
-        "excerpt": "The venue provides an accessible viewing platform in front of the Main Stage. Details about seating areas, companion spaces, and the booking process are not available for this event."
+        "excerpt": "Accessible parking is available for visitors near the venue entrance."
       }
     },
     {
-      "id": "attend-participate",
-      "number": "03",
-      "name": "Attend & participate",
-      "preview": ["Accessible viewing", "Communication access", "Sensory environment"],
-      "coreLabel": "Core questions",
-      "coreQuestions": [
-        {
-          "id": "accessible-viewing",
-          "label": "Accessible viewing",
-          "claim": "An accessible viewing platform is mentioned in venue access information.",
-          "status": "Published by venue",
-          "evidence": {
-            "source": "Demo venue access information",
-            "date": "9 October 2024",
-            "excerpt": "An accessible viewing platform is planned in front of the Main Stage."
-          }
-        },
-        {
-          "id": "communication-access",
-          "label": "Communication access",
-          "claim": "Captioning, sign-language interpretation, audio description, and assistive listening are not mentioned in available sources.",
-          "status": "Unknown",
-          "unknownReason": "Not mentioned in available sources"
-        },
-        {
-          "id": "sensory-environment",
-          "label": "Sensory environment",
-          "claim": "Quiet spaces, lighting information, and sound adjustments are not mentioned in available sources.",
-          "status": "Unknown",
-          "unknownReason": "Not mentioned in available sources"
-        }
-      ]
+      "id": "step-free-route",
+      "question": "Is there a step-free route into the venue?",
+      "answer": "Yes. A continuous level route is available from the west gate to the main entrance.",
+      "status": "Confirmed by venue",
+      "evidence": {
+        "source": "Demo venue access information",
+        "date": "9 October 2024",
+        "excerpt": "A level route is available from the west gate to the main entrance."
+      }
     },
     {
-      "id": "facilities-support",
-      "number": "04",
-      "name": "Facilities & support",
-      "preview": ["Restrooms", "Food and drink", "Staff and volunteers", "Assistance dogs"],
-      "coreLabel": "Core questions",
-      "coreQuestions": [
-        {
-          "id": "accessible-restrooms",
-          "label": "Accessible restrooms",
-          "claim": "Accessible restrooms are listed in venue information.",
-          "status": "Published by venue",
-          "evidence": {
-            "source": "Demo venue access information",
-            "date": "9 October 2024",
-            "excerpt": "Accessible toilets are available within the main arena."
-          }
-        },
-        {
-          "id": "food-drink-access",
-          "label": "Food and drink access",
-          "claim": "Accessible service points, queues, and seating for food and drink are not mentioned in available sources.",
-          "status": "Unknown",
-          "unknownReason": "Not mentioned in available sources"
-        },
-        {
-          "id": "staff-volunteers",
-          "label": "Staff and volunteers",
-          "claim": "A named accessibility contact or trained support staff is not mentioned in available sources.",
-          "status": "Unknown",
-          "unknownReason": "Not mentioned in available sources"
-        },
-        {
-          "id": "assistance-dogs",
-          "label": "Assistance dogs",
-          "claim": "Assistance dog access and relief arrangements are not mentioned in available sources.",
-          "status": "Unknown",
-          "unknownReason": "Not mentioned in available sources"
-        }
-      ]
+      "id": "door-widths",
+      "question": "Are the main public doors wide enough?",
+      "answer": "The main public doors have a clear opening of at least 900mm.",
+      "status": "Confirmed by venue",
+      "evidence": {
+        "source": "Demo venue access information",
+        "date": "9 October 2024",
+        "excerpt": "The main public doors provide a clear opening of at least 900mm."
+      }
     },
     {
-      "id": "leave-safe",
-      "number": "05",
-      "name": "Leave & stay safe",
-      "preview": ["Exits and egress", "Transport after the event", "Emergency support"],
-      "coreLabel": "Core questions",
-      "coreQuestions": [
-        {
-          "id": "step-free-egress",
-          "label": "Exits and egress",
-          "claim": "Step-free emergency exits and accessible routes out of the venue are not mentioned in available sources.",
-          "status": "Unknown",
-          "unknownReason": "Not mentioned in available sources"
-        },
-        {
-          "id": "transport-after-event",
-          "label": "Transport after the event",
-          "claim": "Accessible transport options after the event, including late-night services, are not mentioned in available sources.",
-          "status": "Unknown",
-          "unknownReason": "Not mentioned in available sources"
-        },
-        {
-          "id": "emergency-support",
-          "label": "Emergency support",
-          "claim": "Evacuation assistance and accessible assembly information are not mentioned in available sources.",
-          "status": "Unknown",
-          "unknownReason": "Not mentioned in available sources"
-        }
-      ]
+      "id": "accessible-viewing-platform",
+      "question": "Is there an accessible viewing platform?",
+      "answer": "Yes. An accessible viewing platform is planned in front of the Main Stage.",
+      "status": "Published by venue",
+      "evidence": {
+        "source": "Demo venue access information",
+        "date": "9 October 2024",
+        "excerpt": "An accessible viewing platform is planned in front of the Main Stage."
+      }
+    },
+    {
+      "id": "accessible-restrooms",
+      "question": "Are accessible restrooms available?",
+      "answer": "Yes. Accessible toilets are available within the main arena.",
+      "status": "Published by venue",
+      "evidence": {
+        "source": "Demo venue access information",
+        "date": "9 October 2024",
+        "excerpt": "Accessible toilets are available within the main arena."
+      }
+    },
+    {
+      "id": "staff-accessibility-help",
+      "question": "Can visitors ask staff for accessibility help?",
+      "answer": "Yes. Visitors can ask the event team for help at the entrance, and stewards can guide people to accessible facilities or quieter areas during the event.",
+      "status": "Published by venue",
+      "evidence": {
+        "source": "Demo venue access information",
+        "date": "9 October 2024",
+        "excerpt": "Visitors can ask the event team for help at the entrance, and stewards can guide people to accessible facilities."
+      }
     }
-  ],
-  "method": {
-    "title": "How this brief is built",
-    "description": "BeforeDoors starts with venue-published information, keeps the source and date attached to each claim, and leaves gaps visible when a source does not answer a core question.",
-    "note": "This screen is using demo JSON data. Live crawling and evidence extraction will replace this fixture in a later step."
-  }
+  ]
 }

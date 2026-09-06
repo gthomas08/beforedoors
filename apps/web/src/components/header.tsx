@@ -19,7 +19,7 @@ export default function Header({
 }: HeaderProps) {
   const maxWidthClass =
     alignment === "report"
-      ? "max-w-[80rem]"
+      ? "max-w-[88rem]"
       : alignment === "status"
         ? "max-w-[44rem]"
         : wide
@@ -49,12 +49,6 @@ export default function Header({
             className="ml-auto flex items-center gap-6 max-[680px]:gap-3"
             aria-label="Report actions"
           >
-            <a
-              href="#method"
-              className="text-xs font-semibold tracking-[0.08em] text-[var(--app-ink)] uppercase underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-[var(--app-focus)] focus-visible:outline-offset-4 max-[680px]:text-[0.65rem]"
-            >
-              Method
-            </a>
             <button
               type="button"
               className="border border-[var(--app-accent)] bg-[var(--app-accent)] px-2.5 py-1.5 text-xs font-semibold tracking-[0.08em] text-[var(--app-accent-ink)] uppercase transition-[background-color,border-color] duration-200 hover:border-[var(--app-accent-hover)] hover:bg-[var(--app-accent-hover)] focus-visible:outline-2 focus-visible:outline-[var(--app-focus)] focus-visible:outline-offset-4 max-[680px]:px-2 max-[680px]:py-1 max-[680px]:text-[0.65rem] motion-reduce:transition-none"

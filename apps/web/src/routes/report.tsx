@@ -25,8 +25,7 @@ export const Route = createFileRoute("/report")({
 });
 
 function ReportRouteComponent() {
-  const { url } = Route.useSearch();
   const { report } = Route.useLoaderData();
 
-  return <AccessibilityReportPage requestedUrl={url} report={report} />;
+  return <AccessibilityReportPage report={report} />;
 }
