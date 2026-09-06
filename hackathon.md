@@ -12,7 +12,7 @@
 - **Auth:** none
 - **AI models:** none
 - **Started:** 2026-09-02T18:35:17Z
-- **Last updated:** 2026-09-06T13:56:52Z
+- **Last updated:** 2026-09-06T21:21:37Z
 
 ## Log
 
@@ -39,3 +39,7 @@ Replaced the root diagnostic landing with a focused venue or event URL intake fo
 ### 2026-09-06 - 0890de4
 
 Added the first structured `/report` route and connected the landing URL form to it. The report reads demo JSON and presents five accessibility categories with core questions, additional findings, evidence excerpts, explicit unknown states, and contextual Method and Share controls; the shared trailhead surface and header now span the app (`apps/web/src/routes/report.tsx`, `apps/web/src/components/report-page.tsx`, `apps/web/src/data/demo-report.json`, `apps/web/src/components/header.tsx`). Convex features: the existing realtime health query remains on `/status`; no research backend or live crawler is connected yet.
+
+### 2026-09-06 - c77d68b
+
+Replaced the category-based report with a flat Q&A list showing only venue-sourced answers, compact status/source disclosure, and a provenance note. Added a sixth accessibility question to exercise longer answers and extracted the report contour artwork into its own component; the report remains demo data and the existing Convex health query remains the only backend feature (`apps/web/src/components/report-page.tsx`, `apps/web/src/data/demo-report.json`, `apps/web/src/components/report-contour-lines.tsx`, `apps/web/src/routes/report.tsx`). Convex features: realtime query; no research backend or live crawler is connected yet.
