@@ -2,7 +2,7 @@
 
 - **Project:** BeforeDoors
 - **Event:** Convex All Gas Hackathon
-- **What it does:** A web app where someone pastes a venue or event URL to begin an evidence-based accessibility brief, with a separate live Convex status view.
+- **What it does:** A web app where someone pastes a venue or event URL and reviews a structured, evidence-first accessibility brief, with a separate live Convex status view.
 - **Live app:** not deployed
 - **Repo:** https://github.com/gthomas08/beforedoors
 - **Frontend:** not deployed
@@ -12,7 +12,7 @@
 - **Auth:** none
 - **AI models:** none
 - **Started:** 2026-09-02T18:35:17Z
-- **Last updated:** 2026-09-05T18:01:40Z
+- **Last updated:** 2026-09-06T13:56:52Z
 
 ## Log
 
@@ -35,3 +35,7 @@ Rebranded the status page as BeforeDoors and documented the product and Access F
 ### 2026-09-05 - 2a4f628
 
 Replaced the root diagnostic landing with a focused venue or event URL intake form using TanStack Form. Moved the live Convex health status to `/status`, added the D1B Trailhead visual system with warm paper, contour lines, evergreen ink, and a bright orange route, and centralized the shared light/dark tokens so both routes use the same theme (`apps/web/src/routes/index.tsx`, `apps/web/src/routes/status.tsx`, `apps/web/src/styles.css`, `DESIGN.md`). Valid URL submission is still a native confirmation placeholder; no research mutation exists yet. Convex features: realtime query.
+
+### 2026-09-06 - 0890de4
+
+Added the first structured `/report` route and connected the landing URL form to it. The report reads demo JSON and presents five accessibility categories with core questions, additional findings, evidence excerpts, explicit unknown states, and contextual Method and Share controls; the shared trailhead surface and header now span the app (`apps/web/src/routes/report.tsx`, `apps/web/src/components/report-page.tsx`, `apps/web/src/data/demo-report.json`, `apps/web/src/components/header.tsx`). Convex features: the existing realtime health query remains on `/status`; no research backend or live crawler is connected yet.
