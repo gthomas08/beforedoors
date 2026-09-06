@@ -4,6 +4,7 @@ import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import { useQuery } from "convex/react";
 
 import Header from "@/components/header";
+import { TrailheadSurface } from "@/components/trailhead-surface";
 
 export const Route = createFileRoute("/status")({
   component: StatusComponent,
@@ -57,10 +58,11 @@ function StatusComponent() {
 
   return (
     <>
-      <div className="status-shell grid h-svh grid-rows-[auto_1fr] overflow-hidden">
-        <Header landing wide />
-        <main className="status-stage trailhead-surface min-h-0 overflow-y-auto px-5 sm:px-8">
-          <article className="status-record relative z-10 mx-auto flex min-h-full w-full max-w-[44rem] flex-col border-x border-[var(--app-line)] bg-[var(--app-bg)]">
+      <div className="grid h-svh grid-rows-[auto_1fr] overflow-hidden bg-[var(--app-bg)] text-[var(--app-ink)]">
+        <Header alignment="status" />
+        <main className="relative min-h-0 overflow-y-auto bg-[var(--app-bg)] px-5 sm:px-8">
+          <TrailheadSurface />
+          <article className="relative z-10 mx-auto flex min-h-full w-full max-w-[44rem] flex-col border-x border-[var(--app-line)] bg-[var(--app-bg)]">
             <header className="px-5 py-8 sm:px-8 sm:py-10">
               <h1 className="max-w-[12ch] text-balance text-3xl font-semibold tracking-[-0.025em] sm:text-4xl">
                 System status

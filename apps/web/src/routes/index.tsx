@@ -1,8 +1,10 @@
 import Header from "@/components/header";
+import { DoorApproachMark } from "@/components/door-approach-mark";
+import { TrailheadSurface } from "@/components/trailhead-surface";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useForm } from "@tanstack/react-form";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { ArrowRight } from "lucide-react";
 
 export const Route = createFileRoute("/")({
@@ -40,85 +42,54 @@ function validateVenueUrl(value: string) {
   return undefined;
 }
 
-function TrailheadMark() {
-  return (
-    <svg
-      aria-hidden="true"
-      className="h-full w-full"
-      fill="none"
-      viewBox="0 0 96 88"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <path
-        d="M25 74V14h46v60"
-        stroke="currentColor"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth="4"
-      />
-      <path
-        d="m25 14 16 10v50"
-        stroke="currentColor"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth="4"
-      />
-      <path d="M41 24h30" stroke="currentColor" strokeLinecap="round" strokeWidth="4" />
-      <circle cx="57" cy="51" r="4.5" stroke="currentColor" strokeWidth="3.5" />
-      <path
-        d="M57 57v9m0-5 8 3m-8 2-6 8m6-8 8 8m-13-8h-7"
-        stroke="currentColor"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth="3.5"
-      />
-      <path d="M20 74h56" stroke="currentColor" strokeLinecap="round" strokeWidth="4" />
-    </svg>
-  );
-}
-
 function HomeComponent() {
+  const navigate = useNavigate();
+
   const form = useForm({
     defaultValues: {
       venueUrl: "",
     },
-    onSubmit: ({ value }) => {
-      window.alert(`Thanks — we'll check ${value.venueUrl.trim()}.`);
+    onSubmit: async ({ value }) => {
+      await navigate({
+        to: "/report",
+        search: {
+          url: value.venueUrl.trim(),
+        },
+      });
     },
   });
 
   return (
-    <div className="landing-shell grid h-svh grid-rows-[auto_1fr] overflow-hidden">
-      <Header landing linkToStatus wide />
+    <div className="grid h-svh grid-rows-[auto_1fr] overflow-hidden bg-[var(--app-bg)] text-[var(--app-ink)]">
+      <Header linkToStatus wide />
 
-      <main className="landing-stage trailhead-surface relative min-h-0 overflow-hidden px-5 sm:px-8">
-        <div className="relative z-10 mx-auto flex h-full w-full max-w-5xl items-center justify-center border-x border-[var(--landing-line)] px-5 sm:px-10 lg:px-16">
+      <main className="relative min-h-0 overflow-hidden bg-[var(--app-bg)] px-5 sm:px-8">
+        <TrailheadSurface />
+        <div className="relative z-10 mx-auto flex h-full w-full max-w-5xl items-center justify-center border-x border-[var(--app-line)] px-5 sm:px-10 lg:px-16">
           <section
             aria-labelledby="landing-title"
-            className="landing-hero flex w-full max-w-3xl flex-col items-center py-8 text-center sm:py-10"
+            className="flex w-full max-w-3xl -translate-y-[clamp(1.5rem,7vh,3.25rem)] flex-col items-center py-8 text-center sm:py-10"
           >
-            <div className="landing-mark mb-5 flex size-16 items-center justify-center text-[var(--landing-ink)] sm:mb-6 sm:size-[4.5rem]">
-              <TrailheadMark />
-            </div>
+            <DoorApproachMark />
 
             <h1
               id="landing-title"
-              className="max-w-none whitespace-nowrap text-balance text-[clamp(2rem,7vw,5rem)] leading-[0.9] font-semibold tracking-[-0.04em] text-[var(--landing-ink)]"
+              className="max-w-none whitespace-nowrap text-balance text-[clamp(2rem,7vw,5rem)] leading-[0.9] font-semibold tracking-[-0.04em] text-[var(--app-ink)]"
             >
               Know before you go.
             </h1>
 
-            <p className="mt-4 text-xs font-semibold uppercase tracking-[0.22em] text-[var(--landing-muted)] sm:text-sm">
+            <p className="mt-4 text-xs font-semibold uppercase tracking-[0.22em] text-[var(--app-muted)] sm:text-sm">
               Know access · go with confidence
             </p>
 
-            <p className="mt-5 max-w-[46ch] text-base leading-7 text-[var(--landing-muted)] sm:text-lg sm:leading-8">
+            <p className="mt-5 max-w-[46ch] text-base leading-7 text-[var(--app-muted)] sm:text-lg sm:leading-8">
               Enter a venue or event link to see what its published access information can tell you
               before you go.
             </p>
 
             <form
-              className="landing-url-form mt-8 w-full max-w-3xl sm:mt-10"
+              className="mt-8 w-full max-w-3xl sm:mt-10"
               onSubmit={(event) => {
                 event.preventDefault();
                 event.stopPropagation();
@@ -140,12 +111,12 @@ function HomeComponent() {
                     <div>
                       <label
                         htmlFor={field.name}
-                        className="mb-2 block text-left text-xs font-semibold uppercase tracking-[0.14em] text-[var(--landing-ink)]"
+                        className="mb-2 block text-left text-xs font-semibold uppercase tracking-[0.14em] text-[var(--app-ink)]"
                       >
                         Venue or event URL
                       </label>
 
-                      <div className="grid border border-[var(--landing-field-border)] bg-[var(--landing-field)] transition-[border-color,box-shadow] duration-300 focus-within:border-[var(--landing-focus)] focus-within:ring-2 focus-within:ring-[var(--landing-focus)]/30 sm:grid-cols-[1fr_auto]">
+                      <div className="grid border border-[var(--app-field-border)] bg-[var(--app-field)] transition-[border-color,box-shadow] duration-300 focus-within:border-[var(--app-focus)] focus-within:ring-2 focus-within:ring-[var(--app-focus)]/30 sm:grid-cols-[1fr_auto] motion-reduce:transition-none">
                         <Input
                           id={field.name}
                           name={field.name}
@@ -158,7 +129,7 @@ function HomeComponent() {
                           placeholder="https://venue.com/event"
                           aria-invalid={Boolean(error)}
                           aria-describedby={`${field.name}-${error ? "error" : "hint"}`}
-                          className="h-14 border-0 bg-transparent px-4 text-lg text-[var(--landing-field-ink)] shadow-none caret-[var(--landing-accent)] placeholder:text-[var(--landing-field-placeholder)] focus-visible:ring-0 sm:h-16 sm:px-5 sm:text-lg dark:bg-transparent"
+                          className="h-14 border-0 bg-transparent px-4 text-lg text-[var(--app-field-ink)] shadow-none caret-[var(--app-accent)] placeholder:text-[var(--app-field-placeholder)] focus-visible:ring-0 sm:h-16 sm:px-5 sm:text-lg dark:bg-transparent"
                         />
 
                         <form.Subscribe selector={(state) => state.isSubmitting}>
@@ -166,7 +137,7 @@ function HomeComponent() {
                             <Button
                               type="submit"
                               disabled={isSubmitting}
-                              className="group h-14 justify-between border-t border-[var(--landing-field-border)] bg-[var(--landing-accent)] px-4 text-sm text-[var(--landing-accent-ink)] hover:bg-[var(--landing-accent-hover)] sm:h-16 sm:min-w-44 sm:border-t-0 sm:border-l sm:px-5"
+                              className="group h-14 justify-between border-t border-[var(--app-field-border)] bg-[var(--app-accent)] px-4 text-sm text-[var(--app-accent-ink)] hover:bg-[var(--app-accent-hover)] sm:h-16 sm:min-w-44 sm:border-t-0 sm:border-l sm:px-5"
                             >
                               {isSubmitting ? "Checking…" : "See what’s ahead"}
                               <ArrowRight
@@ -184,7 +155,7 @@ function HomeComponent() {
                             {String(error)}
                           </p>
                         ) : (
-                          <p id={`${field.name}-hint`} className="text-[var(--landing-muted)]">
+                          <p id={`${field.name}-hint`} className="text-[var(--app-muted)]">
                             We’ll begin with the venue’s own published information.
                           </p>
                         )}
