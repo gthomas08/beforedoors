@@ -61,7 +61,7 @@ function HomeComponent() {
 
   return (
     <div className="grid h-svh grid-rows-[auto_1fr] overflow-hidden bg-[var(--app-bg)] text-[var(--app-ink)]">
-      <Header linkToStatus wide />
+      <Header linkToStatus linkToReports wide />
 
       <main className="relative min-h-0 overflow-hidden bg-[var(--app-bg)] px-5 sm:px-8">
         <TrailheadSurface />
