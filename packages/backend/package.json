@@ -9,7 +9,10 @@
     "dev:setup": "convex dev --configure --until-success"
   },
   "dependencies": {
+    "@firecrawl/firecrawl-convex": "^0.1.1",
+    "better-result": "^3.0.1",
     "convex": "catalog:",
+    "convex-helpers": "^0.1.124",
     "dotenv": "catalog:",
     "zod": "catalog:"
   },
