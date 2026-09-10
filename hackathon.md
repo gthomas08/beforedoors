@@ -2,17 +2,17 @@
 
 - **Project:** BeforeDoors
 - **Event:** Convex All Gas Hackathon
-- **What it does:** A web app where someone pastes a venue or event URL and reviews a structured, evidence-first accessibility brief, with a separate live Convex status view.
+- **What it does:** A web app where someone pastes a venue or event URL and reviews a structured, evidence-first accessibility brief; its Convex backend maps relevant pages and extracts sourced accessibility Q&A.
 - **Live app:** not deployed
 - **Repo:** https://github.com/gthomas08/beforedoors
 - **Frontend:** not deployed
 - **Convex deployment:** not deployed
 - **Components:** none
-- **Convex features:** schema, queries, realtime queries
+- **Convex features:** schema, tables, queries, mutations, actions, scheduled functions, realtime queries
 - **Auth:** none
 - **AI models:** none
 - **Started:** 2026-09-02T18:35:17Z
-- **Last updated:** 2026-09-06T21:21:37Z
+- **Last updated:** 2026-09-10T21:17:52Z
 
 ## Log
 
@@ -43,3 +43,11 @@ Added the first structured `/report` route and connected the landing URL form to
 ### 2026-09-06 - c77d68b
 
 Replaced the category-based report with a flat Q&A list showing only venue-sourced answers, compact status/source disclosure, and a provenance note. Added a sixth accessibility question to exercise longer answers and extracted the report contour artwork into its own component; the report remains demo data and the existing Convex health query remains the only backend feature (`apps/web/src/components/report-page.tsx`, `apps/web/src/data/demo-report.json`, `apps/web/src/components/report-contour-lines.tsx`, `apps/web/src/routes/report.tsx`). Convex features: realtime query; no research backend or live crawler is connected yet.
+
+### 2026-09-09 - 1167107
+
+Added a responsive `/reports` index for saved accessibility briefs, with evidence summaries, provenance metadata, and navigation into individual reports. The page remains backed by demo data while the live report workflow is developed (`apps/web/src/components/reports-page.tsx`, `apps/web/src/routes/reports.tsx`, `apps/web/src/components/header.tsx`).
+
+### 2026-09-10 - d0404cf
+
+Added the backend MVP for generating accessibility reports. `startReport` creates a report and schedules `runReport`, which maps up to 100 URLs, ranks accessibility-related pages, scrapes up to five pages, extracts up to 10 sourced Q&A pairs with Zod, and records progress and failures (`packages/backend/convex/reports.ts`, `packages/backend/convex/schema.ts`). Registered the Firecrawl Convex integration with typed API-key configuration (`packages/backend/convex/convex.config.ts`). Convex features: schema, table, query, mutation, action, scheduled function.
