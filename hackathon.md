@@ -2,17 +2,17 @@
 
 - **Project:** BeforeDoors
 - **Event:** Convex All Gas Hackathon
-- **What it does:** A web app where someone pastes a venue or event URL and reviews a structured, evidence-first accessibility brief; its Convex backend maps relevant pages and extracts sourced accessibility Q&A.
+- **What it does:** A web app where someone submits a venue URL, follows Convex research progress, and reviews sourced accessibility Q&A saved with the venue. The backend maps relevant pages and extracts the answers through Firecrawl.
 - **Live app:** not deployed
 - **Repo:** https://github.com/gthomas08/beforedoors
 - **Frontend:** not deployed
 - **Convex deployment:** not deployed
-- **Components:** none
-- **Convex features:** schema, tables, queries, mutations, actions, scheduled functions, realtime queries
+- **Components:** @firecrawl/firecrawl-convex
+- **Convex features:** component, schema, tables, indexes, queries, mutations, actions, scheduled functions, realtime queries, paginated queries
 - **Auth:** none
 - **AI models:** none
 - **Started:** 2026-09-02T18:35:17Z
-- **Last updated:** 2026-09-10T21:17:52Z
+- **Last updated:** 2026-09-12T16:49:01Z
 
 ## Log
 
@@ -51,3 +51,7 @@ Added a responsive `/reports` index for saved accessibility briefs, with evidenc
 ### 2026-09-10 - d0404cf
 
 Added the backend MVP for generating accessibility reports. `startReport` creates a report and schedules `runReport`, which maps up to 100 URLs, ranks accessibility-related pages, scrapes up to five pages, extracts up to 10 sourced Q&A pairs with Zod, and records progress and failures (`packages/backend/convex/reports.ts`, `packages/backend/convex/schema.ts`). Registered the Firecrawl Convex integration with typed API-key configuration (`packages/backend/convex/convex.config.ts`). Convex features: schema, table, query, mutation, action, scheduled function.
+
+### 2026-09-12 - a38bf06
+
+Connected venue research to the Convex backend. Submitting a URL starts a report; `/report` displays queued, mapping, and scraping progress before showing the saved venue Q&A. Reports are saved as URL-keyed venues, with public lookup by URL and a paginated venue list. Report limits can be configured with `REPORT_*` environment variables and retain their existing defaults. Registered the Firecrawl Convex component and added a reusable pagination helper (`packages/backend/convex/reports.ts`, `packages/backend/convex/venues.ts`, `packages/backend/convex/lib/pagination.ts`, `packages/backend/convex/convex.config.ts`, `apps/web/src/routes/index.tsx`, `apps/web/src/routes/report.tsx`, `apps/web/src/routes/venues.tsx`). Convex features: component, tables, indexes, queries, mutations, actions, scheduled functions, realtime queries, paginated queries.
