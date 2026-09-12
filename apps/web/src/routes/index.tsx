@@ -1,3 +1,4 @@
+import { api } from "@my-better-t-app/backend/convex/_generated/api";
 import Header from "@/components/header";
 import { DoorApproachMark } from "@/components/door-approach-mark";
 import { TrailheadSurface } from "@/components/trailhead-surface";
@@ -5,7 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useForm } from "@tanstack/react-form";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useMutation } from "convex/react";
 import { ArrowRight } from "lucide-react";
+import { useState } from "react";
 
 export const Route = createFileRoute("/")({
   component: HomeComponent,
@@ -44,24 +47,33 @@ function validateVenueUrl(value: string) {
 
 function HomeComponent() {
   const navigate = useNavigate();
+  const startReport = useMutation(api.reports.startReport);
+  const [submitError, setSubmitError] = useState<string | undefined>();
 
   const form = useForm({
     defaultValues: {
       venueUrl: "",
     },
     onSubmit: async ({ value }) => {
-      await navigate({
-        to: "/report",
-        search: {
-          url: value.venueUrl.trim(),
-        },
-      });
+      setSubmitError(undefined);
+
+      try {
+        const url = value.venueUrl.trim();
+        const { reportId } = await startReport({ url });
+
+        await navigate({
+          to: "/report",
+          search: { url, reportId },
+        });
+      } catch {
+        setSubmitError("We couldn’t start research for that link. Please try again.");
+      }
     },
   });
 
   return (
     <div className="grid h-svh grid-rows-[auto_1fr] overflow-hidden bg-[var(--app-bg)] text-[var(--app-ink)]">
-      <Header linkToStatus linkToReports wide />
+      <Header linkToStatus linkToVenues wide />
 
       <main className="relative min-h-0 overflow-hidden bg-[var(--app-bg)] px-5 sm:px-8">
         <TrailheadSurface />
@@ -105,7 +117,10 @@ function HomeComponent() {
                 }}
               >
                 {(field) => {
-                  const error = field.state.meta.isTouched ? field.state.meta.errors[0] : undefined;
+                  const validationError = field.state.meta.isTouched
+                    ? field.state.meta.errors[0]
+                    : undefined;
+                  const error = validationError ?? submitError;
 
                   return (
                     <div>

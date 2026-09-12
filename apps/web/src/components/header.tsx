@@ -5,16 +5,16 @@ import { ModeToggle } from "./mode-toggle";
 interface HeaderProps {
   alignment?: "landing" | "report" | "status";
   linkToStatus?: boolean;
-  linkToReports?: boolean;
+  linkToVenues?: boolean;
   wide?: boolean;
-  variant?: "default" | "report" | "reports";
+  variant?: "default" | "report" | "venues";
   onShare?: () => void;
 }
 
 export default function Header({
   alignment = "landing",
   linkToStatus = false,
-  linkToReports = false,
+  linkToVenues = false,
   wide = false,
   variant = "default",
   onShare,
@@ -52,10 +52,10 @@ export default function Header({
             aria-label="Report actions"
           >
             <Link
-              to="/reports"
+              to="/venues"
               className="text-xs font-medium text-[var(--app-muted)] underline-offset-4 hover:text-[var(--app-ink)] focus-visible:outline-2 focus-visible:outline-[var(--app-focus)] focus-visible:outline-offset-4"
             >
-              All reports
+              All venues
             </Link>
             <button
               type="button"
@@ -65,33 +65,33 @@ export default function Header({
               Share this brief
             </button>
           </nav>
-        ) : variant === "reports" ? (
-          <nav className="ml-auto flex items-center gap-4" aria-label="Reports navigation">
+        ) : variant === "venues" ? (
+          <nav className="ml-auto flex items-center gap-4" aria-label="Venues navigation">
             <span className="font-mono text-[0.68rem] font-semibold tracking-[0.12em] text-[var(--app-accent-hover)] uppercase">
-              Reports
+              Venues
             </span>
             <ModeToggle />
           </nav>
         ) : (
           <>
-            {linkToReports ? (
+            {linkToVenues ? (
               <Link
-                to="/reports"
+                to="/venues"
                 className="ml-auto mr-3 text-xs font-medium text-[var(--app-muted)] underline-offset-4 hover:text-[var(--app-ink)] focus-visible:outline-2 focus-visible:outline-[var(--app-focus)] focus-visible:outline-offset-4"
               >
-                Reports
+                Venues
               </Link>
             ) : null}
             {linkToStatus ? (
               <Link
                 to="/status"
-                className={`${linkToReports ? "" : "ml-auto "}mr-3 text-xs font-medium text-[var(--app-muted)] underline-offset-4 hover:text-[var(--app-ink)] focus-visible:outline-2 focus-visible:outline-[var(--app-focus)] focus-visible:outline-offset-4`}
+                className={`${linkToVenues ? "" : "ml-auto "}mr-3 text-xs font-medium text-[var(--app-muted)] underline-offset-4 hover:text-[var(--app-ink)] focus-visible:outline-2 focus-visible:outline-[var(--app-focus)] focus-visible:outline-offset-4`}
               >
                 System status
               </Link>
             ) : (
               <span
-                className={`${linkToReports ? "" : "ml-auto "}mr-3 text-xs font-medium text-[var(--app-muted)]`}
+                className={`${linkToVenues ? "" : "ml-auto "}mr-3 text-xs font-medium text-[var(--app-muted)]`}
               >
                 System status
               </span>

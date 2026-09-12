@@ -4,7 +4,7 @@ import { zid } from "convex-helpers/server/zod4";
 import { v } from "convex/values";
 import { z } from "zod";
 import { internal } from "./_generated/api";
-import { internalAction, internalMutation } from "./_generated/server";
+import { env, internalAction, internalMutation } from "./_generated/server";
 import { publicMutation, publicQuery } from "./lib/customFunctions";
 import { firecrawl } from "./lib/firecrawl";
 
@@ -17,6 +17,7 @@ export const getReportStatus = publicQuery({
       _id: zid("reports"),
       _creationTime: z.number(),
       url: z.string(),
+      name: z.string(),
       phase: z.enum(["queued", "mapping", "scraping", "completed", "failed"]),
       mappedUrls: z.array(
         z.object({
@@ -45,7 +46,7 @@ export const getReportStatus = publicQuery({
       error: z.string().optional(),
     })
     .nullable(),
-  handler: (ctx, args) => ctx.db.get(args.reportId),
+  handler: (ctx, args) => ctx.db.get("reports", args.reportId),
 });
 
 export const startReport = publicMutation({
@@ -54,6 +55,7 @@ export const startReport = publicMutation({
   handler: async (ctx, args) => {
     const reportId = await ctx.db.insert("reports", {
       url: args.url,
+      name: "",
       phase: "queued",
       mappedUrls: [],
       scrapes: [],
@@ -89,7 +91,7 @@ export const setReportPhase = internalMutation({
   },
   returns: v.null(),
   handler: async (ctx, args) => {
-    const report = await ctx.db.get(args.reportId);
+    const report = await ctx.db.get("reports", args.reportId);
     if (report === null) return null;
 
     await ctx.db.patch(
@@ -120,14 +122,14 @@ export const setReportMappedUrls = internalMutation({
   },
   returns: v.null(),
   handler: async (ctx, args) => {
-    const report = await ctx.db.get(args.reportId);
+    const report = await ctx.db.get("reports", args.reportId);
     if (report === null) return null;
 
     await ctx.db.patch(args.reportId, {
       mappedUrls: args.mappedUrls,
       scrapes: args.scrapes,
       totalScrapes: args.scrapes.length,
-      phase: args.scrapes.length === 0 ? "completed" : "scraping",
+      phase: "scraping",
       finishedScrapes: 0,
       results: [],
     });
@@ -139,6 +141,8 @@ export const recordReportScrape = internalMutation({
   args: {
     reportId: v.id("reports"),
     url: v.string(),
+    name: v.string(),
+    maxTotalResults: v.number(),
     results: v.array(
       v.object({
         question: v.string(),
@@ -150,7 +154,7 @@ export const recordReportScrape = internalMutation({
   },
   returns: v.null(),
   handler: async (ctx, args) => {
-    const report = await ctx.db.get(args.reportId);
+    const report = await ctx.db.get("reports", args.reportId);
     if (report === null) return null;
 
     const scrape = report.scrapes.find((item) => item.url === args.url);
@@ -169,7 +173,9 @@ export const recordReportScrape = internalMutation({
       (item) => item.phase === "completed" || item.phase === "failed",
     ).length;
     const results =
-      args.error === undefined ? [...report.results, ...args.results].slice(0, 10) : report.results;
+      args.error === undefined
+        ? [...report.results, ...args.results].slice(0, args.maxTotalResults)
+        : report.results;
     const allFinished = finishedScrapes === scrapes.length;
     const hasSuccess = scrapes.some((item) => item.phase === "completed");
 
@@ -177,10 +183,9 @@ export const recordReportScrape = internalMutation({
       scrapes,
       finishedScrapes,
       results,
-      ...(allFinished
-        ? hasSuccess
-          ? { phase: "completed" as const }
-          : { phase: "failed" as const, error: "All page scrapes failed" }
+      ...(report.name === "" && args.name !== "" ? { name: args.name } : {}),
+      ...(allFinished && !hasSuccess
+        ? { phase: "failed" as const, error: "All page scrapes failed" }
         : {}),
     });
     return null;
@@ -194,8 +199,15 @@ export const runReport = internalAction({
   },
   returns: v.null(),
   handler: async (ctx, args) => {
+    const limits = getReportLimits();
+    let selectedUrlCount = 0;
+    let hasSuccessfulScrape = false;
+
     const reportResult = await Result.tryPromise({
       try: async () => {
+        const resultSchema = accessibilityQaResultSchema(limits.maxResultsPerPage);
+        const prompt = accessibilityQaPrompt(limits.maxResultsPerPage);
+
         // Mark the report as mapping before contacting Firecrawl.
         await ctx.runMutation(internal.reports.setReportPhase, {
           reportId: args.reportId,
@@ -203,9 +215,10 @@ export const runReport = internalAction({
         });
 
         // Map candidate pages and rank them by accessibility relevance.
-        const mapResult = await firecrawl.map(ctx, args.url, { limit: MAX_MAPPED_URLS });
-        const mappedUrls = rankLinks(mapResult.links);
-        const selectedUrls = mappedUrls.slice(0, 5);
+        const mapResult = await firecrawl.map(ctx, args.url, { limit: limits.maxMappedUrls });
+        const mappedUrls = rankLinks(mapResult.links, limits.maxMappedUrls);
+        const selectedUrls = mappedUrls.slice(0, limits.maxPagesToScrape);
+        selectedUrlCount = selectedUrls.length;
 
         // Initialize progress tracking for the selected pages.
         await ctx.runMutation(internal.reports.setReportMappedUrls, {
@@ -226,8 +239,8 @@ export const runReport = internalAction({
                 formats: [
                   {
                     type: "json",
-                    prompt: ACCESSIBILITY_QA_PROMPT,
-                    schema: z.toJSONSchema(ACCESSIBILITY_QA_RESULT_SCHEMA, {
+                    prompt,
+                    schema: z.toJSONSchema(resultSchema, {
                       target: "openapi-3.0",
                     }),
                   },
@@ -240,19 +253,27 @@ export const runReport = internalAction({
             await ctx.runMutation(internal.reports.recordReportScrape, {
               reportId: args.reportId,
               url: link.url,
+              name: "",
+              maxTotalResults: limits.maxTotalResults,
               results: [],
               error: scrapeResult.error,
             });
             continue;
           }
 
+          hasSuccessfulScrape = true;
+          const extracted = extractScrape(
+            scrapeResult.value.json,
+            scrapeResult.value.metadata?.sourceURL ?? link.url,
+            limits.maxResultsPerPage,
+          );
+
           await ctx.runMutation(internal.reports.recordReportScrape, {
             reportId: args.reportId,
             url: link.url,
-            results: extractQuestions(
-              scrapeResult.value.json,
-              scrapeResult.value.metadata?.sourceURL ?? link.url,
-            ),
+            name: extracted.name,
+            maxTotalResults: limits.maxTotalResults,
+            results: extracted.results,
           });
         }
 
@@ -270,6 +291,33 @@ export const runReport = internalAction({
       });
     }
 
+    // Save the venue snapshot before marking the report completed for subscribers.
+    const saveResult = await Result.tryPromise({
+      try: () =>
+        ctx.runMutation(internal.venues.saveReportToVenues, {
+          reportId: args.reportId,
+        }),
+      catch: getErrorMessage,
+    });
+
+    if (saveResult.isErr()) {
+      if (reportResult.isOk()) {
+        await ctx.runMutation(internal.reports.setReportPhase, {
+          reportId: args.reportId,
+          phase: "failed",
+          error: saveResult.error,
+        });
+      }
+      return null;
+    }
+
+    if (reportResult.isOk() && (selectedUrlCount === 0 || hasSuccessfulScrape)) {
+      await ctx.runMutation(internal.reports.setReportPhase, {
+        reportId: args.reportId,
+        phase: "completed",
+      });
+    }
+
     return null;
   },
 });
@@ -278,7 +326,12 @@ export const runReport = internalAction({
 
 //#region Utils
 
-const MAX_MAPPED_URLS = 100;
+const DEFAULT_REPORT_LIMITS = {
+  maxMappedUrls: 100,
+  maxPagesToScrape: 5,
+  maxResultsPerPage: 10,
+  maxTotalResults: 10,
+};
 
 const ACCESSIBILITY_KEYWORDS = [
   "accessibility",
@@ -306,26 +359,31 @@ const ACCESSIBILITY_KEYWORDS = [
   "accessible seating",
 ];
 
-const ACCESSIBILITY_QA_PROMPT = `Extract accessibility-related questions and answers from this webpage.
+function accessibilityQaPrompt(maxResultsPerPage: number) {
+  return `Extract the venue's name and accessibility-related questions and answers from this webpage.
 
-Only include information explicitly supported by the page. Do not invent or infer answers.
+Use the venue name explicitly shown on the page. Return an empty string if the page does not identify it. Do not invent or infer answers.
 Focus on practical accessibility information for visitors, attendees, or users.
-Return at most 10 concise question-and-answer pairs. If there are no relevant pairs, return an empty questions array.`;
+Return at most ${maxResultsPerPage} concise question-and-answer pairs. If there are no relevant pairs, return an empty questions array.`;
+}
 
-const ACCESSIBILITY_QA_RESULT_SCHEMA = z
-  .object({
-    questions: z
-      .array(
-        z
-          .object({
-            question: z.string().trim().min(1),
-            answer: z.string().trim().min(1),
-          })
-          .strict(),
-      )
-      .max(10),
-  })
-  .strict();
+function accessibilityQaResultSchema(maxResultsPerPage: number) {
+  return z
+    .object({
+      name: z.string(),
+      questions: z
+        .array(
+          z
+            .object({
+              question: z.string().trim().min(1),
+              answer: z.string().trim().min(1),
+            })
+            .strict(),
+        )
+        .max(maxResultsPerPage),
+    })
+    .strict();
+}
 
 type RankedLink = {
   url: string;
@@ -340,9 +398,27 @@ type ExtractedResult = {
   url: string;
 };
 
-function rankLinks(links: MapLink[]): RankedLink[] {
+type ExtractedScrape = {
+  name: string;
+  results: ExtractedResult[];
+};
+
+function getReportLimits() {
+  return {
+    maxMappedUrls: Number(env.REPORT_MAX_MAPPED_URLS ?? DEFAULT_REPORT_LIMITS.maxMappedUrls),
+    maxPagesToScrape: Number(
+      env.REPORT_MAX_PAGES_TO_SCRAPE ?? DEFAULT_REPORT_LIMITS.maxPagesToScrape,
+    ),
+    maxResultsPerPage: Number(
+      env.REPORT_MAX_RESULTS_PER_PAGE ?? DEFAULT_REPORT_LIMITS.maxResultsPerPage,
+    ),
+    maxTotalResults: Number(env.REPORT_MAX_TOTAL_RESULTS ?? DEFAULT_REPORT_LIMITS.maxTotalResults),
+  };
+}
+
+function rankLinks(links: MapLink[], maxMappedUrls: number): RankedLink[] {
   return links
-    .slice(0, MAX_MAPPED_URLS)
+    .slice(0, maxMappedUrls)
     .map((link, index) => {
       const searchableText = [link.url, link.title, link.description]
         .filter((value): value is string => Boolean(value))
@@ -369,11 +445,14 @@ function getErrorMessage(error: unknown): string {
   return error instanceof Error ? error.message : String(error);
 }
 
-function extractQuestions(json: unknown, url: string): ExtractedResult[] {
-  const parsed = ACCESSIBILITY_QA_RESULT_SCHEMA.safeParse(json);
-  if (!parsed.success) return [];
+function extractScrape(json: unknown, url: string, maxResultsPerPage: number): ExtractedScrape {
+  const parsed = accessibilityQaResultSchema(maxResultsPerPage).safeParse(json);
+  if (!parsed.success) return { name: "", results: [] };
 
-  return parsed.data.questions.map(({ question, answer }) => ({ question, answer, url }));
+  return {
+    name: parsed.data.name.trim(),
+    results: parsed.data.questions.map(({ question, answer }) => ({ question, answer, url })),
+  };
 }
 
 //#endregion Utils

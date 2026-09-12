@@ -4,7 +4,7 @@
   "categories": {
     "correctness": "error"
   },
-  "ignorePatterns": [".agents/**"],
+  "ignorePatterns": [".agents/**", "packages/backend/convex/_generated/**"],
   "rules": {},
   "env": {
     "builtin": true

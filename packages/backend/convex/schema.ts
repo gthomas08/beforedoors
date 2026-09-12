@@ -4,6 +4,7 @@ import { v } from "convex/values";
 export default defineSchema({
   reports: defineTable({
     url: v.string(),
+    name: v.string(),
     phase: v.union(
       v.literal("queued"),
       v.literal("mapping"),
@@ -37,4 +38,17 @@ export default defineSchema({
     ),
     error: v.optional(v.string()),
   }),
+  venues: defineTable({
+    url: v.string(),
+    name: v.string(),
+    updatedAt: v.number(),
+    results: v.array(
+      v.object({
+        question: v.string(),
+        answer: v.string(),
+        url: v.string(),
+        status: v.union(v.literal("published"), v.literal("confirmed")),
+      }),
+    ),
+  }).index("by_url", ["url"]),
 });
