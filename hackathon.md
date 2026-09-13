@@ -2,17 +2,17 @@
 
 - **Project:** BeforeDoors
 - **Event:** Convex All Gas Hackathon
-- **What it does:** A web app where someone submits a venue URL, follows Convex research progress, and reviews sourced accessibility Q&A saved with the venue. The backend maps relevant pages and extracts the answers through Firecrawl.
+- **What it does:** A web app where people submit venue URLs, follow Convex research progress, review sourced accessibility Q&A, and sign in with username and password accounts; the backend maps relevant pages and extracts answers through Firecrawl.
 - **Live app:** not deployed
 - **Repo:** https://github.com/gthomas08/beforedoors
 - **Frontend:** not deployed
 - **Convex deployment:** not deployed
-- **Components:** @firecrawl/firecrawl-convex
-- **Convex features:** component, schema, tables, indexes, queries, mutations, actions, scheduled functions, realtime queries, paginated queries
-- **Auth:** none
+- **Components:** @convex-dev/auth, @firecrawl/firecrawl-convex
+- **Convex features:** authentication, component, schema, tables, indexes, queries, mutations, actions, scheduled functions, realtime queries, paginated queries
+- **Auth:** Convex Auth
 - **AI models:** none
 - **Started:** 2026-09-02T18:35:17Z
-- **Last updated:** 2026-09-12T16:49:01Z
+- **Last updated:** 2026-09-13T17:44:02Z
 
 ## Log
 
@@ -55,3 +55,17 @@ Added the backend MVP for generating accessibility reports. `startReport` create
 ### 2026-09-12 - a38bf06
 
 Connected venue research to the Convex backend. Submitting a URL starts a report; `/report` displays queued, mapping, and scraping progress before showing the saved venue Q&A. Reports are saved as URL-keyed venues, with public lookup by URL and a paginated venue list. Report limits can be configured with `REPORT_*` environment variables and retain their existing defaults. Registered the Firecrawl Convex component and added a reusable pagination helper (`packages/backend/convex/reports.ts`, `packages/backend/convex/venues.ts`, `packages/backend/convex/lib/pagination.ts`, `packages/backend/convex/convex.config.ts`, `apps/web/src/routes/index.tsx`, `apps/web/src/routes/report.tsx`, `apps/web/src/routes/venues.tsx`). Convex features: component, tables, indexes, queries, mutations, actions, scheduled functions, realtime queries, paginated queries.
+
+### 2026-09-13 - 0cfc8a3
+
+Added username/password sign-in with Convex Auth, authenticated query/mutation
+wrappers, and a current-user query. The header offers sign-in/sign-up controls,
+and `/account` shows account details. Improved loading/error handling on venue
+and report views, added venue Q&A search, refined shared UI/Tailwind classes,
+and enabled React Doctor rules in Oxlint. Documented frontend conditional
+rendering and backend function-region conventions (`packages/backend/convex/auth.config.ts`,
+`packages/backend/convex/lib/customFunctions.ts`, `packages/backend/convex/users.ts`,
+`apps/web/src/components/auth-controls.tsx`, `apps/web/src/routes/account.tsx`,
+`apps/web/src/components/report-page.tsx`, `.oxlintrc.json`,
+`apps/web/AGENTS.md`, `packages/backend/AGENTS.md`). Convex features:
+authentication, authenticated queries and mutations.
