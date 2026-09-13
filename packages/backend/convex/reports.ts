@@ -75,7 +75,7 @@ export const startReport = publicMutation({
 
 //#endregion Public functions
 
-//#region Internal functions
+//#region Private functions
 
 export const setReportPhase = internalMutation({
   args: {
@@ -322,7 +322,7 @@ export const runReport = internalAction({
   },
 });
 
-//#endregion Internal functions
+//#endregion Private functions
 
 //#region Utils
 

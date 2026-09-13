@@ -9,6 +9,7 @@
     "dev:setup": "convex dev --configure --until-success"
   },
   "dependencies": {
+    "@convex-dev/auth": "2.0.0-alpha.1",
     "@firecrawl/firecrawl-convex": "^0.1.1",
     "better-result": "^3.0.1",
     "convex": "catalog:",

@@ -1,3 +1,7 @@
 {
-  "ignorePatterns": [".agents/**", "packages/backend/convex/_generated/**"]
+  "ignorePatterns": [".agents/**", "packages/backend/convex/_generated/**"],
+  "sortTailwindcss": {
+    "stylesheet": "apps/web/src/styles.css",
+    "functions": ["cn", "clsx", "cva"]
+  }
 }

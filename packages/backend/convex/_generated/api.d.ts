@@ -8,11 +8,13 @@
  * @module
  */
 
+import type * as auth from "../auth.js";
 import type * as healthCheck from "../healthCheck.js";
 import type * as lib_customFunctions from "../lib/customFunctions.js";
 import type * as lib_firecrawl from "../lib/firecrawl.js";
 import type * as lib_pagination from "../lib/pagination.js";
 import type * as reports from "../reports.js";
+import type * as users from "../users.js";
 import type * as venues from "../venues.js";
 
 import type {
@@ -22,11 +24,13 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
+  auth: typeof auth;
   healthCheck: typeof healthCheck;
   "lib/customFunctions": typeof lib_customFunctions;
   "lib/firecrawl": typeof lib_firecrawl;
   "lib/pagination": typeof lib_pagination;
   reports: typeof reports;
+  users: typeof users;
   venues: typeof venues;
 }>;
 
@@ -57,5 +61,8 @@ export declare const internal: FilterApi<
 >;
 
 export declare const components: {
+  auth: import("@convex-dev/auth/core/_generated/component.js").ComponentApi<"auth">;
+  authPasswordProvider: import("@convex-dev/auth/providers/password/_generated/component.js").ComponentApi<"authPasswordProvider">;
+  authUsername: import("@convex-dev/auth/username/_generated/component.js").ComponentApi<"authUsername">;
   firecrawl: import("@firecrawl/firecrawl-convex/_generated/component.js").ComponentApi<"firecrawl">;
 };

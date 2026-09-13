@@ -9,7 +9,7 @@ pre-commit:
     # which would block otherwise-valid commits.
     - name: oxlint
       glob: "*.{js,jsx,ts,tsx,cjs,mjs,cts,mts}"
-      run: pnpm oxlint --fix {staged_files}
+      run: pnpm oxlint --fix --fix-suggestions {staged_files}
       stage_fixed: true
     - name: oxfmt
       glob: "*.{js,jsx,ts,tsx,cjs,mjs,cts,mts,json,md,yml,yaml}"

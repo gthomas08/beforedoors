@@ -2,7 +2,7 @@ import "./door-approach-mark.css";
 
 export function DoorApproachMark() {
   return (
-    <div className="approach-mark mb-4 h-28 w-[8.5rem] text-[var(--landing-ink)] sm:mb-5 sm:h-32 sm:w-40">
+    <div className="approach-mark mb-4 h-28 w-34 text-(--landing-ink) sm:mb-5 sm:h-32 sm:w-40">
       <svg
         aria-hidden="true"
         className="h-full w-full"

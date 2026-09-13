@@ -30,7 +30,7 @@ convex/
 └── _generated/
 ```
 
-- Put public and internal functions for a simple domain in its top-level module, such as `reports.ts`.
+- Put public, authenticated, and private functions for a simple domain in its top-level module, such as `reports.ts`.
 - Put reusable infrastructure helpers in `lib/`.
 - Do not create a model layer or extra helper methods for simple CRUD operations unless the logic is genuinely shared or complex.
 - Do not edit files under `_generated/`; they are managed by Convex code generation.
@@ -42,18 +42,24 @@ convex/
 - Every `returns` validator must return an object or `null`; wrap scalar and array results in an object such as `{ reportId }` or `{ items }`.
 - Public functions use `publicQuery` or `publicMutation` from `./lib/customFunctions`.
 - Public functions define their Zod `args` and `returns` schemas inline in the function definition.
-- Internal functions use `internalQuery` or `internalMutation` from `./_generated/server`.
-- Internal functions define their Convex `v` validators inline in the function definition.
-- Public and internal functions for the same domain may live in the same file. Use an `Internal` suffix for internal exports when names would otherwise collide.
+- Authenticated public functions use `authQuery` or `authMutation` from `./lib/customFunctions`. They require a signed-in user and add `ctx.user` and `ctx.userId` to the handler context.
+- Private functions use `internalQuery`, `internalMutation`, or `internalAction` from `./_generated/server`.
+- Private functions define their Convex `v` validators inline in the function definition.
+- Public, authenticated, and private functions for the same domain may live in the same file. Use an `Internal` suffix for private exports when names would otherwise collide.
 - Function names should include the domain model name.
-- Public versus internal access is determined by the function constructor, not the filename.
+- Public versus private access is determined by the function constructor, not the filename. Authenticated functions are part of the public API and must derive the caller identity from `ctx`, never from a client-supplied user ID.
 
 ## File regions
 
-- When using editor regions in a Convex module, keep the top-level regions in this order: `Public functions`, `Internal functions`, then `Utils`.
+- When using editor regions in a Convex module, keep the top-level regions in this order: `Public functions`, `Authenticated functions`, `Private functions`, then `Utils`. Put every `authQuery` or `authMutation` in the `Authenticated functions` region, after `Public functions` and before `Private functions`.
 - Do not use nested regions.
 - Omit a region when it would be empty.
 - Put utility constants, schemas, types, and functions in the `Utils` region.
+
+## Authentication
+
+- This backend uses the component-based Convex Auth v2 alpha API. Keep authentication setup aligned with that API rather than the stable v1 setup.
+- Convex deployments need `AUTH_PRIVATE_KEY` and `AUTH_JWKS` configured for the auth core component.
 
 ## Validation and errors
 

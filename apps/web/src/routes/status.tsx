@@ -29,42 +29,45 @@ const checkDetails = [
   ["Scope", "Connection only"],
 ] as const;
 
+const statusStates = {
+  checking: {
+    label: "Checking",
+    code: "PENDING",
+    explanation: "Waiting for the live Convex query to respond.",
+    signalClass: "bg-status-pending animate-pulse motion-reduce:animate-none",
+    textClass: "text-status-pending",
+  },
+  connected: {
+    label: "Connected",
+    code: "OK",
+    explanation: "The live Convex health query returned OK.",
+    signalClass: "bg-status-verified",
+    textClass: "text-status-verified",
+  },
+  error: {
+    label: "Error",
+    code: "ERROR",
+    explanation: "The live Convex health query returned an unexpected result.",
+    signalClass: "bg-status-signal",
+    textClass: "text-status-signal",
+  },
+};
+
 function StatusComponent() {
   const healthCheck = useQuery(api.healthCheck.get);
-  const state =
-    healthCheck === undefined
-      ? {
-          label: "Checking",
-          code: "PENDING",
-          explanation: "Waiting for the live Convex query to respond.",
-          signalClass: "bg-status-pending animate-pulse motion-reduce:animate-none",
-          textClass: "text-status-pending",
-        }
-      : healthCheck === "OK"
-        ? {
-            label: "Connected",
-            code: "OK",
-            explanation: "The live Convex health query returned OK.",
-            signalClass: "bg-status-verified",
-            textClass: "text-status-verified",
-          }
-        : {
-            label: "Error",
-            code: "ERROR",
-            explanation: "The live Convex health query returned an unexpected result.",
-            signalClass: "bg-status-signal",
-            textClass: "text-status-signal",
-          };
+  let state = statusStates.error;
+  if (healthCheck === undefined) state = statusStates.checking;
+  else if (healthCheck === "OK") state = statusStates.connected;
 
   return (
     <>
-      <div className="grid h-svh grid-rows-[auto_1fr] overflow-hidden bg-[var(--app-bg)] text-[var(--app-ink)]">
+      <div className="grid h-svh grid-rows-[auto_1fr] overflow-hidden bg-(--app-bg) text-(--app-ink)">
         <Header alignment="status" />
-        <main className="relative min-h-0 overflow-y-auto bg-[var(--app-bg)] px-5 sm:px-8">
+        <main className="relative min-h-0 overflow-y-auto bg-(--app-bg) px-5 sm:px-8">
           <TrailheadSurface />
-          <article className="relative z-10 mx-auto flex min-h-full w-full max-w-[44rem] flex-col border-x border-[var(--app-line)] bg-[var(--app-bg)]">
+          <article className="relative z-10 mx-auto flex min-h-full w-full max-w-176 flex-col border-x border-(--app-line) bg-(--app-bg)">
             <header className="px-5 py-8 sm:px-8 sm:py-10">
-              <h1 className="max-w-[12ch] text-balance text-3xl font-semibold tracking-[-0.025em] sm:text-4xl">
+              <h1 className="max-w-[12ch] text-3xl font-semibold tracking-tight text-balance sm:text-4xl">
                 System status
               </h1>
               <p className="mt-3 max-w-[58ch] text-sm leading-6 text-muted-foreground sm:text-base">
@@ -103,7 +106,7 @@ function StatusComponent() {
                     className="grid min-w-0 grid-cols-[minmax(7rem,0.8fr)_minmax(0,1.2fr)] border-b last:border-b-0"
                   >
                     <dt className="px-5 py-3 font-medium text-muted-foreground sm:px-8">{term}</dt>
-                    <dd className="min-w-0 border-l px-5 py-3 text-right break-words text-foreground sm:px-8">
+                    <dd className="min-w-0 border-l px-5 py-3 text-right wrap-break-word text-foreground sm:px-8">
                       {description}
                     </dd>
                   </div>
@@ -144,7 +147,7 @@ function StatusComponent() {
           </article>
         </main>
       </div>
-      <TanStackRouterDevtools position="bottom-left" />
+      {import.meta.env.DEV && <TanStackRouterDevtools position="bottom-left" />}
     </>
   );
 }

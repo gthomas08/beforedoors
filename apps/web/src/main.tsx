@@ -1,7 +1,8 @@
 import { env } from "@/env";
+import { api } from "@my-better-t-app/backend/convex/_generated/api";
+import { ConvexAuthProvider } from "@convex-dev/auth/react";
 import { RouterProvider, createRouter } from "@tanstack/react-router";
 import { ConvexReactClient } from "convex/react";
-import { ConvexProvider } from "convex/react";
 import ReactDOM from "react-dom/client";
 
 import Loader from "./components/loader";
@@ -15,7 +16,14 @@ const router = createRouter({
   defaultPendingComponent: () => <Loader />,
   context: {},
   Wrap: function WrapComponent({ children }: { children: React.ReactNode }) {
-    return <ConvexProvider client={convex}>{children}</ConvexProvider>;
+    return (
+      <ConvexAuthProvider
+        client={convex}
+        api={{ refreshSession: api.auth.refreshSession, signOut: api.auth.signOut }}
+      >
+        {children}
+      </ConvexAuthProvider>
+    );
   },
 });
 

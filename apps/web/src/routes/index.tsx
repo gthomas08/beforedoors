@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useForm } from "@tanstack/react-form";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { Result } from "better-result";
 import { useMutation } from "convex/react";
 import { ArrowRight } from "lucide-react";
 import { useState } from "react";
@@ -32,14 +33,17 @@ function validateVenueUrl(value: string) {
     return "Paste the venue or event page you want to check.";
   }
 
-  try {
-    const url = new URL(candidate);
+  const urlResult = Result.try({
+    try: () => new URL(candidate),
+    catch: () => "Enter a complete web address, such as https://venue.com." as const,
+  });
 
-    if (url.protocol !== "http:" && url.protocol !== "https:") {
-      return "Use a web address that starts with http:// or https://.";
-    }
-  } catch {
-    return "Enter a complete web address, such as https://venue.com.";
+  if (urlResult.isErr()) {
+    return urlResult.error;
+  }
+
+  if (urlResult.value.protocol !== "http:" && urlResult.value.protocol !== "https:") {
+    return "Use a web address that starts with http:// or https://.";
   }
 
   return undefined;
@@ -57,27 +61,32 @@ function HomeComponent() {
     onSubmit: async ({ value }) => {
       setSubmitError(undefined);
 
-      try {
-        const url = value.venueUrl.trim();
-        const { reportId } = await startReport({ url });
+      const result = await Result.tryPromise({
+        try: async () => {
+          const url = value.venueUrl.trim();
+          const { reportId } = await startReport({ url });
 
-        await navigate({
-          to: "/report",
-          search: { url, reportId },
-        });
-      } catch {
-        setSubmitError("We couldn’t start research for that link. Please try again.");
+          return navigate({
+            to: "/report",
+            search: { url, reportId },
+          });
+        },
+        catch: () => "We couldn’t start research for that link. Please try again." as const,
+      });
+
+      if (result.isErr()) {
+        setSubmitError(result.error);
       }
     },
   });
 
   return (
-    <div className="grid h-svh grid-rows-[auto_1fr] overflow-hidden bg-[var(--app-bg)] text-[var(--app-ink)]">
+    <div className="grid h-svh grid-rows-[auto_1fr] overflow-hidden bg-(--app-bg) text-(--app-ink)">
       <Header linkToStatus linkToVenues wide />
 
-      <main className="relative min-h-0 overflow-hidden bg-[var(--app-bg)] px-5 sm:px-8">
+      <main className="relative min-h-0 overflow-hidden bg-(--app-bg) px-5 sm:px-8">
         <TrailheadSurface />
-        <div className="relative z-10 mx-auto flex h-full w-full max-w-5xl items-center justify-center border-x border-[var(--app-line)] px-5 sm:px-10 lg:px-16">
+        <div className="relative z-10 mx-auto flex h-full w-full max-w-5xl items-center justify-center border-x border-(--app-line) px-5 sm:px-10 lg:px-16">
           <section
             aria-labelledby="landing-title"
             className="flex w-full max-w-3xl -translate-y-[clamp(1.5rem,7vh,3.25rem)] flex-col items-center py-8 text-center sm:py-10"
@@ -86,16 +95,16 @@ function HomeComponent() {
 
             <h1
               id="landing-title"
-              className="max-w-none whitespace-nowrap text-balance text-[clamp(2rem,7vw,5rem)] leading-[0.9] font-semibold tracking-[-0.04em] text-[var(--app-ink)]"
+              className="max-w-none text-[clamp(2rem,7vw,5rem)] leading-[0.9] font-semibold tracking-[-0.04em] text-balance whitespace-nowrap text-(--app-ink)"
             >
               Know before you go.
             </h1>
 
-            <p className="mt-4 text-xs font-semibold uppercase tracking-[0.22em] text-[var(--app-muted)] sm:text-sm">
+            <p className="mt-4 text-xs font-semibold tracking-[0.22em] text-(--app-muted) uppercase sm:text-sm">
               Know access · go with confidence
             </p>
 
-            <p className="mt-5 max-w-[46ch] text-base leading-7 text-[var(--app-muted)] sm:text-lg sm:leading-8">
+            <p className="mt-5 max-w-[46ch] text-base leading-7 text-(--app-muted) sm:text-lg sm:leading-8">
               Enter a venue or event link to see what its published access information can tell you
               before you go.
             </p>
@@ -126,12 +135,12 @@ function HomeComponent() {
                     <div>
                       <label
                         htmlFor={field.name}
-                        className="mb-2 block text-left text-xs font-semibold uppercase tracking-[0.14em] text-[var(--app-ink)]"
+                        className="mb-2 block text-left text-xs font-semibold tracking-[0.14em] text-(--app-ink) uppercase"
                       >
                         Venue or event URL
                       </label>
 
-                      <div className="grid border border-[var(--app-field-border)] bg-[var(--app-field)] transition-[border-color,box-shadow] duration-300 focus-within:border-[var(--app-focus)] focus-within:ring-2 focus-within:ring-[var(--app-focus)]/30 sm:grid-cols-[1fr_auto] motion-reduce:transition-none">
+                      <div className="grid border border-(--app-field-border) bg-(--app-field) transition-[border-color,box-shadow] duration-300 focus-within:border-(--app-focus) focus-within:ring-2 focus-within:ring-(--app-focus)/30 motion-reduce:transition-none sm:grid-cols-[1fr_auto]">
                         <Input
                           id={field.name}
                           name={field.name}
@@ -144,7 +153,7 @@ function HomeComponent() {
                           placeholder="https://venue.com/event"
                           aria-invalid={Boolean(error)}
                           aria-describedby={`${field.name}-${error ? "error" : "hint"}`}
-                          className="h-14 border-0 bg-transparent px-4 text-lg text-[var(--app-field-ink)] shadow-none caret-[var(--app-accent)] placeholder:text-[var(--app-field-placeholder)] focus-visible:ring-0 sm:h-16 sm:px-5 sm:text-lg dark:bg-transparent"
+                          className="h-14 border-0 bg-transparent px-4 text-lg text-(--app-field-ink) caret-(--app-accent) shadow-none placeholder:text-(--app-field-placeholder) focus-visible:ring-0 sm:h-16 sm:px-5 sm:text-lg dark:bg-transparent"
                         />
 
                         <form.Subscribe selector={(state) => state.isSubmitting}>
@@ -152,7 +161,7 @@ function HomeComponent() {
                             <Button
                               type="submit"
                               disabled={isSubmitting}
-                              className="group h-14 justify-between border-t border-[var(--app-field-border)] bg-[var(--app-accent)] px-4 text-sm text-[var(--app-accent-ink)] hover:bg-[var(--app-accent-hover)] sm:h-16 sm:min-w-44 sm:border-t-0 sm:border-l sm:px-5"
+                              className="group h-14 justify-between border-t border-(--app-field-border) bg-(--app-accent) px-4 text-sm text-(--app-accent-ink) hover:bg-(--app-accent-hover) sm:h-16 sm:min-w-44 sm:border-t-0 sm:border-l sm:px-5"
                             >
                               {isSubmitting ? "Checking…" : "See what’s ahead"}
                               <ArrowRight
@@ -170,7 +179,7 @@ function HomeComponent() {
                             {String(error)}
                           </p>
                         ) : (
-                          <p id={`${field.name}-hint`} className="text-[var(--app-muted)]">
+                          <p id={`${field.name}-hint`} className="text-(--app-muted)">
                             We’ll begin with the venue’s own published information.
                           </p>
                         )}

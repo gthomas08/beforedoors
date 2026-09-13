@@ -64,7 +64,7 @@ export const listVenues = publicQuery({
 
 //#endregion Public functions
 
-//#region Internal functions
+//#region Private functions
 
 export const saveReportToVenues = internalMutation({
   args: { reportId: v.id("reports") },
@@ -91,4 +91,4 @@ export const saveReportToVenues = internalMutation({
   },
 });
 
-//#endregion Internal functions
+//#endregion Private functions

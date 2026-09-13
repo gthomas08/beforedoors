@@ -1,37 +1,34 @@
 import { Link } from "@tanstack/react-router";
-import { ArrowUpRight } from "lucide-react";
+import { Result } from "better-result";
+import { ArrowRight, ArrowUpRight } from "lucide-react";
+import { useState } from "react";
 import { toast } from "sonner";
 
 import type { Doc } from "@my-better-t-app/backend/convex/_generated/dataModel";
 import Header from "@/components/header";
 import { ReportContourLines } from "@/components/report-contour-lines";
 import { TrailheadSurface } from "@/components/trailhead-surface";
+import { Empty, EmptyDescription, EmptyHeader, EmptyTitle } from "@/components/ui/empty";
+import { Field, FieldLabel } from "@/components/ui/field";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { formatUpdatedAt } from "@/lib/format-date";
 
 type Venue = Pick<Doc<"venues">, "name" | "url" | "updatedAt" | "results">;
 type VenueAnswer = Venue["results"][number];
-
-function formatUpdatedAt(updatedAt: number) {
-  return new Date(updatedAt).toLocaleDateString(undefined, {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-  });
-}
 
 function StatusLabel({ status }: { status: VenueAnswer["status"] }) {
   const label = status === "published" ? "Published by venue" : "Confirmed by venue";
 
   return (
-    <span className="text-[0.72rem] leading-[1.35] font-semibold text-[var(--app-ink)]">
-      {label}
-    </span>
+    <span className="text-[0.72rem] leading-[1.35] font-semibold text-(--app-ink)">{label}</span>
   );
 }
 
 function StatusIndicator({ status }: { status: VenueAnswer["status"] }) {
   return (
     <span className="flex items-center gap-2">
-      <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-[var(--app-accent)]" />
+      <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-(--app-accent)" />
       <StatusLabel status={status} />
     </span>
   );
@@ -44,9 +41,9 @@ function SourceUrl({ url, label }: { url: string; label: string }) {
       target="_blank"
       rel="noreferrer"
       aria-label={`${label} ${url} in a new tab`}
-      className="inline-flex min-w-0 max-w-full items-center gap-1.5 text-[var(--app-ink)] underline decoration-[var(--app-accent)] decoration-1 underline-offset-4 hover:text-[var(--app-accent-hover)] focus-visible:outline-2 focus-visible:outline-[var(--app-focus)] focus-visible:outline-offset-4"
+      className="inline-flex max-w-full min-w-0 items-center gap-1.5 text-(--app-ink) underline decoration-(--app-accent) decoration-1 underline-offset-4 hover:text-(--app-accent-hover) focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-(--app-focus)"
     >
-      <span className="break-words">{url}</span>
+      <span className="wrap-break-word">{url}</span>
       <ArrowUpRight aria-hidden="true" className="size-3.5 shrink-0" />
     </a>
   );
@@ -54,12 +51,12 @@ function SourceUrl({ url, label }: { url: string; label: string }) {
 
 function QuestionRow({ answer }: { answer: VenueAnswer }) {
   return (
-    <li className="border-b border-[var(--app-line)] px-8 py-4 last:border-b-0 max-[680px]:px-4 max-[680px]:py-4">
+    <li className="border-b border-(--app-line) px-8 py-4 last:border-b-0 max-[680px]:px-4 max-[680px]:py-4">
       <article className="grid grid-cols-[minmax(18rem,0.9fr)_minmax(0,1.5fr)_minmax(13rem,0.8fr)] gap-4 max-[900px]:grid-cols-1 max-[900px]:gap-2">
         <div className="flex items-start gap-3">
           <span
             aria-hidden="true"
-            className="mt-0.5 font-mono text-[0.72rem] font-bold tracking-[0.12em] text-[var(--app-accent-hover)]"
+            className="mt-0.5 font-mono text-[0.72rem] font-bold tracking-[0.12em] text-(--app-accent-hover)"
           >
             Q
           </span>
@@ -69,7 +66,7 @@ function QuestionRow({ answer }: { answer: VenueAnswer }) {
         </div>
 
         <div className="min-w-0">
-          <p className="m-0 max-w-[64ch] text-[0.92rem] leading-[1.5]">{answer.answer}</p>
+          <p className="m-0 max-w-[64ch] text-[0.92rem] leading-normal">{answer.answer}</p>
         </div>
 
         <div className="flex min-w-0 flex-col items-end gap-2 max-[900px]:mt-0.5 max-[900px]:items-start">
@@ -82,6 +79,17 @@ function QuestionRow({ answer }: { answer: VenueAnswer }) {
 }
 
 export function VenueInfoPage({ venue }: { venue: Venue }) {
+  const [searchText, setSearchText] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
+  const normalizedSearchQuery = searchQuery.toLowerCase();
+  const filteredAnswers = normalizedSearchQuery
+    ? venue.results.filter(
+        (answer) =>
+          answer.question.toLowerCase().includes(normalizedSearchQuery) ||
+          answer.answer.toLowerCase().includes(normalizedSearchQuery),
+      )
+    : venue.results;
+
   const handleShare = async () => {
     const shareData = {
       title: `${venue.name} · BeforeDoors`,
@@ -90,42 +98,52 @@ export function VenueInfoPage({ venue }: { venue: Venue }) {
     };
 
     if (navigator.share) {
-      try {
-        await navigator.share(shareData);
+      const shareResult = await Result.tryPromise({
+        try: () => navigator.share!(shareData),
+        catch: (error: unknown) => error,
+      });
+
+      if (shareResult.isOk()) {
         return;
-      } catch (error) {
-        if (error instanceof DOMException && error.name === "AbortError") return;
+      }
+
+      if (shareResult.error instanceof DOMException && shareResult.error.name === "AbortError") {
+        return;
       }
     }
 
-    try {
-      await navigator.clipboard.writeText(window.location.href);
+    const copyResult = await Result.tryPromise({
+      try: () => navigator.clipboard.writeText(window.location.href),
+      catch: () => "clipboard-write-failed" as const,
+    });
+
+    if (copyResult.isOk()) {
       toast.success("Brief link copied");
-    } catch {
+    } else {
       toast.error("Copy this page’s URL to share the brief");
     }
   };
 
   return (
-    <div className="min-h-svh bg-[var(--app-bg)] text-[var(--app-ink)]">
+    <div className="min-h-svh bg-(--app-bg) text-(--app-ink)">
       <Header alignment="report" variant="report" onShare={() => void handleShare()} />
 
-      <main className="relative min-h-[calc(100svh-3.5rem)] overflow-x-hidden bg-[var(--app-bg)] px-5 pb-12 max-[680px]:px-0">
+      <main className="relative min-h-[calc(100svh-3.5rem)] overflow-x-hidden bg-(--app-bg) px-5 pb-12 max-[680px]:px-0">
         <TrailheadSurface />
-        <div className="relative z-[1] mx-auto w-full max-w-[88rem] border-x border-[var(--app-line)] bg-[color-mix(in_oklch,var(--app-bg)_96%,var(--app-field))] max-[680px]:border-x-0">
-          <header className="relative isolate flex min-h-44 items-end justify-between gap-5 border-b border-[var(--app-line)] px-8 pt-10 pb-8 max-[760px]:items-start max-[760px]:flex-col max-[680px]:min-h-[13rem] max-[680px]:px-4 max-[680px]:py-8">
+        <div className="relative z-1 mx-auto w-full max-w-352 border-x border-(--app-line) bg-[color-mix(in_oklch,var(--app-bg)_96%,var(--app-field))] max-[680px]:border-x-0">
+          <header className="relative isolate flex min-h-44 items-end justify-between gap-5 border-b border-(--app-line) px-8 pt-10 pb-8 max-[760px]:flex-col max-[760px]:items-start max-[680px]:min-h-52 max-[680px]:px-4 max-[680px]:py-8">
             <div className="relative z-10 min-w-0">
-              <h1 className="m-0 max-w-none text-[clamp(2.75rem,6vw,5rem)] leading-[0.92] font-semibold tracking-[-0.05em] min-[1280px]:whitespace-nowrap max-[680px]:text-[clamp(2.4rem,13vw,4rem)]">
+              <h1 className="m-0 max-w-none text-[clamp(2.75rem,6vw,5rem)] leading-[0.92] font-semibold tracking-tighter max-[680px]:text-[clamp(2.4rem,13vw,4rem)] min-[1280px]:whitespace-nowrap">
                 {venue.name || "Venue name not recorded"}
               </h1>
               <p className="mt-4 mb-0 font-mono text-[clamp(0.8rem,1.3vw,1rem)] leading-6">
                 <SourceUrl url={venue.url} label="Open venue URL" />
               </p>
             </div>
-            <p className="z-10 m-0 max-w-[15rem] shrink-0 font-mono text-[0.72rem] leading-[1.5] text-[var(--app-muted)] max-[760px]:mt-4">
+            <p className="z-10 m-0 max-w-60 shrink-0 font-mono text-[0.72rem] leading-normal text-(--app-muted) max-[760px]:mt-4">
               Last updated
               <br />
-              <strong className="font-semibold text-[var(--app-accent-hover)]">
+              <strong className="font-semibold text-(--app-accent-hover)">
                 {formatUpdatedAt(venue.updatedAt)}
               </strong>
             </p>
@@ -134,41 +152,106 @@ export function VenueInfoPage({ venue }: { venue: Venue }) {
             </div>
           </header>
 
-          <div
-            className="border-b border-[var(--app-line)] bg-[color-mix(in_oklch,var(--app-accent)_8%,var(--app-bg))] px-8 py-2.5 text-xs max-[680px]:px-4"
-            role="status"
-          >
-            <p className="m-0 text-[var(--app-muted)]">
-              Answers include their source page and publication or confirmation status.
-            </p>
+          <div className="flex flex-col gap-3 border-b border-(--app-line) bg-[color-mix(in_oklch,var(--app-accent)_8%,var(--app-bg))] px-8 py-3.5 max-[680px]:px-4 md:flex-row md:items-center md:justify-between">
+            <div className="min-w-0 text-xs">
+              <p className="m-0 text-(--app-muted)">
+                Answers include their source page and publication or confirmation status.
+              </p>
+              {searchQuery && (
+                <p className="mt-1 mb-0 text-(--app-muted)" role="status" aria-live="polite">
+                  Showing {filteredAnswers.length} of {venue.results.length} answers for “
+                  {searchQuery}”.
+                </p>
+              )}
+            </div>
+            {venue.results.length > 0 && (
+              <form
+                className="w-full shrink-0 md:max-w-lg"
+                aria-label="Search venue answers"
+                onSubmit={(event) => {
+                  event.preventDefault();
+                  setSearchQuery(searchText.trim());
+                }}
+              >
+                <div className="grid border border-(--app-field-border) bg-(--app-field) transition-[border-color,box-shadow] duration-300 focus-within:border-(--app-focus) focus-within:ring-2 focus-within:ring-(--app-focus)/30 motion-reduce:transition-none sm:grid-cols-[1fr_auto]">
+                  <Field className="gap-0">
+                    <FieldLabel htmlFor="venue-answer-search" className="sr-only">
+                      Search questions and answers
+                    </FieldLabel>
+                    <Input
+                      id="venue-answer-search"
+                      type="search"
+                      value={searchText}
+                      onChange={(event) => setSearchText(event.target.value)}
+                      placeholder="Search questions and answers"
+                      autoComplete="off"
+                      className="h-14 border-0 bg-transparent px-4 text-lg text-(--app-field-ink) caret-(--app-accent) shadow-none placeholder:text-(--app-field-placeholder) focus-visible:ring-0 sm:h-16 sm:px-5 sm:text-lg dark:bg-transparent"
+                    />
+                  </Field>
+                  <Button
+                    type="submit"
+                    className="group h-14 justify-between border-t border-(--app-field-border) bg-(--app-accent) px-4 text-sm text-(--app-accent-ink) hover:bg-(--app-accent-hover) sm:h-16 sm:min-w-44 sm:border-t-0 sm:border-l sm:px-5"
+                  >
+                    Search
+                    <ArrowRight
+                      aria-hidden="true"
+                      className="transition-transform duration-300 group-hover:translate-x-1 group-focus-visible:translate-x-1 motion-reduce:transition-none"
+                    />
+                  </Button>
+                </div>
+              </form>
+            )}
           </div>
 
-          {venue.results.length ? (
+          {filteredAnswers.length > 0 && (
             <ol className="m-0 list-none p-0" aria-label="Venue answers">
-              {venue.results.map((answer, index) => (
-                <QuestionRow key={`${answer.url}-${index}`} answer={answer} />
+              {filteredAnswers.map((answer) => (
+                <QuestionRow
+                  key={JSON.stringify([answer.url, answer.question, answer.answer])}
+                  answer={answer}
+                />
               ))}
             </ol>
-          ) : (
-            <div className="px-8 py-12 max-[680px]:px-4">
-              <h2 className="m-0 text-[1.35rem] tracking-[-0.025em]">No venue answers yet</h2>
-              <p className="mt-3 mb-0 max-w-[55ch] text-[0.9rem] leading-[1.65] text-[var(--app-muted)]">
-                We’ll show a question here when the venue provides a sourced answer.
-              </p>
-            </div>
           )}
 
-          <aside className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1.5 border-t border-[var(--app-line)] bg-[color-mix(in_oklch,var(--app-field)_70%,var(--app-accent)_4%)] px-8 py-3.5 max-[680px]:px-4">
-            <p className="m-0 text-[0.78rem] leading-[1.45] text-[var(--app-muted)]">
+          {venue.results.length > 0 && filteredAnswers.length === 0 && (
+            <Empty className="min-h-48 gap-3 border-0 px-8 py-12 max-[680px]:px-4">
+              <EmptyHeader>
+                <EmptyTitle role="heading" aria-level={2}>
+                  No matching answers
+                </EmptyTitle>
+                <EmptyDescription>
+                  No questions or answers match “{searchQuery}”. Try another term, or search with an
+                  empty field to see every answer.
+                </EmptyDescription>
+              </EmptyHeader>
+            </Empty>
+          )}
+
+          {venue.results.length === 0 && (
+            <Empty className="min-h-48 gap-3 border-0 px-8 py-12 max-[680px]:px-4">
+              <EmptyHeader>
+                <EmptyTitle role="heading" aria-level={2}>
+                  No venue answers yet
+                </EmptyTitle>
+                <EmptyDescription>
+                  We’ll show a question here when the venue provides a sourced answer.
+                </EmptyDescription>
+              </EmptyHeader>
+            </Empty>
+          )}
+
+          <aside className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1.5 border-t border-(--app-line) bg-[color-mix(in_oklch,var(--app-field)_70%,var(--app-accent)_4%)] px-8 py-3.5 max-[680px]:px-4">
+            <p className="m-0 text-[0.78rem] leading-[1.45] text-(--app-muted)">
               Only sourced answers are shown. Missing information is not a no.
             </p>
-            <p className="m-0 font-mono text-[0.68rem] leading-[1.4] text-[var(--app-muted)]">
+            <p className="m-0 font-mono text-[0.68rem] leading-[1.4] text-(--app-muted)">
               {venue.results.length} {venue.results.length === 1 ? "answer" : "answers"} · from
               venue information
             </p>
           </aside>
 
-          <footer className="flex justify-between gap-4 border-t border-[var(--app-line)] px-8 py-3.5 font-mono text-[0.68rem] leading-[1.5] text-[var(--app-muted)] max-[680px]:flex-col max-[680px]:px-4">
+          <footer className="flex justify-between gap-4 border-t border-(--app-line) px-8 py-3.5 font-mono text-[0.68rem] leading-normal text-(--app-muted) max-[680px]:flex-col max-[680px]:px-4">
             <span>BeforeDoors · Know before you go</span>
             <span>Answers carry their source</span>
           </footer>
@@ -188,29 +271,29 @@ export function VenueInfoMessage({
   isLoading?: boolean;
 }) {
   return (
-    <div className="min-h-svh bg-[var(--app-bg)] text-[var(--app-ink)]">
+    <div className="min-h-svh bg-(--app-bg) text-(--app-ink)">
       <Header alignment="report" linkToVenues />
-      <main className="relative min-h-[calc(100svh-3.5rem)] overflow-x-hidden bg-[var(--app-bg)] px-5 pb-12 max-[680px]:px-0">
+      <main className="relative min-h-[calc(100svh-3.5rem)] overflow-x-hidden bg-(--app-bg) px-5 pb-12 max-[680px]:px-0">
         <TrailheadSurface />
         <section
-          className="relative z-[1] mx-auto w-full max-w-[88rem] border-x border-[var(--app-line)] bg-[color-mix(in_oklch,var(--app-bg)_96%,var(--app-field))] px-8 py-16 max-[680px]:border-x-0 max-[680px]:px-4"
+          className="relative z-1 mx-auto w-full max-w-352 border-x border-(--app-line) bg-[color-mix(in_oklch,var(--app-bg)_96%,var(--app-field))] px-8 py-16 max-[680px]:border-x-0 max-[680px]:px-4"
           role={isLoading ? "status" : undefined}
           aria-live={isLoading ? "polite" : undefined}
         >
           <h1 className="m-0 text-[clamp(2.5rem,6vw,4rem)] leading-[0.95] font-semibold tracking-[-0.045em]">
             {title}
           </h1>
-          <p className="mt-5 mb-0 max-w-[55ch] text-[0.95rem] leading-7 text-[var(--app-muted)]">
+          <p className="mt-5 mb-0 max-w-[55ch] text-[0.95rem] leading-7 text-(--app-muted)">
             {message}
           </p>
-          {!isLoading ? (
+          {!isLoading && (
             <Link
               to="/venues"
-              className="mt-7 inline-flex border border-[var(--app-accent)] px-3 py-2 text-xs font-semibold tracking-[0.08em] text-[var(--app-accent-hover)] uppercase underline-offset-4 hover:bg-[var(--app-accent)] hover:text-[var(--app-accent-ink)] focus-visible:outline-2 focus-visible:outline-[var(--app-focus)] focus-visible:outline-offset-4"
+              className="mt-7 inline-flex border border-(--app-accent) px-3 py-2 text-xs font-semibold tracking-[0.08em] text-(--app-accent-hover) uppercase underline-offset-4 hover:bg-(--app-accent) hover:text-(--app-accent-ink) focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-(--app-focus)"
             >
               View all venues
             </Link>
-          ) : null}
+          )}
         </section>
       </main>
     </div>

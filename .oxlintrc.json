@@ -1,11 +1,26 @@
 {
   "$schema": "./node_modules/oxlint/configuration_schema.json",
   "plugins": ["typescript", "unicorn", "oxc"],
+  "jsPlugins": [
+    "oxlint-tailwindcss",
+    { "name": "react-doctor", "specifier": "oxlint-plugin-react-doctor" }
+  ],
   "categories": {
     "correctness": "error"
   },
   "ignorePatterns": [".agents/**", "packages/backend/convex/_generated/**"],
-  "rules": {},
+  "settings": {
+    "tailwindcss": {
+      "entryPoint": "apps/web/src/styles.css"
+    }
+  },
+  "rules": {
+    "react-doctor/no-fetch-in-effect": "warn",
+    "react-doctor/no-derived-state": "warn",
+    "tailwindcss/enforce-canonical": "warn",
+    "tailwindcss/prefer-scale-token": "warn",
+    "tailwindcss/enforce-consistent-variable-syntax": "warn"
+  },
   "env": {
     "builtin": true
   }
