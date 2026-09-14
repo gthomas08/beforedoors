@@ -43,13 +43,22 @@ export default defineSchema({
     url: v.string(),
     name: v.string(),
     updatedAt: v.number(),
-    results: v.array(
-      v.object({
-        question: v.string(),
-        answer: v.string(),
-        url: v.string(),
-        status: v.union(v.literal("published"), v.literal("confirmed")),
-      }),
-    ),
+    answerCount: v.number(),
+    publishedCount: v.number(),
+    confirmedCount: v.number(),
   }).index("by_url", ["url"]),
+  venueAnswers: defineTable({
+    venueId: v.id("venues"),
+    answerIndex: v.number(),
+    question: v.string(),
+    answer: v.string(),
+    url: v.string(),
+    status: v.union(v.literal("published"), v.literal("confirmed")),
+    searchText: v.string(),
+  })
+    .index("by_venue_and_answer_index", ["venueId", "answerIndex"])
+    .searchIndex("search_text", {
+      searchField: "searchText",
+      filterFields: ["venueId"],
+    }),
 });

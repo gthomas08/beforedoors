@@ -7,25 +7,21 @@ import { ReportContourLines } from "@/components/report-contour-lines";
 import { TrailheadSurface } from "@/components/trailhead-surface";
 import { formatUpdatedAt } from "@/lib/format-date";
 
-type Venue = Pick<Doc<"venues">, "name" | "url" | "results" | "updatedAt">;
+type Venue = Pick<Doc<"venues">, "name" | "url" | "updatedAt"> & {
+  answerCount: number;
+  publishedCount: number;
+  confirmedCount: number;
+};
 
-function StatusSummary({ results }: { results: Venue["results"] }) {
-  let published = 0;
-  let confirmed = 0;
-
-  for (const result of results) {
-    if (result.status === "published") published++;
-    if (result.status === "confirmed") confirmed++;
-  }
-
-  if (results.length === 0) {
+function StatusSummary({ venue }: { venue: Venue }) {
+  if (venue.answerCount === 0) {
     return <span className="text-[0.76rem] text-(--app-muted)">No saved answers</span>;
   }
 
   return (
     <div className="flex flex-col gap-1.5">
-      {published > 0 && <StatusCount label="Published" count={published} />}
-      {confirmed > 0 && <StatusCount label="Confirmed" count={confirmed} />}
+      {venue.publishedCount > 0 && <StatusCount label="Published" count={venue.publishedCount} />}
+      {venue.confirmedCount > 0 && <StatusCount label="Confirmed" count={venue.confirmedCount} />}
     </div>
   );
 }
@@ -73,10 +69,10 @@ function VenueRow({ venue }: { venue: Venue }) {
         </span>
       </th>
       <td className="px-4 py-5 text-[0.82rem] leading-6 sm:px-6 sm:py-6">
-        {venue.results.length} {venue.results.length === 1 ? "answer" : "answers"}
+        {venue.answerCount} {venue.answerCount === 1 ? "answer" : "answers"}
       </td>
       <td className="px-4 py-5 sm:px-6 sm:py-6">
-        <StatusSummary results={venue.results} />
+        <StatusSummary venue={venue} />
       </td>
       <td className="px-4 py-5 text-[0.76rem] leading-5 text-(--app-muted) sm:px-6 sm:py-6">
         {formatUpdatedAt(venue.updatedAt)}
@@ -110,7 +106,7 @@ function MobileVenueRow({ venue }: { venue: Venue }) {
             Answers
           </dt>
           <dd className="mt-1.5 mb-0 text-[0.78rem] leading-5">
-            {venue.results.length} {venue.results.length === 1 ? "answer" : "answers"}
+            {venue.answerCount} {venue.answerCount === 1 ? "answer" : "answers"}
           </dd>
         </div>
         <div>
@@ -126,7 +122,7 @@ function MobileVenueRow({ venue }: { venue: Venue }) {
             Answer status
           </dt>
           <dd className="mt-1.5 mb-0">
-            <StatusSummary results={venue.results} />
+            <StatusSummary venue={venue} />
           </dd>
         </div>
       </dl>

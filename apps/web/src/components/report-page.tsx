@@ -1,21 +1,28 @@
 import { Link } from "@tanstack/react-router";
 import { Result } from "better-result";
-import { ArrowRight, ArrowUpRight } from "lucide-react";
-import { useState } from "react";
+import { Dialog } from "@base-ui/react/dialog";
+import { useQuery } from "convex/react";
+import { ArrowUpRight, Search, X } from "lucide-react";
+import { useEffect, useId, useRef, useState } from "react";
 import { toast } from "sonner";
 
+import { api } from "@my-better-t-app/backend/convex/_generated/api";
 import type { Doc } from "@my-better-t-app/backend/convex/_generated/dataModel";
 import Header from "@/components/header";
 import { ReportContourLines } from "@/components/report-contour-lines";
 import { TrailheadSurface } from "@/components/trailhead-surface";
 import { Empty, EmptyDescription, EmptyHeader, EmptyTitle } from "@/components/ui/empty";
-import { Field, FieldLabel } from "@/components/ui/field";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { formatUpdatedAt } from "@/lib/format-date";
 
-type Venue = Pick<Doc<"venues">, "name" | "url" | "updatedAt" | "results">;
-type VenueAnswer = Venue["results"][number];
+type VenueAnswer = Pick<
+  Doc<"venueAnswers">,
+  "answerIndex" | "question" | "answer" | "url" | "status"
+>;
+type Venue = Pick<Doc<"venues">, "_id" | "name" | "url" | "updatedAt"> & {
+  answerCount: number;
+  answers: VenueAnswer[];
+};
 
 function StatusLabel({ status }: { status: VenueAnswer["status"] }) {
   const label = status === "published" ? "Published by venue" : "Confirmed by venue";
@@ -49,9 +56,22 @@ function SourceUrl({ url, label }: { url: string; label: string }) {
   );
 }
 
-function QuestionRow({ answer }: { answer: VenueAnswer }) {
+function QuestionRow({
+  answer,
+  index,
+  isHighlighted,
+}: {
+  answer: VenueAnswer;
+  index: number;
+  isHighlighted: boolean;
+}) {
   return (
-    <li className="border-b border-(--app-line) px-8 py-4 last:border-b-0 max-[680px]:px-4 max-[680px]:py-4">
+    <li
+      id={`venue-answer-${index}`}
+      className={`border-b border-(--app-line) px-8 py-4 last:border-b-0 max-[680px]:px-4 max-[680px]:py-4 ${
+        isHighlighted ? "answer-jump-flash" : ""
+      }`}
+    >
       <article className="grid grid-cols-[minmax(18rem,0.9fr)_minmax(0,1.5fr)_minmax(13rem,0.8fr)] gap-4 max-[900px]:grid-cols-1 max-[900px]:gap-2">
         <div className="flex items-start gap-3">
           <span
@@ -60,7 +80,11 @@ function QuestionRow({ answer }: { answer: VenueAnswer }) {
           >
             Q
           </span>
-          <h2 className="m-0 max-w-none text-[clamp(0.95rem,1.8vw,1.25rem)] leading-[1.15] font-semibold tracking-[-0.03em] max-[900px]:text-[0.95rem]">
+          <h2
+            id={`venue-question-${index}`}
+            tabIndex={-1}
+            className="m-0 max-w-none text-[clamp(0.95rem,1.8vw,1.25rem)] leading-[1.15] font-semibold tracking-[-0.03em] focus:outline-none focus-visible:underline focus-visible:decoration-(--app-accent) focus-visible:underline-offset-4 max-[900px]:text-[0.95rem]"
+          >
             {answer.question}
           </h2>
         </div>
@@ -78,17 +102,223 @@ function QuestionRow({ answer }: { answer: VenueAnswer }) {
   );
 }
 
+function AnswerSearchPanel({
+  venueId,
+  inputRef,
+  onClose,
+  onSelectAnswer,
+}: {
+  venueId: Venue["_id"];
+  inputRef: React.RefObject<HTMLInputElement | null>;
+  onClose: () => void;
+  onSelectAnswer: (answerIndex: number) => void;
+}) {
+  const [query, setQuery] = useState("");
+  const [activeIndex, setActiveIndex] = useState(0);
+  const inputId = useId();
+  const listboxId = useId();
+  const optionIdPrefix = useId();
+  const searchResult = useQuery(
+    api.venues.searchVenueAnswers,
+    query.trim() ? { venueId, searchTerm: query.trim() } : "skip",
+  );
+  const matches = searchResult?.results ?? [];
+  const activeMatch = matches[activeIndex];
+  const isSearching = query.trim().length > 0 && searchResult === undefined;
+
+  function handleKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
+    if (matches.length === 0) return;
+
+    if (event.key === "ArrowDown") {
+      event.preventDefault();
+      setActiveIndex((current) => (current + 1) % matches.length);
+    } else if (event.key === "ArrowUp") {
+      event.preventDefault();
+      setActiveIndex((current) => (current - 1 + matches.length) % matches.length);
+    } else if (event.key === "Home") {
+      event.preventDefault();
+      setActiveIndex(0);
+    } else if (event.key === "End") {
+      event.preventDefault();
+      setActiveIndex(matches.length - 1);
+    } else if (event.key === "Enter") {
+      event.preventDefault();
+      onSelectAnswer((activeMatch ?? matches[0]).answerIndex);
+    }
+  }
+
+  return (
+    <Dialog.Root open onOpenChange={(open) => !open && onClose()}>
+      <Dialog.Portal>
+        <Dialog.Backdrop className="fixed inset-0 z-60 bg-[oklch(0.14_0.11_255_/_82%)]" />
+        <Dialog.Viewport className="fixed inset-0 z-60 grid place-items-center overflow-y-auto px-4 py-6">
+          <Dialog.Popup
+            id="venue-answer-search-panel"
+            initialFocus={inputRef}
+            className="max-h-[calc(100svh-3rem)] w-full max-w-2xl overflow-y-auto border border-(--app-field-border) bg-(--app-bg) text-(--app-ink) shadow-overlay-large outline-none"
+          >
+            <div className="flex items-start justify-between gap-5 border-b border-(--app-line) px-5 py-4 sm:px-7 sm:py-5">
+              <div>
+                <Dialog.Title className="text-xl font-semibold tracking-[-0.03em] sm:text-2xl">
+                  Find an answer
+                </Dialog.Title>
+                <Dialog.Description className="mt-1 max-w-[52ch] text-sm leading-5 text-(--app-muted)">
+                  Search a venue question or answer, then choose a result to jump to it.
+                </Dialog.Description>
+              </div>
+              <Dialog.Close
+                aria-label="Close answer search"
+                className="flex size-9 shrink-0 items-center justify-center border border-transparent text-(--app-muted) hover:border-(--app-line) hover:text-(--app-ink) focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--app-focus)"
+              >
+                <X aria-hidden="true" className="size-4" />
+              </Dialog.Close>
+            </div>
+
+            <div className="flex items-center gap-3 border-b border-(--app-line) px-5 sm:px-7">
+              <Search aria-hidden="true" className="size-4 shrink-0 text-(--app-muted)" />
+              <label htmlFor={inputId} className="sr-only">
+                Search questions and answers
+              </label>
+              <Input
+                ref={inputRef}
+                id={inputId}
+                type="search"
+                role="combobox"
+                aria-autocomplete="list"
+                aria-expanded={matches.length > 0}
+                aria-controls={matches.length > 0 ? listboxId : undefined}
+                aria-activedescendant={activeMatch ? `${optionIdPrefix}-${activeIndex}` : undefined}
+                value={query}
+                onChange={(event) => {
+                  setQuery(event.target.value);
+                  setActiveIndex(0);
+                }}
+                onKeyDown={handleKeyDown}
+                placeholder="Search questions and answers"
+                autoComplete="off"
+                maxLength={200}
+                className="h-14 border-0 bg-transparent px-0 text-base text-(--app-field-ink) caret-(--app-accent) shadow-none placeholder:text-(--app-field-placeholder) focus-visible:ring-0 dark:bg-transparent"
+              />
+            </div>
+
+            {!query.trim() && (
+              <p className="m-0 px-5 py-5 text-sm leading-6 text-(--app-muted)">
+                Type a topic or phrase to find its question and sourced answer.
+              </p>
+            )}
+
+            {isSearching && (
+              <p className="m-0 px-5 py-5 text-sm leading-6 text-(--app-muted)" role="status">
+                Searching venue answers…
+              </p>
+            )}
+
+            {!isSearching && query.trim() && matches.length === 0 && (
+              <p className="m-0 px-5 py-5 text-sm leading-6 text-(--app-muted)" role="status">
+                No answers match “{query.trim()}”. Try another word or phrase.
+              </p>
+            )}
+
+            {matches.length > 0 && (
+              <>
+                <p className="sr-only" role="status" aria-live="polite">
+                  {matches.length} matching {matches.length === 1 ? "answer" : "answers"}. Use the
+                  arrow keys to choose one.
+                </p>
+                <ul
+                  id={listboxId}
+                  role="listbox"
+                  aria-label="Matching venue questions and answers"
+                  className="m-0 max-h-[min(22rem,45svh)] list-none overflow-y-auto p-0"
+                >
+                  {matches.map(({ answer, answerIndex, question }, index) => (
+                    <li
+                      id={`${optionIdPrefix}-${index}`}
+                      key={`${answerIndex}-${question}`}
+                      role="option"
+                      aria-selected={activeIndex === index}
+                      onMouseDown={(event) => event.preventDefault()}
+                      onPointerMove={() => setActiveIndex(index)}
+                      onClick={() => onSelectAnswer(answerIndex)}
+                      className={`cursor-pointer border-b border-(--app-line) px-5 py-3.5 last:border-b-0 focus:outline-none ${
+                        activeIndex === index
+                          ? "bg-[color-mix(in_oklch,var(--app-accent)_12%,var(--app-field))]"
+                          : "hover:bg-[color-mix(in_oklch,var(--app-accent)_8%,var(--app-field))]"
+                      }`}
+                    >
+                      <span className="block text-sm leading-5 font-semibold text-(--app-ink)">
+                        {question}
+                      </span>
+                      <span className="mt-1 line-clamp-2 block text-[0.78rem] leading-5 text-(--app-muted)">
+                        {answer}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+                <div className="flex flex-wrap items-center justify-between gap-x-5 gap-y-2 border-t border-(--app-line) px-5 py-2.5 font-mono text-[0.65rem] text-(--app-muted)">
+                  <span>
+                    {matches.length} {matches.length === 1 ? "match" : "matches"} · showing up to 5
+                  </span>
+                  <span className="flex items-center gap-3">
+                    <span>
+                      <kbd className="border border-(--app-line) px-1">↑</kbd>{" "}
+                      <kbd className="border border-(--app-line) px-1">↓</kbd> to move
+                    </span>
+                    <span>
+                      <kbd className="border border-(--app-line) px-1">Enter</kbd> to jump
+                    </span>
+                  </span>
+                </div>
+              </>
+            )}
+          </Dialog.Popup>
+        </Dialog.Viewport>
+      </Dialog.Portal>
+    </Dialog.Root>
+  );
+}
+
 export function VenueInfoPage({ venue }: { venue: Venue }) {
-  const [searchText, setSearchText] = useState("");
-  const [searchQuery, setSearchQuery] = useState("");
-  const normalizedSearchQuery = searchQuery.toLowerCase();
-  const filteredAnswers = normalizedSearchQuery
-    ? venue.results.filter(
-        (answer) =>
-          answer.question.toLowerCase().includes(normalizedSearchQuery) ||
-          answer.answer.toLowerCase().includes(normalizedSearchQuery),
-      )
-    : venue.results;
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [highlightedAnswerIndex, setHighlightedAnswerIndex] = useState<number | null>(null);
+  const searchTriggerRef = useRef<HTMLButtonElement>(null);
+  const searchInputRef = useRef<HTMLInputElement>(null);
+  const highlightTimeoutRef = useRef<number | null>(null);
+
+  useEffect(
+    () => () => {
+      if (highlightTimeoutRef.current !== null) window.clearTimeout(highlightTimeoutRef.current);
+    },
+    [],
+  );
+
+  const openSearch = () => setIsSearchOpen(true);
+
+  const closeSearch = () => setIsSearchOpen(false);
+
+  const handleSelectAnswer = (answerIndex: number) => {
+    setIsSearchOpen(false);
+    setHighlightedAnswerIndex(null);
+
+    if (highlightTimeoutRef.current !== null) window.clearTimeout(highlightTimeoutRef.current);
+
+    window.requestAnimationFrame(() => {
+      const answerRow = document.getElementById(`venue-answer-${answerIndex}`);
+      const questionHeading = document.getElementById(`venue-question-${answerIndex}`);
+      const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+      setHighlightedAnswerIndex(answerIndex);
+      answerRow?.scrollIntoView({
+        behavior: prefersReducedMotion ? "auto" : "smooth",
+        block: "center",
+      });
+      questionHeading?.focus({ preventScroll: true });
+      highlightTimeoutRef.current = window.setTimeout(
+        () => setHighlightedAnswerIndex(null),
+        prefersReducedMotion ? 1800 : 2400,
+      );
+    });
+  };
 
   const handleShare = async () => {
     const shareData = {
@@ -152,83 +382,51 @@ export function VenueInfoPage({ venue }: { venue: Venue }) {
             </div>
           </header>
 
-          <div className="flex flex-col gap-3 border-b border-(--app-line) bg-[color-mix(in_oklch,var(--app-accent)_8%,var(--app-bg))] px-8 py-3.5 max-[680px]:px-4 md:flex-row md:items-center md:justify-between">
+          <div className="relative z-20 flex flex-col gap-3 border-b border-(--app-line) bg-[color-mix(in_oklch,var(--app-accent)_8%,var(--app-bg))] px-8 py-3.5 max-[680px]:px-4 md:flex-row md:items-center md:justify-between">
             <div className="min-w-0 text-xs">
               <p className="m-0 text-(--app-muted)">
                 Answers include their source page and publication or confirmation status.
               </p>
-              {searchQuery && (
-                <p className="mt-1 mb-0 text-(--app-muted)" role="status" aria-live="polite">
-                  Showing {filteredAnswers.length} of {venue.results.length} answers for “
-                  {searchQuery}”.
-                </p>
-              )}
             </div>
-            {venue.results.length > 0 && (
-              <form
-                className="w-full shrink-0 md:max-w-lg"
-                aria-label="Search venue answers"
-                onSubmit={(event) => {
-                  event.preventDefault();
-                  setSearchQuery(searchText.trim());
-                }}
+            {venue.answerCount > 0 && (
+              <button
+                ref={searchTriggerRef}
+                type="button"
+                aria-haspopup="dialog"
+                aria-expanded={isSearchOpen}
+                aria-controls={isSearchOpen ? "venue-answer-search-panel" : undefined}
+                onClick={openSearch}
+                className="inline-flex h-10 shrink-0 items-center gap-2 border border-(--app-field-border) bg-(--app-field) px-4 text-xs font-semibold tracking-[0.08em] text-(--app-ink) uppercase transition-colors duration-200 hover:bg-[color-mix(in_oklch,var(--app-accent)_12%,var(--app-field))] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--app-focus) motion-reduce:transition-none"
               >
-                <div className="grid border border-(--app-field-border) bg-(--app-field) transition-[border-color,box-shadow] duration-300 focus-within:border-(--app-focus) focus-within:ring-2 focus-within:ring-(--app-focus)/30 motion-reduce:transition-none sm:grid-cols-[1fr_auto]">
-                  <Field className="gap-0">
-                    <FieldLabel htmlFor="venue-answer-search" className="sr-only">
-                      Search questions and answers
-                    </FieldLabel>
-                    <Input
-                      id="venue-answer-search"
-                      type="search"
-                      value={searchText}
-                      onChange={(event) => setSearchText(event.target.value)}
-                      placeholder="Search questions and answers"
-                      autoComplete="off"
-                      className="h-14 border-0 bg-transparent px-4 text-lg text-(--app-field-ink) caret-(--app-accent) shadow-none placeholder:text-(--app-field-placeholder) focus-visible:ring-0 sm:h-16 sm:px-5 sm:text-lg dark:bg-transparent"
-                    />
-                  </Field>
-                  <Button
-                    type="submit"
-                    className="group h-14 justify-between border-t border-(--app-field-border) bg-(--app-accent) px-4 text-sm text-(--app-accent-ink) hover:bg-(--app-accent-hover) sm:h-16 sm:min-w-44 sm:border-t-0 sm:border-l sm:px-5"
-                  >
-                    Search
-                    <ArrowRight
-                      aria-hidden="true"
-                      className="transition-transform duration-300 group-hover:translate-x-1 group-focus-visible:translate-x-1 motion-reduce:transition-none"
-                    />
-                  </Button>
-                </div>
-              </form>
+                <Search aria-hidden="true" className="size-4" />
+                Search answers
+              </button>
+            )}
+
+            {isSearchOpen && (
+              <AnswerSearchPanel
+                venueId={venue._id}
+                inputRef={searchInputRef}
+                onClose={closeSearch}
+                onSelectAnswer={handleSelectAnswer}
+              />
             )}
           </div>
 
-          {filteredAnswers.length > 0 && (
+          {venue.answers.length > 0 && (
             <ol className="m-0 list-none p-0" aria-label="Venue answers">
-              {filteredAnswers.map((answer) => (
+              {venue.answers.map((answer) => (
                 <QuestionRow
-                  key={JSON.stringify([answer.url, answer.question, answer.answer])}
+                  key={answer.answerIndex}
                   answer={answer}
+                  index={answer.answerIndex}
+                  isHighlighted={highlightedAnswerIndex === answer.answerIndex}
                 />
               ))}
             </ol>
           )}
 
-          {venue.results.length > 0 && filteredAnswers.length === 0 && (
-            <Empty className="min-h-48 gap-3 border-0 px-8 py-12 max-[680px]:px-4">
-              <EmptyHeader>
-                <EmptyTitle role="heading" aria-level={2}>
-                  No matching answers
-                </EmptyTitle>
-                <EmptyDescription>
-                  No questions or answers match “{searchQuery}”. Try another term, or search with an
-                  empty field to see every answer.
-                </EmptyDescription>
-              </EmptyHeader>
-            </Empty>
-          )}
-
-          {venue.results.length === 0 && (
+          {venue.answerCount === 0 && (
             <Empty className="min-h-48 gap-3 border-0 px-8 py-12 max-[680px]:px-4">
               <EmptyHeader>
                 <EmptyTitle role="heading" aria-level={2}>
@@ -246,8 +444,8 @@ export function VenueInfoPage({ venue }: { venue: Venue }) {
               Only sourced answers are shown. Missing information is not a no.
             </p>
             <p className="m-0 font-mono text-[0.68rem] leading-[1.4] text-(--app-muted)">
-              {venue.results.length} {venue.results.length === 1 ? "answer" : "answers"} · from
-              venue information
+              {venue.answerCount} {venue.answerCount === 1 ? "answer" : "answers"} · from venue
+              information
             </p>
           </aside>
 
