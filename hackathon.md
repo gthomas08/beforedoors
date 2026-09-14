@@ -2,17 +2,17 @@
 
 - **Project:** BeforeDoors
 - **Event:** Convex All Gas Hackathon
-- **What it does:** A web app where people submit venue URLs, follow Convex research progress, review sourced accessibility Q&A, and sign in with username and password accounts; the backend maps relevant pages and extracts answers through Firecrawl.
+- **What it does:** A web app where people submit venue URLs, follow Convex research progress, search sourced accessibility Q&A, review reports, and sign in with username and password; the backend uses Firecrawl to map relevant pages and extract answers.
 - **Live app:** not deployed
 - **Repo:** https://github.com/gthomas08/beforedoors
 - **Frontend:** not deployed
 - **Convex deployment:** not deployed
 - **Components:** @convex-dev/auth, @firecrawl/firecrawl-convex
-- **Convex features:** authentication, component, schema, tables, indexes, queries, mutations, actions, scheduled functions, realtime queries, paginated queries
+- **Convex features:** authentication, component, schema, tables, indexes, full-text search, queries, mutations, actions, scheduled functions, realtime queries, paginated queries
 - **Auth:** Convex Auth
 - **AI models:** none
 - **Started:** 2026-09-02T18:35:17Z
-- **Last updated:** 2026-09-13T17:44:02Z
+- **Last updated:** 2026-09-14T18:57:46Z
 
 ## Log
 
@@ -69,3 +69,7 @@ rendering and backend function-region conventions (`packages/backend/convex/auth
 `apps/web/src/components/report-page.tsx`, `.oxlintrc.json`,
 `apps/web/AGENTS.md`, `packages/backend/AGENTS.md`). Convex features:
 authentication, authenticated queries and mutations.
+
+### 2026-09-14 - c8335cb
+
+Added venue-scoped full-text search for accessibility questions and answers. Convex indexes each saved answer's question and answer, and a reactive query returns up to five matches for the dialog; keyboard selection jumps to the chosen answer (`packages/backend/convex/schema.ts`, `packages/backend/convex/venues.ts`, `apps/web/src/components/report-page.tsx`). Convex features: full-text search.
