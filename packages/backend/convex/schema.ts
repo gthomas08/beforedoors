@@ -47,6 +47,16 @@ export default defineSchema({
     publishedCount: v.number(),
     confirmedCount: v.number(),
   }).index("by_url", ["url"]),
+  venueQuestionRequests: defineTable({
+    userId: v.id("users"),
+    requestKey: v.string(),
+    venueName: v.string(),
+    venueUrl: v.string(),
+    questions: v.array(v.string()),
+    outboundId: v.string(),
+  })
+    .index("by_user_and_request_key", ["userId", "requestKey"])
+    .index("by_user_and_venue_url", ["userId", "venueUrl"]),
   venueAnswers: defineTable({
     venueId: v.id("venues"),
     answerIndex: v.number(),

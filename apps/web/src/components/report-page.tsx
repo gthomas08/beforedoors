@@ -2,7 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { Result } from "better-result";
 import { Dialog } from "@base-ui/react/dialog";
 import { useQuery } from "convex/react";
-import { ArrowUpRight, Search, X } from "lucide-react";
+import { ArrowRight, ArrowUpRight, MessageCircleQuestion, Search, X } from "lucide-react";
 import { useEffect, useId, useRef, useState } from "react";
 import { toast } from "sonner";
 
@@ -448,6 +448,36 @@ export function VenueInfoPage({ venue }: { venue: Venue }) {
               information
             </p>
           </aside>
+
+          <section
+            aria-labelledby="ask-venue-title"
+            className="flex flex-wrap items-center justify-between gap-5 border-t border-(--app-line) px-8 py-7 max-[680px]:items-start max-[680px]:px-4"
+          >
+            <div className="max-w-[56ch]">
+              <h2
+                id="ask-venue-title"
+                className="m-0 text-[1.2rem] leading-tight font-semibold tracking-[-0.025em]"
+              >
+                Still have a question?
+              </h2>
+              <p className="mt-2 mb-0 text-[0.86rem] leading-6 text-(--app-muted)">
+                Ask the venue directly. Add only what the published information could not answer,
+                then review the note before it leaves BeforeDoors.
+              </p>
+            </div>
+            <Link
+              to="/ask-venue"
+              search={{ venueName: venue.name || "the venue", venueUrl: venue.url }}
+              className="group inline-flex h-10 shrink-0 items-center gap-2 border border-(--app-accent) bg-(--app-accent) px-4 text-xs font-semibold tracking-[0.08em] text-(--app-accent-ink) uppercase transition-[background-color,border-color] duration-200 hover:border-(--app-accent-hover) hover:bg-(--app-accent-hover) focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--app-focus) motion-reduce:transition-none"
+            >
+              <MessageCircleQuestion aria-hidden="true" className="size-4" />
+              Ask the venue
+              <ArrowRight
+                aria-hidden="true"
+                className="size-4 transition-transform duration-200 group-hover:translate-x-0.5 group-focus-visible:translate-x-0.5 motion-reduce:transition-none"
+              />
+            </Link>
+          </section>
 
           <footer className="flex justify-between gap-4 border-t border-(--app-line) px-8 py-3.5 font-mono text-[0.68rem] leading-normal text-(--app-muted) max-[680px]:flex-col max-[680px]:px-4">
             <span>BeforeDoors · Know before you go</span>
