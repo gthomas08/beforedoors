@@ -2,17 +2,17 @@
 
 - **Project:** BeforeDoors
 - **Event:** Convex All Gas Hackathon
-- **What it does:** A web app where people submit venue URLs, follow Convex research progress, search sourced accessibility Q&A, review reports, and sign in with username and password; the backend uses Firecrawl to map relevant pages and extract answers.
+- **What it does:** A web app where people submit venue URLs, follow Convex research progress, search sourced accessibility Q&A, review reports, ask authenticated venue-specific questions, and view replies; the backend uses Firecrawl to map relevant pages and extract answers, while AgentMail handles venue inquiries.
 - **Live app:** not deployed
 - **Repo:** https://github.com/gthomas08/beforedoors
 - **Frontend:** not deployed
 - **Convex deployment:** not deployed
-- **Components:** @convex-dev/auth, @firecrawl/firecrawl-convex
-- **Convex features:** authentication, component, schema, tables, indexes, full-text search, queries, mutations, actions, scheduled functions, realtime queries, paginated queries
+- **Components:** @convex-dev/auth, @firecrawl/firecrawl-convex, AgentMail (local component)
+- **Convex features:** authentication, components, schema, tables, indexes, full-text search, queries, mutations, actions, HTTP actions, scheduled functions, realtime queries, paginated queries, AgentMail webhooks
 - **Auth:** Convex Auth
 - **AI models:** none
 - **Started:** 2026-09-02T18:35:17Z
-- **Last updated:** 2026-09-14T18:57:46Z
+- **Last updated:** 2026-09-16T19:25:38Z
 
 ## Log
 
@@ -73,3 +73,7 @@ authentication, authenticated queries and mutations.
 ### 2026-09-14 - c8335cb
 
 Added venue-scoped full-text search for accessibility questions and answers. Convex indexes each saved answer's question and answer, and a reactive query returns up to five matches for the dialog; keyboard selection jumps to the chosen answer (`packages/backend/convex/schema.ts`, `packages/backend/convex/venues.ts`, `apps/web/src/components/report-page.tsx`). Convex features: full-text search.
+
+### 2026-09-16 - 630daf6
+
+Added an authenticated venue-question workflow with a TanStack Form, distinct question fields, a read-only email preview, and delivery/reply states on `/ask-venue`. The backend persists requests, queues mail through the registered local AgentMail component, tracks delivery, validates the AgentMail webhook, and exposes replies through a reactive query (`apps/web/src/components/ask-venue-page.tsx`, `apps/web/src/routes/ask-venue.tsx`, `packages/backend/convex/venueQuestions.ts`, `packages/backend/convex/http.ts`, `packages/backend/convex/convex.config.ts`). Convex features: authenticated query and mutation, component, tables, indexes, HTTP action, webhook handling, and realtime query.
