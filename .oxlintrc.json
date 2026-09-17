@@ -8,7 +8,11 @@
   "categories": {
     "correctness": "error"
   },
-  "ignorePatterns": [".agents/**", "packages/backend/convex/_generated/**"],
+  "ignorePatterns": [
+    ".agents/**",
+    "packages/backend/convex/_generated/**",
+    "packages/backend/convex/components/agentmail/_generated/**"
+  ],
   "settings": {
     "tailwindcss": {
       "entryPoint": "apps/web/src/styles.css"

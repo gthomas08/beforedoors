@@ -2,7 +2,9 @@ import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
 
 export default defineSchema({
-  users: defineTable({}),
+  users: defineTable({
+    username: v.string(),
+  }),
   reports: defineTable({
     url: v.string(),
     name: v.string(),
@@ -47,6 +49,10 @@ export default defineSchema({
     publishedCount: v.number(),
     confirmedCount: v.number(),
   }).index("by_url", ["url"]),
+  venueFavorites: defineTable({
+    userId: v.id("users"),
+    venueId: v.id("venues"),
+  }).index("by_user_and_venue", ["userId", "venueId"]),
   venueQuestionRequests: defineTable({
     userId: v.id("users"),
     requestKey: v.string(),

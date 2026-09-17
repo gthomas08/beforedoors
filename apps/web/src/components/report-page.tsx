@@ -1,8 +1,9 @@
 import { Link } from "@tanstack/react-router";
 import { Result } from "better-result";
 import { Dialog } from "@base-ui/react/dialog";
-import { useQuery } from "convex/react";
-import { ArrowRight, ArrowUpRight, MessageCircleQuestion, Search, X } from "lucide-react";
+import { useConvexAuth } from "@convex-dev/auth/react";
+import { useMutation, useQuery } from "convex/react";
+import { ArrowRight, ArrowUpRight, Heart, MessageCircleQuestion, Search, X } from "lucide-react";
 import { useEffect, useId, useRef, useState } from "react";
 import { toast } from "sonner";
 
@@ -83,14 +84,14 @@ function QuestionRow({
           <h2
             id={`venue-question-${index}`}
             tabIndex={-1}
-            className="m-0 max-w-none text-[clamp(0.95rem,1.8vw,1.25rem)] leading-[1.15] font-semibold tracking-[-0.03em] focus:outline-none focus-visible:underline focus-visible:decoration-(--app-accent) focus-visible:underline-offset-4 max-[900px]:text-[0.95rem]"
+            className="m-0 max-w-none text-base leading-[1.15] font-semibold tracking-[-0.03em] focus:outline-none focus-visible:underline focus-visible:decoration-(--app-accent) focus-visible:underline-offset-4 lg:text-xl"
           >
             {answer.question}
           </h2>
         </div>
 
         <div className="min-w-0">
-          <p className="m-0 max-w-[64ch] text-[0.92rem] leading-normal">{answer.answer}</p>
+          <p className="m-0 max-w-[64ch] text-sm leading-normal">{answer.answer}</p>
         </div>
 
         <div className="flex min-w-0 flex-col items-end gap-2 max-[900px]:mt-0.5 max-[900px]:items-start">
@@ -255,7 +256,7 @@ function AnswerSearchPanel({
                     </li>
                   ))}
                 </ul>
-                <div className="flex flex-wrap items-center justify-between gap-x-5 gap-y-2 border-t border-(--app-line) px-5 py-2.5 font-mono text-[0.65rem] text-(--app-muted)">
+                <div className="flex flex-wrap items-center justify-between gap-x-5 gap-y-2 border-t border-(--app-line) px-5 py-2.5 font-mono text-xs text-(--app-muted)">
                   <span>
                     {matches.length} {matches.length === 1 ? "match" : "matches"} · showing up to 5
                   </span>
@@ -275,6 +276,56 @@ function AnswerSearchPanel({
         </Dialog.Viewport>
       </Dialog.Portal>
     </Dialog.Root>
+  );
+}
+
+function VenueFavoriteButton({ venueId, venueName }: { venueId: Venue["_id"]; venueName: string }) {
+  const { isAuthenticated, isLoading: isAuthLoading } = useConvexAuth();
+  const favorite = useQuery(api.favorites.getVenueFavorite, isAuthenticated ? { venueId } : "skip");
+  const setVenueFavorite = useMutation(api.favorites.setVenueFavorite);
+  const [isUpdating, setIsUpdating] = useState(false);
+
+  const handleFavorite = async () => {
+    if (isAuthLoading) return;
+
+    if (!isAuthenticated) {
+      toast.error("Sign in to favorite venues.");
+      return;
+    }
+
+    if (favorite === undefined || isUpdating) return;
+
+    setIsUpdating(true);
+    try {
+      const result = await setVenueFavorite({
+        venueId,
+        isFavorite: !favorite.isFavorite,
+      });
+      toast.success(
+        result.isFavorite ? "Venue added to favorites." : "Venue removed from favorites.",
+      );
+    } catch {
+      toast.error("We couldn’t update this favorite. Please try again.");
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  const isFavorite = favorite?.isFavorite ?? false;
+  const isChecking = isAuthLoading || (isAuthenticated && favorite === undefined);
+
+  return (
+    <button
+      type="button"
+      aria-label={`${isFavorite ? "Remove favorite" : "Favorite"} ${venueName || "this venue"}`}
+      aria-pressed={isFavorite}
+      disabled={isChecking || isUpdating}
+      onClick={() => void handleFavorite()}
+      className="inline-flex h-10 shrink-0 items-center gap-2 border border-(--app-field-border) bg-(--app-field) px-4 text-xs font-semibold tracking-[0.08em] text-(--app-ink) uppercase transition-colors duration-200 hover:bg-[color-mix(in_oklch,var(--app-accent)_12%,var(--app-field))] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--app-focus) disabled:cursor-wait disabled:opacity-60 motion-reduce:transition-none"
+    >
+      <Heart aria-hidden="true" className={`size-4 ${isFavorite ? "fill-current" : ""}`} />
+      {isChecking ? "Checking…" : isFavorite ? "Favorited" : "Favorite venue"}
+    </button>
   );
 }
 
@@ -370,13 +421,16 @@ export function VenueInfoPage({ venue }: { venue: Venue }) {
                 <SourceUrl url={venue.url} label="Open venue URL" />
               </p>
             </div>
-            <p className="z-10 m-0 max-w-60 shrink-0 font-mono text-[0.72rem] leading-normal text-(--app-muted) max-[760px]:mt-4">
-              Last updated
-              <br />
-              <strong className="font-semibold text-(--app-accent-hover)">
-                {formatUpdatedAt(venue.updatedAt)}
-              </strong>
-            </p>
+            <div className="z-10 flex shrink-0 items-end gap-5 max-[760px]:mt-4 max-[760px]:items-start">
+              <p className="m-0 max-w-60 font-mono text-[0.72rem] leading-normal text-(--app-muted)">
+                Last updated
+                <br />
+                <strong className="font-semibold text-(--app-accent-hover)">
+                  {formatUpdatedAt(venue.updatedAt)}
+                </strong>
+              </p>
+              <VenueFavoriteButton venueId={venue._id} venueName={venue.name} />
+            </div>
             <div className="pointer-events-none absolute inset-y-0 right-0 z-[-1] w-[48%] max-[680px]:inset-0 max-[680px]:w-full max-[680px]:opacity-60">
               <ReportContourLines />
             </div>
@@ -443,7 +497,7 @@ export function VenueInfoPage({ venue }: { venue: Venue }) {
             <p className="m-0 text-[0.78rem] leading-[1.45] text-(--app-muted)">
               Only sourced answers are shown. Missing information is not a no.
             </p>
-            <p className="m-0 font-mono text-[0.68rem] leading-[1.4] text-(--app-muted)">
+            <p className="m-0 font-mono text-xs leading-[1.4] text-(--app-muted)">
               {venue.answerCount} {venue.answerCount === 1 ? "answer" : "answers"} · from venue
               information
             </p>
@@ -456,11 +510,11 @@ export function VenueInfoPage({ venue }: { venue: Venue }) {
             <div className="max-w-[56ch]">
               <h2
                 id="ask-venue-title"
-                className="m-0 text-[1.2rem] leading-tight font-semibold tracking-[-0.025em]"
+                className="m-0 text-xl leading-tight font-semibold tracking-[-0.025em]"
               >
                 Still have a question?
               </h2>
-              <p className="mt-2 mb-0 text-[0.86rem] leading-6 text-(--app-muted)">
+              <p className="mt-2 mb-0 text-sm leading-6 text-(--app-muted)">
                 Ask the venue directly. Add only what the published information could not answer,
                 then review the note before it leaves BeforeDoors.
               </p>
@@ -479,7 +533,7 @@ export function VenueInfoPage({ venue }: { venue: Venue }) {
             </Link>
           </section>
 
-          <footer className="flex justify-between gap-4 border-t border-(--app-line) px-8 py-3.5 font-mono text-[0.68rem] leading-normal text-(--app-muted) max-[680px]:flex-col max-[680px]:px-4">
+          <footer className="flex justify-between gap-4 border-t border-(--app-line) px-8 py-3.5 font-mono text-xs leading-normal text-(--app-muted) max-[680px]:flex-col max-[680px]:px-4">
             <span>BeforeDoors · Know before you go</span>
             <span>Answers carry their source</span>
           </footer>
@@ -511,9 +565,7 @@ export function VenueInfoMessage({
           <h1 className="m-0 text-[clamp(2.5rem,6vw,4rem)] leading-[0.95] font-semibold tracking-[-0.045em]">
             {title}
           </h1>
-          <p className="mt-5 mb-0 max-w-[55ch] text-[0.95rem] leading-7 text-(--app-muted)">
-            {message}
-          </p>
+          <p className="mt-5 mb-0 max-w-[55ch] text-base leading-7 text-(--app-muted)">{message}</p>
           {!isLoading && (
             <Link
               to="/venues"

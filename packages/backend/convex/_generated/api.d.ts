@@ -9,6 +9,7 @@
  */
 
 import type * as auth from "../auth.js";
+import type * as favorites from "../favorites.js";
 import type * as healthCheck from "../healthCheck.js";
 import type * as http from "../http.js";
 import type * as lib_customFunctions from "../lib/customFunctions.js";
@@ -27,6 +28,7 @@ import type {
 
 declare const fullApi: ApiFromModules<{
   auth: typeof auth;
+  favorites: typeof favorites;
   healthCheck: typeof healthCheck;
   http: typeof http;
   "lib/customFunctions": typeof lib_customFunctions;

@@ -16,7 +16,7 @@ type CompactNavLink = {
 };
 
 interface HeaderProps {
-  alignment?: "landing" | "report" | "status";
+  alignment?: "landing" | "report" | "status" | "account";
   linkToStatus?: boolean;
   linkToVenues?: boolean;
   wide?: boolean;
@@ -36,7 +36,12 @@ export default function Header({
   const maxWidthClass =
     alignment === "landing" && wide
       ? "max-w-5xl"
-      : { landing: "max-w-176", report: "max-w-352", status: "max-w-176" }[alignment];
+      : {
+          landing: "max-w-176",
+          report: "max-w-352",
+          status: "max-w-176",
+          account: "max-w-224",
+        }[alignment];
   const gutterClass = isReportAligned
     ? "w-[calc(100%-2.5rem)] sm:w-[calc(100%-2.5rem)]"
     : "w-[calc(100%-2.5rem)] sm:w-[calc(100%-4rem)]";
@@ -93,7 +98,7 @@ function ReportHeaderActions({ onShare }: { onShare?: () => void }) {
         </Link>
         <button
           type="button"
-          className="border border-(--app-accent) bg-(--app-accent) px-2.5 py-1.5 text-xs font-semibold tracking-[0.08em] text-(--app-accent-ink) uppercase transition-[background-color,border-color] duration-200 hover:border-(--app-accent-hover) hover:bg-(--app-accent-hover) focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-(--app-focus) motion-reduce:transition-none max-[680px]:px-2 max-[680px]:py-1 max-[680px]:text-[0.65rem]"
+          className="border border-(--app-accent) bg-(--app-accent) px-2.5 py-1.5 text-xs font-semibold tracking-[0.08em] text-(--app-accent-ink) uppercase transition-[background-color,border-color] duration-200 hover:border-(--app-accent-hover) hover:bg-(--app-accent-hover) focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-(--app-focus) motion-reduce:transition-none max-[680px]:px-2 max-[680px]:py-1"
           onClick={onShare}
         >
           Share this brief
@@ -114,7 +119,7 @@ function VenuesHeaderActions() {
   return (
     <>
       <nav className="flex items-center gap-3" aria-label="Venues navigation">
-        <span className="font-mono text-[0.68rem] font-semibold tracking-[0.12em] text-(--app-accent-hover) uppercase max-[680px]:hidden">
+        <span className="font-mono text-xs font-semibold tracking-[0.12em] text-(--app-accent-hover) uppercase max-[680px]:hidden">
           Venues
         </span>
         <ModeToggle />

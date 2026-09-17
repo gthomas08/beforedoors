@@ -1,4 +1,3 @@
-import { components } from "./_generated/api";
 import { internalMutation } from "./_generated/server";
 import { v } from "convex/values";
 import { zid } from "convex-helpers/server/zod4";
@@ -12,17 +11,7 @@ export const getCurrentUser = authQuery({
     id: zid("users"),
     username: z.string(),
   }),
-  handler: async (ctx) => {
-    const username = await ctx.runQuery(components.authUsername.public.getUsername, {
-      userId: ctx.userId,
-    });
-
-    if (username === null) {
-      throw new Error(`User ${ctx.userId} unexpectedly has no username`);
-    }
-
-    return { id: ctx.user._id, username };
-  },
+  handler: async (ctx) => ({ id: ctx.user._id, username: ctx.user.username }),
 });
 //#endregion Authenticated functions
 
@@ -34,6 +23,9 @@ export const createUser = internalMutation({
     profile: v.object({ username: v.string() }),
   },
   returns: v.id("users"),
-  handler: async (ctx) => ctx.db.insert("users", {}),
+  handler: async (ctx, args) =>
+    ctx.db.insert("users", {
+      username: args.profile.username,
+    }),
 });
 //#endregion Private functions

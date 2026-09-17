@@ -1,11 +1,68 @@
 import { AgentMail, type OutboundId } from "./components/agentmail/client/index.js";
 import { components } from "./_generated/api";
 import { env } from "./_generated/server";
+import { paginationOptsValidator } from "convex/server";
+import { v } from "convex/values";
+import { convexToZod } from "convex-helpers/server/zod4";
 import { zid } from "convex-helpers/server/zod4";
 import { z } from "zod";
 import { authMutation, authQuery } from "./lib/customFunctions";
+import { paginationResultSchema } from "./lib/pagination";
 
 const MAX_QUESTIONS = 10;
+
+const deliveryStatusSchema = z.enum([
+  "pending",
+  "sent",
+  "failed",
+  "delivered",
+  "bounced",
+  "complained",
+  "rejected",
+]);
+
+const vDeliveryStatus = v.union(
+  v.literal("pending"),
+  v.literal("sent"),
+  v.literal("failed"),
+  v.literal("delivered"),
+  v.literal("bounced"),
+  v.literal("complained"),
+  v.literal("rejected"),
+);
+
+const accountMessageValidator = v.object({
+  id: v.string(),
+  direction: v.union(v.literal("sent"), v.literal("received")),
+  from: v.union(v.string(), v.null()),
+  to: v.array(v.string()),
+  subject: v.union(v.string(), v.null()),
+  text: v.string(),
+  timestamp: v.number(),
+  status: v.union(vDeliveryStatus, v.null()),
+});
+
+const accountThreadValidator = v.object({
+  id: v.id("venueQuestionRequests"),
+  threadId: v.union(v.string(), v.null()),
+  venueName: v.string(),
+  venueUrl: v.string(),
+  subject: v.string(),
+  timestamp: v.number(),
+  status: vDeliveryStatus,
+  replyCount: v.number(),
+  errorMessage: v.union(v.string(), v.null()),
+  messages: v.array(accountMessageValidator),
+});
+
+const accountMessageSchema = convexToZod(accountMessageValidator);
+
+type AccountMessage = z.infer<typeof accountMessageSchema>;
+type OutboundStatusSummary = {
+  status: z.infer<typeof deliveryStatusSchema>;
+  threadId: string | null;
+  errorMessage: string | null;
+};
 
 const agentmail = new AgentMail(components.agentmail);
 
@@ -143,6 +200,69 @@ export const getLatestVenueQuestion = authQuery({
   },
 });
 
+export const listMyEmailThreads = authQuery({
+  args: { paginationOpts: convexToZod(paginationOptsValidator) },
+  returns: paginationResultSchema(accountThreadValidator),
+  handler: async (ctx, args) => {
+    const page = await ctx.db
+      .query("venueQuestionRequests")
+      .withIndex("by_user_and_request_key", (q) => q.eq("userId", ctx.userId))
+      .order("desc")
+      .paginate(args.paginationOpts);
+
+    const threads = await Promise.all(
+      page.page.map(async (request) => {
+        const delivery = (await ctx.runQuery(components.agentmail.lib.getOutboundStatus, {
+          outboundId: request.outboundId,
+        })) as OutboundStatusSummary | null;
+        const replies = delivery?.threadId
+          ? ((await ctx.runQuery(components.agentmail.lib.listInboundMessages, {
+              threadId: delivery.threadId,
+            })) as InboundMessageSummary[])
+          : [];
+        const subject = `A question from BeforeDoors · ${request.venueName}`;
+        const sentMessage: AccountMessage = {
+          id: request.outboundId,
+          direction: "sent",
+          from: env.BEFOREDOORS_EMAIL ?? null,
+          to: env.TEST_VENUE_EMAIL ? [env.TEST_VENUE_EMAIL] : [],
+          subject,
+          text: buildVenueQuestionEmail(request.venueName, request.questions),
+          timestamp: request._creationTime,
+          status: delivery?.status ?? "pending",
+        };
+        const receivedMessages: AccountMessage[] = replies.map((reply) => ({
+          id: reply.messageId,
+          direction: "received",
+          from: reply.from,
+          to: reply.to ?? [],
+          subject: reply.subject ?? null,
+          text: reply.text ?? reply.extractedText ?? reply.preview ?? "",
+          timestamp: reply.timestamp,
+          status: null,
+        }));
+
+        return {
+          id: request._id,
+          threadId: delivery?.threadId ?? null,
+          venueName: request.venueName,
+          venueUrl: request.venueUrl,
+          subject,
+          timestamp: request._creationTime,
+          status: delivery?.status ?? "pending",
+          replyCount: receivedMessages.length,
+          errorMessage: delivery?.errorMessage ?? null,
+          messages: [sentMessage, ...receivedMessages].sort(
+            (left, right) => left.timestamp - right.timestamp,
+          ),
+        };
+      }),
+    );
+
+    return { ...page, page: threads };
+  },
+});
+
 //#endregion Authenticated functions
 
 //#region Utils
@@ -167,6 +287,7 @@ function buildVenueQuestionEmail(venueName: string, questions: string[]) {
 type InboundMessageSummary = {
   messageId: string;
   from: string;
+  to?: string[];
   subject?: string;
   text?: string;
   extractedText?: string;
