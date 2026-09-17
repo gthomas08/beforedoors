@@ -12,7 +12,7 @@
 - **Auth:** Convex Auth
 - **AI models:** none
 - **Started:** 2026-09-02T18:35:17Z
-- **Last updated:** 2026-09-16T19:25:38Z
+- **Last updated:** 2026-09-17T17:35:15Z
 
 ## Log
 
@@ -77,3 +77,7 @@ Added venue-scoped full-text search for accessibility questions and answers. Con
 ### 2026-09-16 - 630daf6
 
 Added an authenticated venue-question workflow with a TanStack Form, distinct question fields, a read-only email preview, and delivery/reply states on `/ask-venue`. The backend persists requests, queues mail through the registered local AgentMail component, tracks delivery, validates the AgentMail webhook, and exposes replies through a reactive query (`apps/web/src/components/ask-venue-page.tsx`, `apps/web/src/routes/ask-venue.tsx`, `packages/backend/convex/venueQuestions.ts`, `packages/backend/convex/http.ts`, `packages/backend/convex/convex.config.ts`). Convex features: authenticated query and mutation, component, tables, indexes, HTTP action, webhook handling, and realtime query.
+
+### 2026-09-17 - b0489b8
+
+Expanded the private account record with required usernames, paginated sent and received venue-question threads, delivery and reply states, account filters, and a paginated list of user-saved venues. Added a `venueFavorites` junction table with authenticated Convex query and mutation APIs; venue reports can save or remove venues, and the account list links back to sourced reports (`packages/backend/convex/favorites.ts`, `packages/backend/convex/schema.ts`, `packages/backend/convex/venueQuestions.ts`, `packages/backend/convex/users.ts`, `apps/web/src/routes/account.tsx`, `apps/web/src/components/report-page.tsx`). Convex features: authenticated queries and mutations, schema, table, indexes, paginated queries, and realtime queries. Also upgraded the workspace to Convex 1.46.0 and excluded nested generated Convex code from lint and format checks.
