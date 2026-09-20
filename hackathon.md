@@ -5,14 +5,14 @@
 - **What it does:** A web app where people submit venue URLs, follow Convex research progress, search sourced accessibility Q&A, review reports, ask authenticated venue-specific questions, and view replies; the backend uses Firecrawl to map relevant pages and extract answers, while AgentMail handles venue inquiries.
 - **Live app:** not deployed
 - **Repo:** https://github.com/gthomas08/beforedoors
-- **Frontend:** not deployed
+- **Frontend:** Convex static hosting
 - **Convex deployment:** not deployed
-- **Components:** @convex-dev/auth, @firecrawl/firecrawl-convex, AgentMail (local component)
-- **Convex features:** authentication, components, schema, tables, indexes, full-text search, queries, mutations, actions, HTTP actions, scheduled functions, realtime queries, paginated queries, AgentMail webhooks
+- **Components:** @convex-dev/agent, @convex-dev/auth, @convex-dev/static-hosting, @convex-dev/workpool
+- **Convex features:** authentication, components, schema, tables, indexes, full-text search, queries, mutations, actions, HTTP actions, scheduled functions, realtime queries, paginated queries, queued background work, static hosting, AgentMail webhooks
 - **Auth:** Convex Auth
-- **AI models:** none
+- **AI models:** gpt-5.6-luna
 - **Started:** 2026-09-02T18:35:17Z
-- **Last updated:** 2026-09-17T17:35:15Z
+- **Last updated:** 2026-09-20T19:27:20Z
 
 ## Log
 
@@ -81,3 +81,9 @@ Added an authenticated venue-question workflow with a TanStack Form, distinct qu
 ### 2026-09-17 - b0489b8
 
 Expanded the private account record with required usernames, paginated sent and received venue-question threads, delivery and reply states, account filters, and a paginated list of user-saved venues. Added a `venueFavorites` junction table with authenticated Convex query and mutation APIs; venue reports can save or remove venues, and the account list links back to sourced reports (`packages/backend/convex/favorites.ts`, `packages/backend/convex/schema.ts`, `packages/backend/convex/venueQuestions.ts`, `packages/backend/convex/users.ts`, `apps/web/src/routes/account.tsx`, `apps/web/src/components/report-page.tsx`). Convex features: authenticated queries and mutations, schema, table, indexes, paginated queries, and realtime queries. Also upgraded the workspace to Convex 1.46.0 and excluded nested generated Convex code from lint and format checks.
+
+### 2026-09-20 - 0791bc9
+
+Turned research into a venue-specific, language-aware workflow that resolves a canonical target, ranks candidate pages with `gpt-5.6-luna` through the Convex Agent component, caches and queues Firecrawl work with Workpool, validates and deduplicates extracted answers, and reports finalization progress (`packages/backend/convex/reports.ts`, `packages/backend/convex/urlRanking.ts`, `packages/backend/convex/answerDeduplication.ts`, `packages/backend/convex/researchPageCache.ts`).
+
+Made contact email optional, added AgentMail reply extraction into confirmed venue answers, and shipped indexed venue search plus paginated favorites and email activity (`packages/backend/convex/venueReplyExtraction.ts`, `packages/backend/convex/venueQuestions.ts`, `packages/backend/convex/venues.ts`, `packages/backend/convex/schema.ts`). Unified the responsive frontend with shared page heroes, clearer answer states, and consistent filters, then registered Convex static hosting and added public social metadata (`apps/web/src/components/page-hero.tsx`, `apps/web/src/components/answer-status.ts`, `packages/backend/convex/convex.config.ts`, `apps/web/src/lib/site-meta.ts`).
