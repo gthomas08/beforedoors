@@ -130,12 +130,15 @@ The shared palette pairs warm ivory and evergreen with a single vivid orange rou
 - **Evergreen Muted** (`oklch(0.4 0.05 145)`): Supporting copy, route labels, and quiet metadata.
 - **Map Line** (`oklch(0.34 0.06 145 / 24%)`): One-pixel borders and low-contrast contour structure.
 - **Field Paper** (`oklch(0.99 0.01 88 / 94%)`): URL input surface and raised paper-toned controls.
+- **Filter White** (`oklch(1 0 0)`): Search and filtering controls that need a clear, neutral surface.
 - **Field Border** (`oklch(0.31 0.07 145)`): URL instrument stroke.
 - **Night Evergreen** (`oklch(0.24 0.025 151)`): Dark-mode page ground.
 - **Night Paper** (`oklch(0.96 0.025 88)`): Dark-mode text and warm contrast reference.
 
 ### Status
 
+- **Published Warm** (`oklch(0.53 0.14 52)`): Published answers sourced from the venue’s own website.
+- **Confirmed Evergreen** (`oklch(0.43 0.09 150)`): Answers confirmed directly by the venue.
 - **Verified Green** (`oklch(72.3% 0.219 149.579)`): A confirmed live connection only.
 - **Pending Amber** (`oklch(75% 0.183 55.934)`): A query that is still checking or awaiting evidence.
 - **Signal Red** (`oklch(63.7% 0.237 25.331)`): A failed or conflicting system state.

@@ -6,12 +6,17 @@
   "author": "",
   "scripts": {
     "dev": "convex dev",
-    "dev:setup": "convex dev --configure --until-success"
+    "dev:setup": "convex dev --configure --until-success",
+    "host:dev": "npx @convex-dev/static-hosting upload --build --dist ../../apps/web/dist --build-command \"pnpm --filter web build\""
   },
   "dependencies": {
+    "@ai-sdk/openai": "^4.0.71",
+    "@convex-dev/agent": "^0.7.3",
     "@convex-dev/auth": "2.0.0-alpha.1",
+    "@convex-dev/static-hosting": "^0.2.1",
     "@convex-dev/workpool": "^0.3.2",
     "@firecrawl/firecrawl-convex": "^0.1.1",
+    "ai": "^7.0.107",
     "better-result": "^3.0.1",
     "convex": "catalog:",
     "convex-helpers": "^0.1.124",

@@ -7,12 +7,10 @@ import { useForm } from "@tanstack/react-form";
 import { useMutation, useQuery } from "convex/react";
 
 import Header from "@/components/header";
-import { ReportContourLines } from "@/components/report-contour-lines";
+import { PageHero } from "@/components/page-hero";
 import { TrailheadSurface } from "@/components/trailhead-surface";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-
-const TEST_VENUE_EMAIL = "test@example.com";
 
 function validateQuestion(value: string) {
   const question = value.trim();
@@ -28,7 +26,7 @@ function EmailPreview({
   questions,
 }: {
   venueName: string;
-  venueEmail: string;
+  venueEmail: string | null;
   questions: Array<{ text: string }>;
 }) {
   return (
@@ -57,10 +55,7 @@ function EmailPreview({
             To
           </dt>
           <dd className="m-0 font-medium break-all">
-            {venueEmail}
-            <span className="ml-2 font-mono text-[0.62rem] font-normal tracking-[0.08em] text-(--app-field-placeholder) uppercase">
-              test destination
-            </span>
+            {venueEmail || "No verified public email found"}
           </dd>
         </div>
         <div className="grid gap-1 sm:grid-cols-[4.5rem_1fr] sm:gap-3">
@@ -104,8 +99,25 @@ function EmailPreview({
   );
 }
 
-export function AskVenuePage({ venueName, venueUrl }: { venueName: string; venueUrl: string }) {
-  const destinationEmail = TEST_VENUE_EMAIL;
+export function AskVenuePage({
+  venueName,
+  venueUrl,
+  venueEmail,
+  isVenueLoading = false,
+}: {
+  venueName: string;
+  venueUrl: string;
+  venueEmail: string | null;
+  isVenueLoading?: boolean;
+}) {
+  const hasVerifiedVenueEmail = Boolean(
+    venueEmail && !venueEmail.toLowerCase().endsWith(".invalid"),
+  );
+  const destinationEmail = isVenueLoading
+    ? "Looking up the venue email…"
+    : hasVerifiedVenueEmail
+      ? venueEmail
+      : null;
   const { isAuthenticated, isLoading: isAuthLoading } = useConvexAuth();
   const sendVenueQuestions = useMutation(api.venueQuestions.sendVenueQuestions);
   const latestVenueQuestion = useQuery(
@@ -125,6 +137,11 @@ export function AskVenuePage({ venueName, venueUrl }: { venueName: string; venue
 
       if (!isAuthenticated) {
         setSubmitError("Sign in above before sending a question to the venue.");
+        return;
+      }
+
+      if (!hasVerifiedVenueEmail) {
+        setSubmitError("This venue does not have a verified public contact email yet.");
         return;
       }
 
@@ -148,33 +165,30 @@ export function AskVenuePage({ venueName, venueUrl }: { venueName: string; venue
 
   return (
     <div className="min-h-svh bg-(--app-bg) text-(--app-ink)">
-      <Header alignment="report" linkToStatus linkToVenues />
+      <Header linkToVenues />
 
-      <main className="relative min-h-[calc(100svh-3.5rem)] overflow-x-hidden bg-(--app-bg) px-5 pb-12 max-[680px]:px-0">
+      <main className="relative min-h-[calc(100svh-3.5rem)] overflow-x-hidden bg-(--app-bg) px-0 pb-12 sm:px-5">
         <TrailheadSurface />
-        <div className="relative z-1 mx-auto w-full max-w-224 border-x border-(--app-line) bg-[color-mix(in_oklch,var(--app-bg)_96%,var(--app-field))] max-[680px]:border-x-0">
-          <header className="relative isolate border-b border-(--app-line) px-8 pt-8 pb-10 max-[680px]:px-4 max-[680px]:pt-7 max-[680px]:pb-8">
+        <div className="relative z-1 mx-auto w-full max-w-352 border-x border-(--app-line) bg-[color-mix(in_oklch,var(--app-bg)_96%,var(--app-field))]">
+          <PageHero
+            title={`Ask ${venueName}`}
+            description="Couldn’t find what you need in the brief? Write the venue a short, specific note. You’ll see exactly what is prepared before it is sent."
+            descriptionClassName="max-w-[55ch]"
+          />
+
+          <nav
+            aria-label="Venue navigation"
+            className="border-b border-(--app-line) px-8 py-3.5 max-[680px]:px-4"
+          >
             <Link
               to="/report"
               search={{ url: venueUrl }}
               className="inline-flex items-center gap-2 text-xs font-semibold tracking-[0.08em] text-(--app-muted) uppercase underline-offset-4 hover:text-(--app-ink) hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-(--app-focus)"
             >
               <ArrowLeft aria-hidden="true" className="size-3.5" />
-              Back to venue answers
+              Back to venue page
             </Link>
-            <div className="relative z-10 mt-8 max-w-3xl">
-              <h1 className="m-0 text-[clamp(2.6rem,6vw,5rem)] leading-[0.92] font-semibold tracking-[-0.045em] text-balance">
-                Ask {venueName}
-              </h1>
-              <p className="mt-5 mb-0 max-w-[55ch] text-[0.95rem] leading-7 text-(--app-muted) sm:text-base">
-                Couldn’t find what you need in the brief? Write the venue a short, specific note.
-                You’ll see exactly what is prepared before it is sent.
-              </p>
-            </div>
-            <div className="pointer-events-none absolute inset-y-0 right-0 z-[-1] w-[48%] opacity-75 max-[680px]:inset-0 max-[680px]:w-full max-[680px]:opacity-45">
-              <ReportContourLines />
-            </div>
-          </header>
+          </nav>
 
           <div className="border-b border-(--app-line) bg-[color-mix(in_oklch,var(--app-accent)_8%,var(--app-bg))] px-8 py-3.5 text-xs max-[680px]:px-4">
             <p className="m-0 leading-5 text-(--app-muted)">
@@ -205,7 +219,7 @@ export function AskVenuePage({ venueName, venueUrl }: { venueName: string; venue
                 </div>
                 <span className="inline-flex items-center gap-2 font-mono text-[0.65rem] font-semibold tracking-[0.12em] text-(--app-muted) uppercase">
                   <span className="text-(--app-accent-hover)">To</span>
-                  {destinationEmail}
+                  {destinationEmail || "No verified public email found"}
                 </span>
               </div>
 
@@ -261,7 +275,7 @@ export function AskVenuePage({ venueName, venueUrl }: { venueName: string; venue
                                 maxLength={300}
                                 aria-invalid={Boolean(error)}
                                 aria-describedby={error ? `${questionField.name}-error` : undefined}
-                                className="min-h-28 border-0 bg-transparent px-4 py-3 text-[0.95rem] leading-6 text-(--app-field-ink) caret-(--app-accent) shadow-none placeholder:text-(--app-field-placeholder) focus-visible:ring-0 dark:bg-transparent"
+                                className="min-h-28 border-0 bg-transparent px-4 py-3 text-[0.95rem] leading-6 text-(--app-field-ink) caret-(--app-accent) shadow-none placeholder:text-(--app-field-placeholder) focus-visible:ring-0"
                               />
                               <div className="flex min-h-8 items-center justify-between gap-4 border-t border-(--app-line) px-4 py-2 text-[0.68rem] text-(--app-field-placeholder)">
                                 {error ? (
@@ -352,30 +366,52 @@ export function AskVenuePage({ venueName, venueUrl }: { venueName: string; venue
                     here.
                   </p>
                 )}
-                {!submitError && !isSubmitted && isAuthenticated && (
-                  <p className="m-0 text-(--app-muted)">
-                    You stay in control: review the note, then choose to send it.
-                  </p>
-                )}
+                {!submitError &&
+                  !isSubmitted &&
+                  isAuthenticated &&
+                  !isVenueLoading &&
+                  !hasVerifiedVenueEmail && (
+                    <p className="m-0 text-(--app-muted)">
+                      We couldn’t find a verified public email for this venue yet.
+                    </p>
+                  )}
+                {!submitError &&
+                  !isSubmitted &&
+                  isAuthenticated &&
+                  (isVenueLoading || hasVerifiedVenueEmail) && (
+                    <p className="m-0 text-(--app-muted)">
+                      You stay in control: review the note, then choose to send it.
+                    </p>
+                  )}
               </div>
 
               <form.Subscribe selector={(state) => state.isSubmitting}>
                 {(isSubmitting) => (
                   <Button
                     type="submit"
-                    disabled={isSubmitting || isAuthLoading || !isAuthenticated}
+                    disabled={
+                      isSubmitting ||
+                      isAuthLoading ||
+                      !isAuthenticated ||
+                      !hasVerifiedVenueEmail ||
+                      isVenueLoading
+                    }
                     className="h-11 gap-2 border border-(--app-accent) bg-(--app-accent) px-4 text-xs font-semibold tracking-[0.08em] text-(--app-accent-ink) uppercase hover:bg-(--app-accent-hover) focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--app-focus)"
                   >
                     <Send aria-hidden="true" className="size-4" />
                     {isAuthLoading
                       ? "Checking access…"
-                      : isSubmitting
-                        ? "Sending…"
-                        : !isAuthenticated
-                          ? "Sign in to send"
-                          : isSubmitted
-                            ? "Send another"
-                            : "Send to venue"}
+                      : isVenueLoading
+                        ? "Looking up email…"
+                        : isSubmitting
+                          ? "Sending…"
+                          : !isAuthenticated
+                            ? "Sign in to send"
+                            : !hasVerifiedVenueEmail
+                              ? "Email unavailable"
+                              : isSubmitted
+                                ? "Send another"
+                                : "Send to venue"}
                   </Button>
                 )}
               </form.Subscribe>
@@ -395,7 +431,7 @@ export function AskVenuePage({ venueName, venueUrl }: { venueName: string; venue
                       Venue response
                     </h2>
                     <p className="mt-1.5 mb-0 text-sm leading-6 text-(--app-muted)">
-                      Replies to your latest question request will appear here automatically.
+                      Replies to your latest question request will appear here.
                     </p>
                   </div>
                   <span className="font-mono text-[0.65rem] font-semibold tracking-[0.12em] text-(--app-muted) uppercase">

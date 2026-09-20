@@ -2,9 +2,11 @@ import { api } from "@my-better-t-app/backend/convex/_generated/api";
 import type { Id } from "@my-better-t-app/backend/convex/_generated/dataModel";
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "convex/react";
+import { useEffect, useState } from "react";
 
 import { PendingReportPage } from "@/components/pending-report-page";
-import { VenueInfoMessage, VenueInfoPage } from "@/components/report-page";
+import { VenueInfoMessage, VenueInfoPage, VenueSelectionPage } from "@/components/report-page";
+import { createSiteMeta } from "@/lib/site-meta";
 
 export const Route = createFileRoute("/report")({
   validateSearch: (search: Record<string, unknown>) => ({
@@ -13,15 +15,10 @@ export const Route = createFileRoute("/report")({
   }),
   component: ReportRouteComponent,
   head: () => ({
-    meta: [
-      {
-        title: "BeforeDoors · Venue information",
-      },
-      {
-        name: "description",
-        content: "Review a venue's accessibility answers and source URLs before you go.",
-      },
-    ],
+    meta: createSiteMeta({
+      title: "BeforeDoors · Venue information",
+      description: "Review a venue's accessibility answers and source URLs before you go.",
+    }),
   }),
 });
 
@@ -38,23 +35,32 @@ function ReportRouteComponent() {
   }
 
   return reportId ? (
-    <TrackedReport key={reportId} reportId={reportId} url={url} />
+    <TrackedReport key={reportId} reportId={reportId} />
   ) : (
     <SavedVenueReport url={url} />
   );
 }
 
-function TrackedReport({ reportId, url }: { reportId: string; url: string }) {
+function TrackedReport({ reportId }: { reportId: string }) {
   const report = useQuery(api.reports.getReportStatus, {
     reportId: reportId as Id<"reports">,
   });
+  const [hasShownCompletion, setHasShownCompletion] = useState(false);
+  const isResearchComplete = report?.phase === "completed";
   const venue = useQuery(
     api.venues.getVenueByUrl,
-    report?.phase === "completed" ? { url: report.url } : "skip",
+    isResearchComplete ? { url: report.url } : "skip",
   );
 
+  useEffect(() => {
+    if (!isResearchComplete) return;
+
+    const completionTimer = window.setTimeout(() => setHasShownCompletion(true), 1000);
+    return () => window.clearTimeout(completionTimer);
+  }, [isResearchComplete]);
+
   if (report === undefined) {
-    return <PendingReportPage url={url} phase="queued" />;
+    return <PendingReportPage phase="queued" />;
   }
 
   if (report === null) {
@@ -62,6 +68,25 @@ function TrackedReport({ reportId, url }: { reportId: string; url: string }) {
       <VenueInfoMessage
         title="Research not found"
         message="This research link is no longer available. Start a new search to try again."
+      />
+    );
+  }
+
+  if (report.phase === "selection") {
+    if (report.candidateVenues.length === 0) {
+      return (
+        <VenueInfoMessage
+          title="No specific venue links found"
+          message="This page lists multiple venues, but no individual venue pages were available to choose."
+        />
+      );
+    }
+
+    return (
+      <VenueSelectionPage
+        reportId={report._id}
+        seedUrl={report.seedUrl}
+        candidates={report.candidateVenues}
       />
     );
   }
@@ -76,12 +101,12 @@ function TrackedReport({ reportId, url }: { reportId: string; url: string }) {
   }
 
   if (report.phase === "completed") {
-    if (venue === undefined) {
+    if (!hasShownCompletion || venue === undefined) {
       return (
-        <VenueInfoMessage
-          title="Saving venue information"
-          message="The research is complete. We’re saving its answers and sources now."
-          isLoading
+        <PendingReportPage
+          phase="completed"
+          totalPages={report.totalScrapes}
+          finishedPages={report.finishedScrapes}
         />
       );
     }
@@ -98,7 +123,13 @@ function TrackedReport({ reportId, url }: { reportId: string; url: string }) {
     return <VenueInfoPage venue={venue.venue} />;
   }
 
-  return <PendingReportPage url={url} phase={report.phase} />;
+  return (
+    <PendingReportPage
+      phase={report.phase}
+      totalPages={report.totalScrapes}
+      finishedPages={report.finishedScrapes}
+    />
+  );
 }
 
 function SavedVenueReport({ url }: { url: string }) {

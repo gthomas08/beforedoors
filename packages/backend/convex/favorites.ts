@@ -29,7 +29,7 @@ export const listMyFavoriteVenues = authQuery({
   handler: async (ctx, args) => {
     const page = await ctx.db
       .query("venueFavorites")
-      .withIndex("by_user_and_venue", (q) => q.eq("userId", ctx.userId))
+      .withIndex("by_user", (q) => q.eq("userId", ctx.userId))
       .order("desc")
       .paginate(args.paginationOpts);
 

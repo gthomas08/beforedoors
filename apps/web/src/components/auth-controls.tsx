@@ -1,5 +1,5 @@
 import { useAuthActions, useConvexAuth } from "@convex-dev/auth/react";
-import { Link } from "@tanstack/react-router";
+import { Link, useLocation } from "@tanstack/react-router";
 import { Result } from "better-result";
 import { lazy, Suspense, useState } from "react";
 import { toast } from "sonner";
@@ -30,8 +30,10 @@ function AuthActionItems({
   onSignOut: () => void;
   onSetAuthMode: (mode: AuthMode) => void;
 }) {
+  const pathname = useLocation({ select: (location) => location.pathname });
   const showAccountActions = !isLoading && isAuthenticated;
   const showGuestActions = !isLoading && !isAuthenticated;
+  const isAccountActive = pathname === "/account";
 
   return (
     <>
@@ -45,7 +47,12 @@ function AuthActionItems({
         <>
           <Link
             to="/account"
-            className="px-1.5 py-1 text-xs font-medium text-(--app-muted) underline-offset-4 hover:text-(--app-ink) hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-(--app-focus) sm:px-2"
+            className={`inline-flex h-full items-center px-1.5 text-xs leading-4 font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--app-focus) sm:px-2 ${
+              isAccountActive
+                ? "text-(--app-ink) underline decoration-(--app-accent) decoration-2 underline-offset-4"
+                : "text-(--app-muted) hover:text-(--app-ink)"
+            }`}
+            aria-current={isAccountActive ? "page" : undefined}
           >
             Account
           </Link>
@@ -55,7 +62,7 @@ function AuthActionItems({
             size="sm"
             disabled={isSigningOut}
             onClick={onSignOut}
-            className="h-8 px-1.5 text-[0.68rem] sm:px-2 sm:text-xs"
+            className="h-8 px-1.5 text-[0.68rem] leading-4 sm:px-2 sm:text-xs"
           >
             {isSigningOut ? "Signing out…" : "Sign out"}
           </Button>
@@ -70,7 +77,7 @@ function AuthActionItems({
             size="sm"
             onFocus={preloadPasswordAuthDialog}
             onClick={() => onSetAuthMode("signIn")}
-            className="h-8 px-1.5 text-[0.68rem] sm:px-2 sm:text-xs"
+            className="h-8 px-1.5 text-[0.68rem] leading-4 sm:px-2 sm:text-xs"
           >
             Sign in
           </Button>
@@ -79,7 +86,7 @@ function AuthActionItems({
             size="sm"
             onFocus={preloadPasswordAuthDialog}
             onClick={() => onSetAuthMode("signUp")}
-            className="h-8 px-2 text-[0.68rem] sm:px-2.5 sm:text-xs"
+            className="h-8 px-2 text-[0.68rem] leading-4 sm:px-2.5 sm:text-xs"
           >
             Sign up
           </Button>
@@ -111,7 +118,7 @@ export function AuthControls() {
 
   return (
     <>
-      <nav aria-label="Account" className="flex shrink-0 items-center gap-1 sm:gap-2">
+      <nav aria-label="Account" className="flex h-full shrink-0 items-center gap-1 sm:gap-2">
         <AuthActionItems
           isLoading={isLoading}
           isAuthenticated={isAuthenticated}

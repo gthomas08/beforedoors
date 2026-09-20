@@ -1,0 +1,17 @@
+{
+  "name": "BeforeDoors",
+  "short_name": "BeforeDoors",
+  "description": "Know before you go with clear, evidence-based venue access information.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f7f1e7",
+  "theme_color": "#0f3c27",
+  "icons": [
+    {
+      "src": "/beforedoors-mark.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

@@ -1,4 +1,5 @@
 import { api } from "@my-better-t-app/backend/convex/_generated/api";
+import type { Id } from "@my-better-t-app/backend/convex/_generated/dataModel";
 import { useConvexAuth } from "@convex-dev/auth/react";
 import { Link, createFileRoute } from "@tanstack/react-router";
 import {
@@ -15,9 +16,12 @@ import {
   ShieldCheck,
 } from "lucide-react";
 import { useState } from "react";
-import { usePaginatedQuery, useQuery } from "convex/react";
+import { useMutation, usePaginatedQuery, useQuery } from "convex/react";
+import { toast } from "sonner";
 
 import Header from "@/components/header";
+import { PageHero } from "@/components/page-hero";
+import { SearchField } from "@/components/search-field";
 import { TrailheadSurface } from "@/components/trailhead-surface";
 import { Button } from "@/components/ui/button";
 import {
@@ -30,24 +34,17 @@ import {
 } from "@/components/ui/empty";
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatUpdatedAt } from "@/lib/format-date";
+import { createSiteMeta } from "@/lib/site-meta";
 
 export const Route = createFileRoute("/account")({
   component: AccountPage,
   head: () => ({
-    meta: [
-      { title: "BeforeDoors · Account" },
-      {
-        name: "description",
-        content: "Review your BeforeDoors email activity and favorite venues.",
-      },
-    ],
+    meta: createSiteMeta({
+      title: "BeforeDoors · Account",
+      description: "Review your BeforeDoors email activity and favorite venues.",
+    }),
   }),
 });
-
-type CurrentUser = {
-  id: string;
-  username: string;
-};
 
 type AccountMessage = {
   id: string;
@@ -83,7 +80,7 @@ type AccountThread = {
 
 type FavoriteVenue = {
   _id: string;
-  venueId: string;
+  venueId: Id<"venues">;
   name: string;
   url: string;
   updatedAt: number;
@@ -93,6 +90,9 @@ type FavoriteVenue = {
 };
 
 type ActivityFilter = "all" | "waiting" | "replied";
+type AccountSection = "favorites" | "activity";
+
+const ACCOUNT_PAGE_SIZE = 5;
 
 const activityDateFormatter = new Intl.DateTimeFormat(undefined, {
   day: "numeric",
@@ -141,73 +141,51 @@ function getThreadState(thread: AccountThread) {
   }
 
   return {
-    label: "Waiting for reply",
+    label: "Awaiting reply",
     icon: Clock3,
     className: "text-(--status-pending)",
   };
 }
 
-function AccountIdentity({
-  isAuthLoading,
-  isAuthenticated,
-  user,
+function AccountSectionTabs({
+  activeSection,
+  onSectionChange,
 }: {
-  isAuthLoading: boolean;
-  isAuthenticated: boolean;
-  user: CurrentUser | undefined;
+  activeSection: AccountSection;
+  onSectionChange: (section: AccountSection) => void;
 }) {
-  if (isAuthLoading || (isAuthenticated && user === undefined)) {
-    return (
-      <section
-        aria-label="Account identity"
-        className="border-b border-(--app-line) px-5 py-5 sm:px-8"
-      >
-        <div className="flex items-center gap-3">
-          <Skeleton className="size-10 shrink-0" />
-          <div className="grid gap-2">
-            <Skeleton className="h-3 w-36" />
-            <Skeleton className="h-3 w-52 max-w-[60vw]" />
-          </div>
-        </div>
-      </section>
-    );
-  }
-
-  if (!isAuthenticated || user === undefined) return null;
-
   return (
-    <section aria-label="Account identity" className="border-b border-(--app-line)">
-      <div className="grid md:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
-        <div className="px-5 py-5 sm:px-8 sm:py-6">
-          <div className="flex items-start gap-3">
-            <span className="inline-flex size-9 shrink-0 items-center justify-center border border-(--app-line) bg-(--app-field) text-(--app-accent-hover)">
-              <ShieldCheck aria-hidden="true" className="size-4" />
-            </span>
-            <div>
-              <h2 className="m-0 text-sm font-semibold tracking-[-0.01em]">Signed-in identity</h2>
-              <p className="mt-1.5 mb-0 max-w-[42ch] text-xs leading-5 text-(--app-muted)">
-                This record is scoped to your sign-in and is not visible to other BeforeDoors users.
-              </p>
-            </div>
-          </div>
-        </div>
+    <nav aria-label="Account sections" className="border-b border-(--app-line) px-5 sm:px-8">
+      <div className="flex min-h-12 items-center gap-5" role="tablist">
+        {(
+          [
+            ["favorites", "Favorite venues", "account-favorites-panel"],
+            ["activity", "Email activity", "account-activity-panel"],
+          ] as const
+        ).map(([section, label, panelId]) => {
+          const isActive = activeSection === section;
 
-        <dl className="grid border-t border-(--app-line) text-sm md:border-t-0 md:border-l">
-          <div className="grid grid-cols-[7rem_minmax(0,1fr)] border-b border-(--app-line) last:border-b-0">
-            <dt className="px-5 py-3.5 font-medium text-(--app-muted) sm:px-6">Username</dt>
-            <dd className="border-l border-(--app-line) px-5 py-3.5 font-medium wrap-break-word sm:px-6">
-              {user.username}
-            </dd>
-          </div>
-          <div className="grid grid-cols-[7rem_minmax(0,1fr)]">
-            <dt className="px-5 py-3.5 font-medium text-(--app-muted) sm:px-6">User ID</dt>
-            <dd className="border-l border-(--app-line) px-5 py-3.5 font-mono text-xs break-all sm:px-6">
-              {user.id}
-            </dd>
-          </div>
-        </dl>
+          return (
+            <button
+              key={section}
+              id={`${panelId}-tab`}
+              type="button"
+              role="tab"
+              aria-selected={isActive}
+              aria-controls={panelId}
+              onClick={() => onSectionChange(section)}
+              className={`inline-flex h-8 cursor-pointer items-center text-xs font-semibold tracking-[0.08em] uppercase transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--app-focus) ${
+                isActive
+                  ? "text-(--app-ink) underline decoration-(--app-accent) decoration-2 underline-offset-4"
+                  : "text-(--app-muted) hover:text-(--app-ink)"
+              }`}
+            >
+              {label}
+            </button>
+          );
+        })}
       </div>
-    </section>
+    </nav>
   );
 }
 
@@ -221,7 +199,7 @@ function SignedOutState() {
           </EmptyMedia>
           <EmptyTitle>Sign in to open your record</EmptyTitle>
           <EmptyDescription>
-            Your venue questions and replies live here once you sign in from the header.
+            Your venue questions and replies are kept here once you sign in from the header.
           </EmptyDescription>
         </EmptyHeader>
         <EmptyContent>
@@ -248,7 +226,7 @@ function ActivityMessage({ message }: { message: AccountMessage }) {
       <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 text-xs font-semibold tracking-[0.1em] text-(--app-muted) uppercase">
         <span className="inline-flex items-center gap-2">
           <Icon aria-hidden="true" className="size-3.5 text-(--app-accent-hover)" />
-          {isSent ? "Sent from BeforeDoors" : "Response received"}
+          {isSent ? "Sent from BeforeDoors" : "Reply received"}
         </span>
         <time
           dateTime={new Date(message.timestamp).toISOString()}
@@ -306,7 +284,9 @@ function ActivityThread({ thread }: { thread: AccountThread }) {
           <span className="mt-2 flex flex-wrap gap-x-3 gap-y-1 font-mono text-xs leading-5 text-(--app-muted)">
             <span>{sentCount} sent</span>
             <span aria-hidden="true">·</span>
-            <span>{thread.replyCount} received</span>
+            <span>
+              {thread.replyCount} {thread.replyCount === 1 ? "reply" : "replies"}
+            </span>
             <span aria-hidden="true">·</span>
             <span>{thread.threadId ? "Thread linked" : "Thread forming"}</span>
           </span>
@@ -382,8 +362,8 @@ function ActivityFilters({
       {(
         [
           ["all", "All threads"],
-          ["waiting", "Needs reply"],
-          ["replied", "With responses"],
+          ["waiting", "Awaiting reply"],
+          ["replied", "With replies"],
         ] as const
       ).map(([value, label]) => (
         <Button
@@ -404,12 +384,37 @@ function ActivityFilters({
 }
 
 function FavoriteVenueRow({ venue }: { venue: FavoriteVenue }) {
+  const setVenueFavorite = useMutation(api.favorites.setVenueFavorite);
+  const [isRemoving, setIsRemoving] = useState(false);
+
+  const handleRemove = async () => {
+    if (isRemoving) return;
+
+    setIsRemoving(true);
+    try {
+      await setVenueFavorite({ venueId: venue.venueId, isFavorite: false });
+      toast.success("Venue removed from favorites.");
+    } catch {
+      toast.error("We couldn’t update this favorite. Please try again.");
+    } finally {
+      setIsRemoving(false);
+    }
+  };
+
   return (
     <li className="border-b border-(--app-line) px-5 py-5 last:border-b-0 sm:px-8 sm:py-6">
       <div className="flex items-start gap-4">
-        <span className="inline-flex size-9 shrink-0 items-center justify-center border border-(--app-line) bg-(--app-field) text-(--app-accent-hover)">
+        <button
+          type="button"
+          aria-label={`Remove ${venue.name || "venue"} from favorites`}
+          aria-pressed={true}
+          disabled={isRemoving}
+          onClick={() => void handleRemove()}
+          title="Remove from favorites"
+          className="inline-flex size-9 shrink-0 cursor-pointer items-center justify-center border border-(--app-accent) bg-[color-mix(in_oklch,var(--app-accent)_12%,var(--app-field))] text-(--app-accent-hover) transition-colors hover:bg-(--app-accent) hover:text-(--app-accent-ink) focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--app-focus) disabled:cursor-wait disabled:opacity-60 motion-reduce:transition-none"
+        >
           <Heart aria-hidden="true" className="size-4 fill-current" />
-        </span>
+        </button>
 
         <div className="min-w-0 flex-1">
           <Link
@@ -455,10 +460,20 @@ function FavoriteVenues({
   isLoadingMore: boolean;
   onLoadMore: () => void;
 }) {
+  const [searchTerm, setSearchTerm] = useState("");
+  const normalizedSearchTerm = searchTerm.trim().toLowerCase();
+  const filteredVenues = normalizedSearchTerm
+    ? venues.filter((venue) => venue.name.toLowerCase().includes(normalizedSearchTerm))
+    : venues;
+  const hasSearchTerm = normalizedSearchTerm.length > 0;
   const isLoadingFirstPage = isLoading && venues.length === 0;
 
   return (
-    <section aria-labelledby="favorite-venues-title">
+    <section
+      id="account-favorites-panel"
+      role="tabpanel"
+      aria-labelledby="account-favorites-panel-tab"
+    >
       <div className="flex flex-wrap items-end justify-between gap-4 border-b border-(--app-line) px-5 py-7 sm:px-8 sm:py-8">
         <div>
           <div className="flex items-center gap-3">
@@ -476,8 +491,18 @@ function FavoriteVenues({
         </div>
         <p className="m-0 inline-flex items-center gap-2 font-mono text-xs tracking-[0.1em] text-(--app-muted) uppercase">
           <span aria-hidden="true" className="size-2 rounded-full bg-(--status-verified)" />
-          Saved privately
+          Favorite record
         </p>
+      </div>
+
+      <div className="border-b border-(--app-line) px-5 py-4 sm:px-8">
+        <SearchField
+          id="favorite-venue-search"
+          label="Filter favorite venues"
+          placeholder="Filter by venue name"
+          value={searchTerm}
+          onChange={setSearchTerm}
+        />
       </div>
 
       {isLoadingFirstPage ? (
@@ -496,12 +521,19 @@ function FavoriteVenues({
             </div>
           ))}
         </div>
-      ) : venues.length > 0 ? (
+      ) : filteredVenues.length > 0 ? (
         <ul aria-label="Favorite venues" className="m-0 list-none p-0">
-          {venues.map((venue) => (
+          {filteredVenues.map((venue) => (
             <FavoriteVenueRow key={venue._id} venue={venue} />
           ))}
         </ul>
+      ) : venues.length > 0 ? (
+        <div className="flex min-h-48 flex-col items-start justify-center gap-3 border-b border-(--app-line) px-5 py-10 sm:px-8">
+          <p className="m-0 text-sm font-semibold">No favorite venues match this search</p>
+          <p className="m-0 text-sm leading-6 text-(--app-muted)">
+            Try a different venue name or load more saved venues.
+          </p>
+        </div>
       ) : (
         <Empty className="min-h-64 border-b border-(--app-line) px-5 py-12 sm:px-8">
           <EmptyHeader>
@@ -529,9 +561,11 @@ function FavoriteVenues({
         <p className="m-0 font-mono text-xs leading-5 text-(--app-muted)" aria-live="polite">
           {isLoadingFirstPage
             ? "Checking your favorite venues…"
-            : `${venues.length} venue${venues.length === 1 ? "" : "s"} saved`}
+            : hasSearchTerm
+              ? `${filteredVenues.length} matching venue${filteredVenues.length === 1 ? "" : "s"}`
+              : `${venues.length} venue${venues.length === 1 ? "" : "s"} loaded`}
         </p>
-        {canLoadMore || isLoadingMore ? (
+        {canLoadMore && !isLoadingMore ? (
           <Button
             type="button"
             variant="outline"
@@ -562,15 +596,29 @@ function AccountActivity({
   onLoadMore: () => void;
 }) {
   const [filter, setFilter] = useState<ActivityFilter>("all");
+  const [searchTerm, setSearchTerm] = useState("");
+  const normalizedSearchTerm = searchTerm.trim().toLowerCase();
   const visibleThreads = threads.filter((thread) => {
-    if (filter === "replied") return thread.replyCount > 0;
-    if (filter === "waiting") return thread.replyCount === 0 && !isDeliveryIssue(thread);
-    return true;
+    const matchesFilter =
+      filter === "all" ||
+      (filter === "replied" && thread.replyCount > 0) ||
+      (filter === "waiting" && thread.replyCount === 0 && !isDeliveryIssue(thread));
+    if (!matchesFilter) return false;
+
+    return (
+      normalizedSearchTerm.length === 0 ||
+      thread.venueName.toLowerCase().includes(normalizedSearchTerm)
+    );
   });
+  const hasSearchTerm = normalizedSearchTerm.length > 0;
   const isLoadingFirstPage = isLoading && threads.length === 0;
 
   return (
-    <section aria-labelledby="activity-title">
+    <section
+      id="account-activity-panel"
+      role="tabpanel"
+      aria-labelledby="account-activity-panel-tab"
+    >
       <div className="flex flex-wrap items-end justify-between gap-4 border-b border-(--app-line) px-5 py-7 sm:px-8 sm:py-8">
         <div>
           <div className="flex items-center gap-3">
@@ -580,13 +628,23 @@ function AccountActivity({
             </h2>
           </div>
           <p className="mt-2 mb-0 max-w-[62ch] text-sm leading-6 text-(--app-muted)">
-            Questions you sent to venues and the responses that came back, kept together by thread.
+            Questions you sent to venues and the replies that came back, kept together by thread.
           </p>
         </div>
         <p className="m-0 inline-flex items-center gap-2 font-mono text-xs tracking-[0.1em] text-(--app-muted) uppercase">
           <span aria-hidden="true" className="size-2 rounded-full bg-(--status-verified)" />
-          Live record
+          Email record
         </p>
+      </div>
+
+      <div className="border-b border-(--app-line) px-5 py-4 sm:px-8">
+        <SearchField
+          id="activity-venue-search"
+          label="Filter email activity"
+          placeholder="Filter by venue name"
+          value={searchTerm}
+          onChange={setSearchTerm}
+        />
       </div>
 
       <ActivityFilters filter={filter} onFilterChange={setFilter} threads={threads} />
@@ -622,7 +680,7 @@ function AccountActivity({
             </EmptyMedia>
             <EmptyTitle>No email threads yet</EmptyTitle>
             <EmptyDescription>
-              When you ask a venue a question, the outgoing note and any response will appear here.
+              When you ask a venue a question, the outgoing note and any reply will appear here.
             </EmptyDescription>
           </EmptyHeader>
           <EmptyContent>
@@ -637,18 +695,25 @@ function AccountActivity({
         </Empty>
       ) : (
         <div className="flex min-h-48 flex-col items-start justify-center gap-3 border-b border-(--app-line) px-5 py-10 sm:px-8">
-          <p className="m-0 text-sm font-semibold">No threads match this view</p>
+          <p className="m-0 text-sm font-semibold">
+            {hasSearchTerm ? "No email threads match this search" : "No threads match this view"}
+          </p>
           <p className="m-0 text-sm leading-6 text-(--app-muted)">
-            Try the full activity list to see every thread in your record.
+            {hasSearchTerm
+              ? "Try a different venue name or load more email activity."
+              : "Try the full activity list to see every thread in your record."}
           </p>
           <Button
             type="button"
             variant="link"
             size="sm"
-            onClick={() => setFilter("all")}
+            onClick={() => {
+              setFilter("all");
+              setSearchTerm("");
+            }}
             className="h-auto px-0 text-xs font-semibold tracking-[0.08em] uppercase"
           >
-            Show all threads
+            Clear filters
           </Button>
         </div>
       )}
@@ -657,9 +722,11 @@ function AccountActivity({
         <p className="m-0 font-mono text-xs leading-5 text-(--app-muted)" aria-live="polite">
           {isLoadingFirstPage
             ? "Checking your email activity…"
-            : `${threads.length} thread${threads.length === 1 ? "" : "s"} loaded`}
+            : filter !== "all" || hasSearchTerm
+              ? `${visibleThreads.length} matching thread${visibleThreads.length === 1 ? "" : "s"}`
+              : `${threads.length} thread${threads.length === 1 ? "" : "s"} loaded`}
         </p>
-        {canLoadMore || isLoadingMore ? (
+        {canLoadMore && !isLoadingMore ? (
           <Button
             type="button"
             variant="outline"
@@ -678,71 +745,83 @@ function AccountActivity({
 
 function AccountPage() {
   const { isAuthenticated, isLoading: isAuthLoading } = useConvexAuth();
+  const [activeSection, setActiveSection] = useState<AccountSection>("favorites");
   const user = useQuery(api.users.getCurrentUser, isAuthenticated ? {} : "skip");
   const favoriteVenues = usePaginatedQuery(
     api.favorites.listMyFavoriteVenues,
     isAuthenticated ? {} : "skip",
-    { initialNumItems: 12 },
+    { initialNumItems: ACCOUNT_PAGE_SIZE },
   );
   const activity = usePaginatedQuery(
     api.venueQuestions.listMyEmailThreads,
     isAuthenticated ? {} : "skip",
-    { initialNumItems: 20 },
+    { initialNumItems: ACCOUNT_PAGE_SIZE },
   );
+  const isAccountHeadingReady = !isAuthLoading && (!isAuthenticated || user !== undefined);
 
   return (
     <div className="min-h-svh bg-(--app-bg) text-(--app-ink)">
-      <Header alignment="account" linkToStatus />
+      <Header linkToVenues />
 
-      <main className="relative min-h-[calc(100svh-3.5rem)] overflow-x-hidden bg-(--app-bg) px-5 pb-12 max-[680px]:px-0">
+      <main className="relative min-h-[calc(100svh-3.5rem)] overflow-x-hidden bg-(--app-bg) px-0 pb-12 sm:px-5">
         <TrailheadSurface />
-        <div className="relative z-10 mx-auto w-full max-w-224 border-x border-(--app-line) bg-[color-mix(in_oklch,var(--app-bg)_96%,var(--app-field))] max-[680px]:border-x-0">
-          <header className="relative isolate overflow-hidden border-b border-(--app-line) px-5 pt-10 pb-9 sm:px-8 sm:pt-14 sm:pb-12">
-            <div className="relative z-10 flex flex-wrap items-end justify-between gap-8">
-              <div className="max-w-3xl">
-                <h1 className="m-0 text-[clamp(2.75rem,7vw,5.5rem)] leading-[0.88] font-semibold tracking-[-0.045em] text-balance">
-                  Your BeforeDoors
-                </h1>
-                <p className="mt-5 mb-0 max-w-[60ch] text-base leading-7 text-(--app-muted)">
-                  A private record of the questions you’ve sent, the responses you’ve received, and
-                  the venues you’ve saved.
-                </p>
-              </div>
+        <div className="relative z-10 mx-auto w-full max-w-352 border-x border-(--app-line) bg-[color-mix(in_oklch,var(--app-bg)_96%,var(--app-field))]">
+          <PageHero
+            title={
+              isAuthenticated ? (
+                <>
+                  <span>Hello, </span>
+                  <span className="wrap-break-word text-(--app-accent-hover)">
+                    {user?.username}
+                  </span>
+                </>
+              ) : (
+                "Your BeforeDoors"
+              )
+            }
+            titleClassName={`text-balance${isAccountHeadingReady ? "" : " invisible"}`}
+            description="A BeforeDoors record of the questions you’ve sent, the responses you’ve received, and the venues you’ve saved."
+            descriptionClassName="max-w-[60ch]"
+            actionsClassName="flex items-end gap-6 max-[760px]:mt-4 max-[760px]:items-start"
+            actions={
               <p className="m-0 max-w-52 font-mono text-xs leading-5 text-(--app-muted)">
                 Personal record
                 <br />
-                <span className="text-(--app-accent-hover)">Activity · live updates</span>
+                <span className="text-(--app-accent-hover)">Activity</span>
               </p>
-            </div>
-          </header>
+            }
+            className="px-5 py-7 sm:px-8 sm:py-8"
+          />
 
           {isAuthLoading || isAuthenticated ? (
             <>
-              <AccountIdentity
-                isAuthLoading={isAuthLoading}
-                isAuthenticated={isAuthenticated}
-                user={user}
+              <AccountSectionTabs
+                activeSection={activeSection}
+                onSectionChange={setActiveSection}
               />
-              <FavoriteVenues
-                venues={favoriteVenues.results as FavoriteVenue[]}
-                isLoading={favoriteVenues.status === "LoadingFirstPage"}
-                canLoadMore={favoriteVenues.status === "CanLoadMore"}
-                isLoadingMore={favoriteVenues.status === "LoadingMore"}
-                onLoadMore={() => favoriteVenues.loadMore(12)}
-              />
-              <AccountActivity
-                threads={activity.results as AccountThread[]}
-                isLoading={activity.status === "LoadingFirstPage"}
-                canLoadMore={activity.status === "CanLoadMore"}
-                isLoadingMore={activity.status === "LoadingMore"}
-                onLoadMore={() => activity.loadMore(20)}
-              />
+              {activeSection === "favorites" ? (
+                <FavoriteVenues
+                  venues={favoriteVenues.results as FavoriteVenue[]}
+                  isLoading={favoriteVenues.status === "LoadingFirstPage"}
+                  canLoadMore={favoriteVenues.status === "CanLoadMore"}
+                  isLoadingMore={favoriteVenues.status === "LoadingMore"}
+                  onLoadMore={() => favoriteVenues.loadMore(ACCOUNT_PAGE_SIZE)}
+                />
+              ) : (
+                <AccountActivity
+                  threads={activity.results as AccountThread[]}
+                  isLoading={activity.status === "LoadingFirstPage"}
+                  canLoadMore={activity.status === "CanLoadMore"}
+                  isLoadingMore={activity.status === "LoadingMore"}
+                  onLoadMore={() => activity.loadMore(ACCOUNT_PAGE_SIZE)}
+                />
+              )}
             </>
           ) : (
             <SignedOutState />
           )}
 
-          <footer className="flex flex-wrap justify-between gap-4 border-t border-(--app-line) px-5 py-4 font-mono text-xs leading-5 text-(--app-muted) sm:px-8">
+          <footer className="flex flex-wrap justify-between gap-4 px-5 py-4 font-mono text-xs leading-5 text-(--app-muted) sm:px-8">
             <span>BeforeDoors · Know before you go</span>
             <span>Personal record · Activity + saved venues</span>
           </footer>

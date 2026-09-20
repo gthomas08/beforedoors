@@ -3,8 +3,6 @@
 @import "shadcn/tailwind.css";
 @source "./**/*.{ts,tsx}";
 
-@custom-variant dark (&:is(.dark *));
-
 :root {
   --app-bg: oklch(0.965 0.025 88);
   --app-ink: oklch(0.28 0.075 151);
@@ -14,6 +12,7 @@
   --app-accent-ink: oklch(0.2 0.05 145);
   --app-line: oklch(0.34 0.06 145 / 24%);
   --app-field: oklch(0.99 0.01 88 / 94%);
+  --app-filter: oklch(1 0 0);
   --app-field-ink: oklch(0.25 0.06 145);
   --app-field-placeholder: oklch(0.47 0.04 145);
   --app-field-border: oklch(0.31 0.07 145);
@@ -36,6 +35,8 @@
   --status-verified: oklch(72.3% 0.219 149.579);
   --status-pending: oklch(75% 0.183 55.934);
   --status-signal: oklch(63.7% 0.237 25.331);
+  --status-published: oklch(0.53 0.14 52);
+  --status-confirmed: oklch(0.43 0.09 150);
   --border: var(--app-line);
   --input: var(--app-field-border);
   --ring: var(--app-focus);
@@ -46,52 +47,6 @@
   --chart-5: oklch(0.7 0.13 52);
   --radius: 0rem;
   --sidebar: var(--app-field);
-  --sidebar-foreground: var(--app-ink);
-  --sidebar-primary: var(--app-accent);
-  --sidebar-primary-foreground: var(--app-accent-ink);
-  --sidebar-accent: var(--accent);
-  --sidebar-accent-foreground: var(--app-ink);
-  --sidebar-border: var(--app-line);
-  --sidebar-ring: var(--app-focus);
-}
-
-.dark {
-  --app-bg: oklch(0.24 0.025 151);
-  --app-ink: oklch(0.96 0.025 88);
-  --app-muted: oklch(0.82 0.035 94);
-  --app-accent: oklch(0.74 0.19 52);
-  --app-accent-hover: oklch(0.8 0.17 55);
-  --app-accent-ink: oklch(0.18 0.04 145);
-  --app-line: oklch(0.92 0.035 94 / 24%);
-  --app-field: oklch(0.96 0.018 88);
-  --app-field-ink: oklch(0.24 0.06 145);
-  --app-field-placeholder: oklch(0.48 0.04 145);
-  --app-field-border: oklch(0.96 0.025 88);
-  --app-focus: oklch(0.74 0.19 52);
-  --background: var(--app-bg);
-  --foreground: var(--app-ink);
-  --card: oklch(0.28 0.035 151);
-  --card-foreground: var(--app-ink);
-  --popover: oklch(0.28 0.035 151);
-  --popover-foreground: var(--app-ink);
-  --primary: var(--app-accent);
-  --primary-foreground: var(--app-accent-ink);
-  --secondary: oklch(0.3 0.04 151);
-  --secondary-foreground: var(--app-ink);
-  --muted: oklch(0.3 0.04 151);
-  --muted-foreground: var(--app-muted);
-  --accent: oklch(0.34 0.05 151);
-  --accent-foreground: var(--app-ink);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: var(--app-line);
-  --input: var(--app-field-border);
-  --ring: var(--app-focus);
-  --chart-1: oklch(0.7 0.16 52);
-  --chart-2: oklch(0.72 0.11 145);
-  --chart-3: oklch(0.8 0.1 88);
-  --chart-4: oklch(0.64 0.09 151);
-  --chart-5: oklch(0.76 0.13 52);
-  --sidebar: var(--card);
   --sidebar-foreground: var(--app-ink);
   --sidebar-primary: var(--app-accent);
   --sidebar-primary-foreground: var(--app-accent-ink);
@@ -159,9 +114,7 @@
   html {
     @apply font-sans;
     color-scheme: light;
-  }
-  html.dark {
-    color-scheme: dark;
+    scrollbar-gutter: stable;
   }
   ::selection {
     background: var(--foreground);
@@ -170,6 +123,93 @@
   * {
     scrollbar-color: color-mix(in oklch, var(--foreground) 28%, transparent) transparent;
     scrollbar-width: thin;
+  }
+}
+
+/* Keep transient feedback in the same quiet field-guide language as the app. */
+.toaster[data-sonner-toaster] {
+  --border-radius: 0px;
+  font-family: inherit;
+}
+
+.toaster[data-sonner-toaster] [data-sonner-toast][data-styled="true"] {
+  padding: 0.75rem 0.875rem;
+  border-radius: 0;
+  border-color: var(--app-line);
+  background: var(--app-field);
+  color: var(--app-ink);
+  box-shadow: none;
+  font-size: 0.75rem;
+  line-height: 1.3333;
+}
+
+.toaster[data-sonner-toaster] [data-sonner-toast][data-styled="true"] [data-title] {
+  font-weight: 600;
+  line-height: 1.3333;
+}
+
+.toaster[data-sonner-toaster] [data-sonner-toast][data-styled="true"] [data-description] {
+  color: var(--app-muted);
+}
+
+.toaster[data-sonner-toaster] [data-sonner-toast][data-styled="true"] [data-close-button] {
+  border-radius: 0;
+  border-color: var(--app-line);
+  background: var(--app-field);
+  color: var(--app-muted);
+  box-shadow: none;
+}
+
+.toaster[data-sonner-toaster] [data-sonner-toast][data-styled="true"] [data-close-button]:hover {
+  border-color: var(--app-field-border);
+  background: var(--app-bg);
+  color: var(--app-ink);
+}
+
+.toaster[data-sonner-toaster] [data-sonner-toast][data-styled="true"][data-type="success"] {
+  border-color: color-mix(in oklch, var(--status-verified) 46%, var(--app-line));
+  background: color-mix(in oklch, var(--status-verified) 8%, var(--app-field));
+}
+
+.toaster[data-sonner-toaster]
+  [data-sonner-toast][data-styled="true"][data-type="success"]
+  [data-icon] {
+  color: var(--status-verified);
+}
+
+.toaster[data-sonner-toaster] [data-sonner-toast][data-styled="true"][data-type="error"] {
+  border-color: color-mix(in oklch, var(--status-signal) 42%, var(--app-line));
+  background: color-mix(in oklch, var(--status-signal) 7%, var(--app-field));
+}
+
+.toaster[data-sonner-toaster]
+  [data-sonner-toast][data-styled="true"][data-type="error"]
+  [data-icon] {
+  color: var(--status-signal);
+}
+
+.toaster[data-sonner-toaster] [data-sonner-toast][data-styled="true"][data-type="warning"] {
+  border-color: color-mix(in oklch, var(--status-pending) 42%, var(--app-line));
+  background: color-mix(in oklch, var(--status-pending) 8%, var(--app-field));
+}
+
+.toaster[data-sonner-toaster]
+  [data-sonner-toast][data-styled="true"][data-type="warning"]
+  [data-icon] {
+  color: var(--status-pending);
+}
+
+.toaster[data-sonner-toaster]
+  [data-sonner-toast][data-styled="true"][data-type="info"]
+  [data-icon] {
+  color: var(--app-accent-hover);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toaster[data-sonner-toaster] [data-sonner-toast],
+  .toaster[data-sonner-toaster] [data-sonner-toast] * {
+    transition: none !important;
+    animation: none !important;
   }
 }
 

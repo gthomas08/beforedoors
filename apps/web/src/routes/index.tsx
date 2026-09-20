@@ -4,6 +4,7 @@ import { DoorApproachMark } from "@/components/door-approach-mark";
 import { TrailheadSurface } from "@/components/trailhead-surface";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { createSiteMeta } from "@/lib/site-meta";
 import { useForm } from "@tanstack/react-form";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Result } from "better-result";
@@ -14,15 +15,10 @@ import { useState } from "react";
 export const Route = createFileRoute("/")({
   component: HomeComponent,
   head: () => ({
-    meta: [
-      {
-        title: "BeforeDoors",
-      },
-      {
-        name: "description",
-        content: "Turn a venue or event link into a clear, evidence-based accessibility brief.",
-      },
-    ],
+    meta: createSiteMeta({
+      title: "BeforeDoors — Know before you go",
+      description: "Turn a venue link into a clear, evidence-based accessibility brief.",
+    }),
   }),
 });
 
@@ -30,12 +26,12 @@ function validateVenueUrl(value: string) {
   const candidate = value.trim();
 
   if (!candidate) {
-    return "Paste the venue or event page you want to check.";
+    return "Paste the venue page you want to check.";
   }
 
   const urlResult = Result.try({
     try: () => new URL(candidate),
-    catch: () => "Enter a complete web address, such as https://venue.com." as const,
+    catch: () => "Enter a complete web address, such as https://www.thesphere.com/." as const,
   });
 
   if (urlResult.isErr()) {
@@ -82,11 +78,11 @@ function HomeComponent() {
 
   return (
     <div className="grid h-svh grid-rows-[auto_1fr] overflow-hidden bg-(--app-bg) text-(--app-ink)">
-      <Header linkToStatus linkToVenues wide />
+      <Header linkToVenues />
 
-      <main className="relative min-h-0 overflow-hidden bg-(--app-bg) px-5 sm:px-8">
+      <main className="relative min-h-0 overflow-hidden bg-(--app-bg) px-0 sm:px-5">
         <TrailheadSurface />
-        <div className="relative z-10 mx-auto flex h-full w-full max-w-5xl items-center justify-center border-x border-(--app-line) px-5 sm:px-10 lg:px-16">
+        <div className="relative z-10 mx-auto flex h-full w-full max-w-352 items-center justify-center border-x border-(--app-line) px-5 sm:px-10 lg:px-16">
           <section
             aria-labelledby="landing-title"
             className="flex w-full max-w-3xl -translate-y-[clamp(1.5rem,7vh,3.25rem)] flex-col items-center py-8 text-center sm:py-10"
@@ -105,8 +101,8 @@ function HomeComponent() {
             </p>
 
             <p className="mt-5 max-w-[46ch] text-base leading-7 text-(--app-muted) sm:text-lg sm:leading-8">
-              Enter a venue or event link to see what its published access information can tell you
-              before you go.
+              Enter a venue link to see what its published access information can tell you before
+              you go.
             </p>
 
             <form
@@ -137,7 +133,7 @@ function HomeComponent() {
                         htmlFor={field.name}
                         className="mb-2 block text-left text-xs font-semibold tracking-[0.14em] text-(--app-ink) uppercase"
                       >
-                        Venue or event URL
+                        Venue URL
                       </label>
 
                       <div className="grid border border-(--app-field-border) bg-(--app-field) transition-[border-color,box-shadow] duration-300 focus-within:border-(--app-focus) focus-within:ring-2 focus-within:ring-(--app-focus)/30 motion-reduce:transition-none sm:grid-cols-[1fr_auto]">
@@ -150,10 +146,10 @@ function HomeComponent() {
                           value={field.state.value}
                           onBlur={field.handleBlur}
                           onChange={(event) => field.handleChange(event.target.value)}
-                          placeholder="https://venue.com/event"
+                          placeholder="https://www.thesphere.com/"
                           aria-invalid={Boolean(error)}
                           aria-describedby={`${field.name}-${error ? "error" : "hint"}`}
-                          className="h-14 border-0 bg-transparent px-4 text-lg text-(--app-field-ink) caret-(--app-accent) shadow-none placeholder:text-(--app-field-placeholder) focus-visible:ring-0 sm:h-16 sm:px-5 sm:text-lg dark:bg-transparent"
+                          className="h-14 border-0 bg-transparent px-4 text-lg text-(--app-field-ink) caret-(--app-accent) shadow-none placeholder:text-(--app-field-placeholder) focus-visible:ring-0 sm:h-16 sm:px-5 sm:text-lg"
                         />
 
                         <form.Subscribe selector={(state) => state.isSubmitting}>

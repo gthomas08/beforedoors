@@ -1,8 +1,7 @@
 import { Toaster } from "@/components/ui/sonner";
 import { HeadContent, Outlet, createRootRouteWithContext } from "@tanstack/react-router";
 
-import { ThemeProvider } from "@/components/theme-provider";
-
+import { createSiteMeta } from "@/lib/site-meta";
 import "../styles.css";
 
 export interface RouterAppContext {}
@@ -10,15 +9,16 @@ export interface RouterAppContext {}
 export const Route = createRootRouteWithContext<RouterAppContext>()({
   component: RootComponent,
   head: () => ({
-    meta: [
-      {
-        title: "BeforeDoors",
-      },
-    ],
+    meta: createSiteMeta({ title: "BeforeDoors — Know before you go" }),
     links: [
       {
         rel: "icon",
-        href: "/favicon.ico",
+        type: "image/svg+xml",
+        href: "/beforedoors-mark.svg",
+      },
+      {
+        rel: "manifest",
+        href: "/site.webmanifest",
       },
     ],
   }),
@@ -28,15 +28,8 @@ function RootComponent() {
   return (
     <>
       <HeadContent />
-      <ThemeProvider
-        attribute="class"
-        defaultTheme="light"
-        disableTransitionOnChange
-        storageKey="vite-ui-theme"
-      >
-        <Outlet />
-        <Toaster richColors />
-      </ThemeProvider>
+      <Outlet />
+      <Toaster />
     </>
   );
 }

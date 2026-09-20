@@ -37,11 +37,11 @@ type Env = {
   readonly AUTH_PRIVATE_KEY: string;
   readonly BEFOREDOORS_EMAIL: string | undefined;
   readonly FIRECRAWL_API_KEY: string;
+  readonly OPENAI_API_KEY: string;
   readonly REPORT_MAX_MAPPED_URLS: string | undefined;
   readonly REPORT_MAX_PAGES_TO_SCRAPE: string | undefined;
   readonly REPORT_MAX_RESULTS_PER_PAGE: string | undefined;
   readonly REPORT_MAX_TOTAL_RESULTS: string | undefined;
-  readonly TEST_VENUE_EMAIL: string | undefined;
 };
 
 /**

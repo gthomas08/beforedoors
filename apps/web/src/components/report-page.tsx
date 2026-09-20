@@ -1,5 +1,4 @@
 import { Link } from "@tanstack/react-router";
-import { Result } from "better-result";
 import { Dialog } from "@base-ui/react/dialog";
 import { useConvexAuth } from "@convex-dev/auth/react";
 import { useMutation, useQuery } from "convex/react";
@@ -8,36 +7,34 @@ import { useEffect, useId, useRef, useState } from "react";
 import { toast } from "sonner";
 
 import { api } from "@my-better-t-app/backend/convex/_generated/api";
-import type { Doc } from "@my-better-t-app/backend/convex/_generated/dataModel";
+import type { Doc, Id } from "@my-better-t-app/backend/convex/_generated/dataModel";
 import Header from "@/components/header";
-import { ReportContourLines } from "@/components/report-contour-lines";
+import { answerStatusMeta } from "@/components/answer-status";
+import { PageHero } from "@/components/page-hero";
 import { TrailheadSurface } from "@/components/trailhead-surface";
 import { Empty, EmptyDescription, EmptyHeader, EmptyTitle } from "@/components/ui/empty";
 import { Input } from "@/components/ui/input";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { formatUpdatedAt } from "@/lib/format-date";
 
 type VenueAnswer = Pick<
   Doc<"venueAnswers">,
   "answerIndex" | "question" | "answer" | "url" | "status"
 >;
-type Venue = Pick<Doc<"venues">, "_id" | "name" | "url" | "updatedAt"> & {
+type Venue = Pick<Doc<"venues">, "_id" | "name" | "url" | "updatedAt" | "contactEmail"> & {
   answerCount: number;
   answers: VenueAnswer[];
 };
 
-function StatusLabel({ status }: { status: VenueAnswer["status"] }) {
-  const label = status === "published" ? "Published by venue" : "Confirmed by venue";
-
-  return (
-    <span className="text-[0.72rem] leading-[1.35] font-semibold text-(--app-ink)">{label}</span>
-  );
-}
-
 function StatusIndicator({ status }: { status: VenueAnswer["status"] }) {
+  const statusMeta = answerStatusMeta[status];
+
   return (
     <span className="flex items-center gap-2">
-      <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-(--app-accent)" />
-      <StatusLabel status={status} />
+      <span aria-hidden="true" className={`h-1.5 w-1.5 rounded-full ${statusMeta.dotClassName}`} />
+      <span className="text-[0.72rem] leading-[1.35] font-semibold text-(--app-ink)">
+        {statusMeta.label}
+      </span>
     </span>
   );
 }
@@ -49,9 +46,9 @@ function SourceUrl({ url, label }: { url: string; label: string }) {
       target="_blank"
       rel="noreferrer"
       aria-label={`${label} ${url} in a new tab`}
-      className="inline-flex max-w-full min-w-0 items-center gap-1.5 text-(--app-ink) underline decoration-(--app-accent) decoration-1 underline-offset-4 hover:text-(--app-accent-hover) focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-(--app-focus)"
+      className="inline-flex max-w-full min-w-0 items-center gap-1.5 overflow-hidden font-mono text-[0.68rem] leading-4 text-(--app-ink) underline decoration-(--app-accent) decoration-1 underline-offset-4 hover:text-(--app-accent-hover) focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-(--app-focus)"
     >
-      <span className="wrap-break-word">{url}</span>
+      <span className="min-w-0 truncate">{url}</span>
       <ArrowUpRight aria-hidden="true" className="size-3.5 shrink-0" />
     </a>
   );
@@ -96,7 +93,9 @@ function QuestionRow({
 
         <div className="flex min-w-0 flex-col items-end gap-2 max-[900px]:mt-0.5 max-[900px]:items-start">
           <StatusIndicator status={answer.status} />
-          <SourceUrl url={answer.url} label="Open answer source" />
+          {answer.status === "published" ? (
+            <SourceUrl url={answer.url} label="Open answer source" />
+          ) : null}
         </div>
       </article>
     </li>
@@ -152,11 +151,11 @@ function AnswerSearchPanel({
     <Dialog.Root open onOpenChange={(open) => !open && onClose()}>
       <Dialog.Portal>
         <Dialog.Backdrop className="fixed inset-0 z-60 bg-[oklch(0.14_0.11_255_/_82%)]" />
-        <Dialog.Viewport className="fixed inset-0 z-60 grid place-items-center overflow-y-auto px-4 py-6">
+        <Dialog.Viewport className="fixed inset-0 z-60 flex items-start justify-center overflow-y-auto px-4 pt-18 pb-6 sm:pt-20">
           <Dialog.Popup
             id="venue-answer-search-panel"
             initialFocus={inputRef}
-            className="max-h-[calc(100svh-3rem)] w-full max-w-2xl overflow-y-auto border border-(--app-field-border) bg-(--app-bg) text-(--app-ink) shadow-overlay-large outline-none"
+            className="max-h-[calc(100svh-3rem)] w-full max-w-2xl overflow-y-auto border border-(--app-field-border) bg-(--app-filter) text-(--app-ink) shadow-overlay-large outline-none"
           >
             <div className="flex items-start justify-between gap-5 border-b border-(--app-line) px-5 py-4 sm:px-7 sm:py-5">
               <div>
@@ -198,7 +197,7 @@ function AnswerSearchPanel({
                 placeholder="Search questions and answers"
                 autoComplete="off"
                 maxLength={200}
-                className="h-14 border-0 bg-transparent px-0 text-base text-(--app-field-ink) caret-(--app-accent) shadow-none placeholder:text-(--app-field-placeholder) focus-visible:ring-0 dark:bg-transparent"
+                className="h-14 border-0 bg-transparent px-0 text-base text-(--app-field-ink) caret-(--app-accent) shadow-none placeholder:text-(--app-field-placeholder) focus-visible:ring-0"
               />
             </div>
 
@@ -321,7 +320,11 @@ function VenueFavoriteButton({ venueId, venueName }: { venueId: Venue["_id"]; ve
       aria-pressed={isFavorite}
       disabled={isChecking || isUpdating}
       onClick={() => void handleFavorite()}
-      className="inline-flex h-10 shrink-0 items-center gap-2 border border-(--app-field-border) bg-(--app-field) px-4 text-xs font-semibold tracking-[0.08em] text-(--app-ink) uppercase transition-colors duration-200 hover:bg-[color-mix(in_oklch,var(--app-accent)_12%,var(--app-field))] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--app-focus) disabled:cursor-wait disabled:opacity-60 motion-reduce:transition-none"
+      className={`inline-flex h-10 w-44 shrink-0 cursor-pointer items-center justify-center gap-2 border px-4 text-xs font-semibold tracking-[0.08em] uppercase transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--app-focus) disabled:cursor-wait disabled:opacity-60 motion-reduce:transition-none ${
+        isFavorite
+          ? "border-(--app-accent) bg-(--app-accent) text-(--app-accent-ink) hover:bg-(--app-accent-hover)"
+          : "border-(--app-field-border) bg-(--app-field) text-(--app-ink) hover:bg-[color-mix(in_oklch,var(--app-accent)_12%,var(--app-field))]"
+      }`}
     >
       <Heart aria-hidden="true" className={`size-4 ${isFavorite ? "fill-current" : ""}`} />
       {isChecking ? "Checking…" : isFavorite ? "Favorited" : "Favorite venue"}
@@ -335,6 +338,9 @@ export function VenueInfoPage({ venue }: { venue: Venue }) {
   const searchTriggerRef = useRef<HTMLButtonElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const highlightTimeoutRef = useRef<number | null>(null);
+  const hasVerifiedContactEmail = Boolean(
+    venue.contactEmail?.trim() && !venue.contactEmail.toLowerCase().endsWith(".invalid"),
+  );
 
   useEffect(
     () => () => {
@@ -371,57 +377,25 @@ export function VenueInfoPage({ venue }: { venue: Venue }) {
     });
   };
 
-  const handleShare = async () => {
-    const shareData = {
-      title: `${venue.name} · BeforeDoors`,
-      text: "Accessibility answers from BeforeDoors",
-      url: window.location.href,
-    };
-
-    if (navigator.share) {
-      const shareResult = await Result.tryPromise({
-        try: () => navigator.share!(shareData),
-        catch: (error: unknown) => error,
-      });
-
-      if (shareResult.isOk()) {
-        return;
-      }
-
-      if (shareResult.error instanceof DOMException && shareResult.error.name === "AbortError") {
-        return;
-      }
-    }
-
-    const copyResult = await Result.tryPromise({
-      try: () => navigator.clipboard.writeText(window.location.href),
-      catch: () => "clipboard-write-failed" as const,
-    });
-
-    if (copyResult.isOk()) {
-      toast.success("Brief link copied");
-    } else {
-      toast.error("Copy this page’s URL to share the brief");
-    }
-  };
-
   return (
     <div className="min-h-svh bg-(--app-bg) text-(--app-ink)">
-      <Header alignment="report" variant="report" onShare={() => void handleShare()} />
+      <Header variant="report" />
 
-      <main className="relative min-h-[calc(100svh-3.5rem)] overflow-x-hidden bg-(--app-bg) px-5 pb-12 max-[680px]:px-0">
+      <main className="relative min-h-[calc(100svh-3.5rem)] overflow-x-hidden bg-(--app-bg) px-0 pb-12 sm:px-5">
         <TrailheadSurface />
-        <div className="relative z-1 mx-auto w-full max-w-352 border-x border-(--app-line) bg-[color-mix(in_oklch,var(--app-bg)_96%,var(--app-field))] max-[680px]:border-x-0">
-          <header className="relative isolate flex min-h-44 items-end justify-between gap-5 border-b border-(--app-line) px-8 pt-10 pb-8 max-[760px]:flex-col max-[760px]:items-start max-[680px]:min-h-52 max-[680px]:px-4 max-[680px]:py-8">
-            <div className="relative z-10 min-w-0">
-              <h1 className="m-0 max-w-none text-[clamp(2.75rem,6vw,5rem)] leading-[0.92] font-semibold tracking-tighter max-[680px]:text-[clamp(2.4rem,13vw,4rem)] min-[1280px]:whitespace-nowrap">
-                {venue.name || "Venue name not recorded"}
-              </h1>
-              <p className="mt-4 mb-0 font-mono text-[clamp(0.8rem,1.3vw,1rem)] leading-6">
+        <div className="relative z-1 mx-auto w-full max-w-352 border-x border-(--app-line) bg-[color-mix(in_oklch,var(--app-bg)_96%,var(--app-field))]">
+          <PageHero
+            title={venue.name || "Venue name not recorded"}
+            titleAttribute={venue.name || "Venue name not recorded"}
+            titleClassName="truncate"
+            descriptionClassName="max-w-full min-w-0 overflow-hidden"
+            description={
+              venue.answerCount > 0 ? (
                 <SourceUrl url={venue.url} label="Open venue URL" />
-              </p>
-            </div>
-            <div className="z-10 flex shrink-0 items-end gap-5 max-[760px]:mt-4 max-[760px]:items-start">
+              ) : undefined
+            }
+            actionsClassName="flex items-end gap-5 max-[760px]:mt-4 max-[760px]:items-start"
+            actions={
               <p className="m-0 max-w-60 font-mono text-[0.72rem] leading-normal text-(--app-muted)">
                 Last updated
                 <br />
@@ -429,12 +403,72 @@ export function VenueInfoPage({ venue }: { venue: Venue }) {
                   {formatUpdatedAt(venue.updatedAt)}
                 </strong>
               </p>
+            }
+            className="gap-5"
+          />
+
+          <section
+            aria-labelledby="ask-venue-title"
+            className="flex flex-wrap items-center justify-between gap-4 border-b border-(--app-line) bg-[color-mix(in_oklch,var(--app-field)_70%,var(--app-accent)_4%)] px-8 py-5 max-[680px]:items-start max-[680px]:px-4"
+          >
+            <div className="max-w-[60ch]">
+              <h2
+                id="ask-venue-title"
+                className="m-0 text-base leading-tight font-semibold tracking-[-0.02em]"
+              >
+                Still have a question?
+              </h2>
+              <p className="mt-1.5 mb-0 text-xs leading-5 text-(--app-muted) sm:text-sm">
+                Ask the venue only what its published information could not answer, then review the
+                note before it is sent.
+              </p>
+            </div>
+            <div className="flex flex-wrap items-center justify-end gap-3">
               <VenueFavoriteButton venueId={venue._id} venueName={venue.name} />
+              {hasVerifiedContactEmail ? (
+                <Link
+                  to="/ask-venue"
+                  search={{ venueName: venue.name || "the venue", venueUrl: venue.url }}
+                  className="group inline-flex h-10 shrink-0 cursor-pointer items-center gap-2 border border-(--app-accent) bg-(--app-accent) px-3 text-xs font-semibold tracking-[0.08em] text-(--app-accent-ink) uppercase transition-[background-color,border-color] duration-200 hover:border-(--app-accent-hover) hover:bg-(--app-accent-hover) focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--app-focus) motion-reduce:transition-none"
+                >
+                  <MessageCircleQuestion aria-hidden="true" className="size-3.5" />
+                  Ask the venue
+                  <ArrowRight
+                    aria-hidden="true"
+                    className="size-3.5 transition-transform duration-200 group-hover:translate-x-0.5 group-focus-visible:translate-x-0.5 motion-reduce:transition-none"
+                  />
+                </Link>
+              ) : (
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger
+                      tabIndex={0}
+                      render={
+                        <span
+                          className="inline-flex cursor-help"
+                          aria-label="Ask the venue unavailable: no verified public email was found"
+                        />
+                      }
+                    >
+                      <button
+                        type="button"
+                        disabled
+                        aria-disabled="true"
+                        className="pointer-events-none inline-flex h-10 shrink-0 cursor-not-allowed items-center gap-2 border border-(--app-line) bg-(--app-field) px-3 text-xs font-semibold tracking-[0.08em] text-(--app-muted) uppercase opacity-70"
+                      >
+                        <MessageCircleQuestion aria-hidden="true" className="size-3.5" />
+                        Ask the venue
+                        <ArrowRight aria-hidden="true" className="size-3.5" />
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      No verified public email was found for this venue.
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              )}
             </div>
-            <div className="pointer-events-none absolute inset-y-0 right-0 z-[-1] w-[48%] max-[680px]:inset-0 max-[680px]:w-full max-[680px]:opacity-60">
-              <ReportContourLines />
-            </div>
-          </header>
+          </section>
 
           <div className="relative z-20 flex flex-col gap-3 border-b border-(--app-line) bg-[color-mix(in_oklch,var(--app-accent)_8%,var(--app-bg))] px-8 py-3.5 max-[680px]:px-4 md:flex-row md:items-center md:justify-between">
             <div className="min-w-0 text-xs">
@@ -450,7 +484,7 @@ export function VenueInfoPage({ venue }: { venue: Venue }) {
                 aria-expanded={isSearchOpen}
                 aria-controls={isSearchOpen ? "venue-answer-search-panel" : undefined}
                 onClick={openSearch}
-                className="inline-flex h-10 shrink-0 items-center gap-2 border border-(--app-field-border) bg-(--app-field) px-4 text-xs font-semibold tracking-[0.08em] text-(--app-ink) uppercase transition-colors duration-200 hover:bg-[color-mix(in_oklch,var(--app-accent)_12%,var(--app-field))] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--app-focus) motion-reduce:transition-none"
+                className="inline-flex h-10 shrink-0 cursor-pointer items-center gap-2 border border-(--app-field-border) bg-(--app-filter) px-4 text-xs font-semibold tracking-[0.08em] text-(--app-ink) uppercase transition-colors duration-200 hover:bg-[color-mix(in_oklch,var(--app-accent)_12%,var(--app-filter))] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--app-focus) motion-reduce:transition-none"
               >
                 <Search aria-hidden="true" className="size-4" />
                 Search answers
@@ -503,41 +537,91 @@ export function VenueInfoPage({ venue }: { venue: Venue }) {
             </p>
           </aside>
 
-          <section
-            aria-labelledby="ask-venue-title"
-            className="flex flex-wrap items-center justify-between gap-5 border-t border-(--app-line) px-8 py-7 max-[680px]:items-start max-[680px]:px-4"
-          >
-            <div className="max-w-[56ch]">
-              <h2
-                id="ask-venue-title"
-                className="m-0 text-xl leading-tight font-semibold tracking-[-0.025em]"
-              >
-                Still have a question?
-              </h2>
-              <p className="mt-2 mb-0 text-sm leading-6 text-(--app-muted)">
-                Ask the venue directly. Add only what the published information could not answer,
-                then review the note before it leaves BeforeDoors.
-              </p>
-            </div>
-            <Link
-              to="/ask-venue"
-              search={{ venueName: venue.name || "the venue", venueUrl: venue.url }}
-              className="group inline-flex h-10 shrink-0 items-center gap-2 border border-(--app-accent) bg-(--app-accent) px-4 text-xs font-semibold tracking-[0.08em] text-(--app-accent-ink) uppercase transition-[background-color,border-color] duration-200 hover:border-(--app-accent-hover) hover:bg-(--app-accent-hover) focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--app-focus) motion-reduce:transition-none"
-            >
-              <MessageCircleQuestion aria-hidden="true" className="size-4" />
-              Ask the venue
-              <ArrowRight
-                aria-hidden="true"
-                className="size-4 transition-transform duration-200 group-hover:translate-x-0.5 group-focus-visible:translate-x-0.5 motion-reduce:transition-none"
-              />
-            </Link>
-          </section>
-
           <footer className="flex justify-between gap-4 border-t border-(--app-line) px-8 py-3.5 font-mono text-xs leading-normal text-(--app-muted) max-[680px]:flex-col max-[680px]:px-4">
             <span>BeforeDoors · Know before you go</span>
             <span>Answers carry their source</span>
           </footer>
         </div>
+      </main>
+    </div>
+  );
+}
+
+export function VenueSelectionPage({
+  reportId,
+  seedUrl,
+  candidates,
+}: {
+  reportId: Id<"reports">;
+  seedUrl: string;
+  candidates: Array<{ name: string; url: string }>;
+}) {
+  const selectReportVenue = useMutation(api.reports.selectReportVenue);
+  const [selectedUrl, setSelectedUrl] = useState<string | null>(null);
+
+  const handleSelect = async (url: string) => {
+    if (selectedUrl !== null) return;
+    setSelectedUrl(url);
+    try {
+      await selectReportVenue({ reportId, venueUrl: url });
+    } catch {
+      setSelectedUrl(null);
+      toast.error("We couldn’t start research for that venue. Please try again.");
+    }
+  };
+
+  return (
+    <div className="min-h-svh bg-(--app-bg) text-(--app-ink)">
+      <Header linkToVenues />
+      <main className="relative min-h-[calc(100svh-3.5rem)] overflow-x-hidden bg-(--app-bg) px-0 pb-12 sm:px-5">
+        <TrailheadSurface />
+        <section className="relative z-1 mx-auto w-full max-w-352 border-x border-(--app-line) bg-[color-mix(in_oklch,var(--app-bg)_96%,var(--app-field))]">
+          <PageHero
+            title="Which venue should we research?"
+            titleClassName="max-w-[18ch] leading-[0.94] tracking-[-0.045em]"
+            description="This link includes more than one venue. Choose the specific venue you want to use so the research stays focused."
+            descriptionClassName="mt-4 max-w-[58ch]"
+            className="py-10 max-[680px]:py-8"
+          />
+
+          <div className="border-b border-(--app-line) bg-[color-mix(in_oklch,var(--app-field)_70%,var(--app-accent)_4%)] px-8 py-4 max-[680px]:px-4">
+            <p className="m-0 font-mono text-[0.68rem] leading-5 text-(--app-muted)">
+              Submitted URL
+            </p>
+            <p className="mt-1 mb-0 font-mono text-xs leading-5 break-all text-(--app-ink)">
+              {seedUrl}
+            </p>
+          </div>
+
+          <ol className="m-0 list-none p-0" aria-label="Venues found on the submitted page">
+            {candidates.map((candidate) => {
+              const isSelected = selectedUrl === candidate.url;
+              return (
+                <li
+                  key={candidate.url}
+                  className="flex items-center justify-between gap-6 border-b border-(--app-line) px-8 py-5 last:border-b-0 max-[680px]:items-start max-[680px]:gap-4 max-[680px]:px-4 max-[680px]:py-4"
+                >
+                  <div className="min-w-0">
+                    <h2 className="m-0 text-base leading-tight font-semibold tracking-[-0.02em]">
+                      {candidate.name}
+                    </h2>
+                    <p className="mt-2 mb-0 max-w-full min-w-0 overflow-hidden">
+                      <SourceUrl url={candidate.url} label="Open venue page" />
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    disabled={selectedUrl !== null}
+                    onClick={() => void handleSelect(candidate.url)}
+                    className="inline-flex h-10 shrink-0 cursor-pointer items-center border border-(--app-accent) bg-(--app-accent) px-4 text-xs font-semibold tracking-[0.08em] text-(--app-accent-ink) uppercase transition-colors hover:border-(--app-accent-hover) hover:bg-(--app-accent-hover) focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--app-focus) disabled:cursor-wait disabled:opacity-60 motion-reduce:transition-none max-[680px]:px-3"
+                  >
+                    {isSelected ? "Starting…" : "Research this venue"}
+                  </button>
+                </li>
+              );
+            })}
+          </ol>
+        </section>
       </main>
     </div>
   );
@@ -554,27 +638,30 @@ export function VenueInfoMessage({
 }) {
   return (
     <div className="min-h-svh bg-(--app-bg) text-(--app-ink)">
-      <Header alignment="report" linkToVenues />
-      <main className="relative min-h-[calc(100svh-3.5rem)] overflow-x-hidden bg-(--app-bg) px-5 pb-12 max-[680px]:px-0">
+      <Header linkToVenues />
+      <main className="relative min-h-[calc(100svh-3.5rem)] overflow-x-hidden bg-(--app-bg) px-0 pb-12 sm:px-5">
         <TrailheadSurface />
-        <section
-          className="relative z-1 mx-auto w-full max-w-352 border-x border-(--app-line) bg-[color-mix(in_oklch,var(--app-bg)_96%,var(--app-field))] px-8 py-16 max-[680px]:border-x-0 max-[680px]:px-4"
+        <PageHero
+          element="section"
           role={isLoading ? "status" : undefined}
-          aria-live={isLoading ? "polite" : undefined}
-        >
-          <h1 className="m-0 text-[clamp(2.5rem,6vw,4rem)] leading-[0.95] font-semibold tracking-[-0.045em]">
-            {title}
-          </h1>
-          <p className="mt-5 mb-0 max-w-[55ch] text-base leading-7 text-(--app-muted)">{message}</p>
-          {!isLoading && (
-            <Link
-              to="/venues"
-              className="mt-7 inline-flex border border-(--app-accent) px-3 py-2 text-xs font-semibold tracking-[0.08em] text-(--app-accent-hover) uppercase underline-offset-4 hover:bg-(--app-accent) hover:text-(--app-accent-ink) focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-(--app-focus)"
-            >
-              View all venues
-            </Link>
-          )}
-        </section>
+          ariaLive={isLoading ? "polite" : undefined}
+          title={title}
+          titleClassName="leading-[0.95] tracking-[-0.045em]"
+          description={message}
+          descriptionClassName="mt-5 max-w-[55ch] text-base leading-7"
+          actionsClassName="mt-7 max-[760px]:mt-0"
+          actions={
+            !isLoading ? (
+              <Link
+                to="/venues"
+                className="inline-flex h-10 items-center border border-(--app-accent) px-3 text-xs font-semibold tracking-[0.08em] text-(--app-accent-hover) uppercase underline-offset-4 hover:bg-(--app-accent) hover:text-(--app-accent-ink) focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-(--app-focus)"
+              >
+                View all venues
+              </Link>
+            ) : undefined
+          }
+          className="relative z-1 mx-auto w-full max-w-352 py-16 max-[680px]:py-12"
+        />
       </main>
     </div>
   );

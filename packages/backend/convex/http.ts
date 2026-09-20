@@ -1,6 +1,7 @@
 import { AgentMail } from "./components/agentmail/client/index.js";
+import { registerStaticRoutes } from "@convex-dev/static-hosting";
 import { httpRouter } from "convex/server";
-import { components } from "./_generated/api";
+import { components, internal } from "./_generated/api";
 import { env, httpAction } from "./_generated/server";
 
 const http = httpRouter();
@@ -11,6 +12,7 @@ http.route({
   handler: httpAction(async (ctx, request) => {
     const agentmail = new AgentMail(components.agentmail, {
       webhookSecret: env.AGENTMAIL_WEBHOOK_SECRET,
+      onMessageReceived: internal.venueQuestions.handleVenueReplyReceived,
     });
 
     // The AgentMail client was built against an older Convex context signature;
@@ -21,5 +23,7 @@ http.route({
     );
   }),
 });
+
+registerStaticRoutes(http, components.staticHosting);
 
 export default http;

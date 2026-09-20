@@ -189,7 +189,7 @@ function PasswordAuthFormControls({
           onChange={(event) => onUsernameChange(event.target.value)}
           aria-invalid={Boolean(error)}
           aria-describedby={error ? errorId : undefined}
-          className="h-11 bg-(--app-field) px-3 text-sm text-(--app-field-ink) dark:bg-(--app-field)"
+          className="h-11 bg-(--app-field) px-3 text-sm text-(--app-field-ink)"
         />
       </div>
 
@@ -212,7 +212,7 @@ function PasswordAuthFormControls({
           onChange={(event) => onPasswordChange(event.target.value)}
           aria-invalid={Boolean(error)}
           aria-describedby={passwordDescriptionId}
-          className="h-11 bg-(--app-field) px-3 text-sm text-(--app-field-ink) dark:bg-(--app-field)"
+          className="h-11 bg-(--app-field) px-3 text-sm text-(--app-field-ink)"
         />
         {copy.passwordHint && (
           <p id="auth-password-hint" className="text-xs leading-5 text-(--app-muted)">
@@ -236,7 +236,7 @@ function PasswordAuthFormControls({
         <button
           type="button"
           onClick={() => onChangeMode(copy.nextMode)}
-          className="font-semibold text-(--app-ink) underline underline-offset-4 hover:text-(--app-muted) focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--app-focus)"
+          className="cursor-pointer font-semibold text-(--app-ink) underline underline-offset-4 hover:text-(--app-muted) focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--app-focus)"
         >
           {copy.switchLabel}
         </button>

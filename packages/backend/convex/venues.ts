@@ -1,11 +1,12 @@
-import { paginationOptsValidator } from "convex/server";
+import { paginationOptsValidator, paginationResultValidator } from "convex/server";
 import { convexToZod, zid } from "convex-helpers/server/zod4";
 import { v } from "convex/values";
 import { z } from "zod";
-import type { Id } from "./_generated/dataModel";
-import { internalMutation, type MutationCtx } from "./_generated/server";
+import type { Doc, Id } from "./_generated/dataModel";
+import { internalMutation, internalQuery, type MutationCtx } from "./_generated/server";
 import { publicQuery } from "./lib/customFunctions";
 import { paginationResultSchema } from "./lib/pagination";
+import { deduplicateResearchResults, researchResultKey } from "./lib/researchResults";
 
 const venueAnswerSchema = z.object({
   answerIndex: z.number(),
@@ -20,6 +21,7 @@ const venueSummaryValidator = v.object({
   _creationTime: v.number(),
   url: v.string(),
   name: v.string(),
+  contactEmail: v.optional(v.string()),
   updatedAt: v.number(),
   answerCount: v.number(),
   publishedCount: v.number(),
@@ -63,6 +65,7 @@ export const getVenueByUrl = publicQuery({
         _creationTime: venue._creationTime,
         url: venue.url,
         name: venue.name,
+        contactEmail: venue.contactEmail,
         updatedAt: venue.updatedAt,
         answerCount: venue.answerCount,
         publishedCount: venue.publishedCount,
@@ -103,23 +106,178 @@ export const searchVenueAnswers = publicQuery({
 });
 
 export const listVenues = publicQuery({
-  args: { paginationOpts: convexToZod(paginationOptsValidator) },
+  args: {
+    paginationOpts: convexToZod(paginationOptsValidator),
+    searchTerm: z.string().max(200).optional(),
+  },
   returns: paginationResultSchema(venueSummaryValidator),
   handler: async (ctx, args) => {
+    const searchTerm = args.searchTerm?.trim() ?? "";
+    if (searchTerm.length > 0) {
+      const searchPage = await ctx.db
+        .query("venueSearch")
+        .withSearchIndex("search_text", (q) => q.search("searchText", searchTerm))
+        .paginate(args.paginationOpts);
+      const searchVenues = await Promise.all(
+        searchPage.page.map((entry) => ctx.db.get("venues", entry.venueId)),
+      );
+
+      return {
+        ...searchPage,
+        page: searchVenues
+          .filter((venue): venue is Doc<"venues"> => venue !== null)
+          .map(toVenueSummary),
+      };
+    }
+
     const page = await ctx.db.query("venues").order("desc").paginate(args.paginationOpts);
     return {
       ...page,
-      page: page.page.map((venue) => ({
-        _id: venue._id,
-        _creationTime: venue._creationTime,
-        url: venue.url,
-        name: venue.name,
-        updatedAt: venue.updatedAt,
-        answerCount: venue.answerCount,
-        publishedCount: venue.publishedCount,
-        confirmedCount: venue.confirmedCount,
-      })),
+      page: page.page.map(toVenueSummary),
     };
+  },
+});
+
+//#region Private functions
+
+export const getVenueValidationInput = internalQuery({
+  args: { venueId: v.id("venues") },
+  returns: v.union(
+    v.null(),
+    v.object({
+      venueId: v.id("venues"),
+      url: v.string(),
+      answers: v.array(
+        v.object({
+          answerIndex: v.number(),
+          question: v.string(),
+          answer: v.string(),
+          url: v.string(),
+        }),
+      ),
+    }),
+  ),
+  handler: async (ctx, args) => {
+    const venue = await ctx.db.get("venues", args.venueId);
+    if (venue === null) return null;
+
+    const answers = await ctx.db
+      .query("venueAnswers")
+      .withIndex("by_venue_and_answer_index", (q) => q.eq("venueId", venue._id))
+      .order("asc")
+      .take(1001);
+    if (answers.length > 1000) {
+      throw new Error(`Venue ${venue._id} exceeds the supported answer count`);
+    }
+
+    return {
+      venueId: venue._id,
+      url: venue.url,
+      answers: answers
+        .filter((answer) => answer.status === "published")
+        .map(({ answerIndex, question, answer, url }) => ({
+          answerIndex,
+          question,
+          answer,
+          url,
+        })),
+    };
+  },
+});
+
+export const listVenueValidationPage = internalQuery({
+  args: { paginationOpts: paginationOptsValidator },
+  returns: paginationResultValidator(
+    v.object({
+      _id: v.id("venues"),
+      url: v.string(),
+    }),
+  ),
+  handler: async (ctx, args) => {
+    const page = await ctx.db.query("venues").order("asc").paginate(args.paginationOpts);
+    return {
+      ...page,
+      page: page.page.map(({ _id, url }) => ({ _id, url })),
+    };
+  },
+});
+
+export const applyVenueValidation = internalMutation({
+  args: {
+    venueId: v.id("venues"),
+    results: v.array(
+      v.object({
+        answerIndex: v.number(),
+        question: v.string(),
+        answer: v.string(),
+        url: v.string(),
+      }),
+    ),
+  },
+  returns: v.null(),
+  handler: async (ctx, args) => {
+    const venue = await ctx.db.get("venues", args.venueId);
+    if (venue === null) return null;
+
+    const existingRows = await ctx.db
+      .query("venueAnswers")
+      .withIndex("by_venue_and_answer_index", (q) => q.eq("venueId", venue._id))
+      .order("asc")
+      .take(1001);
+    if (existingRows.length > 1000) {
+      throw new Error(`Venue ${venue._id} exceeds the supported answer count`);
+    }
+
+    const publishedByIndex = new Map(
+      existingRows.filter((row) => row.status === "published").map((row) => [row.answerIndex, row]),
+    );
+    const confirmedResults = existingRows
+      .filter((row) => row.status === "confirmed")
+      .map(({ question, answer, url, language }) => ({
+        question,
+        answer,
+        url,
+        language,
+        status: "confirmed" as const,
+      }));
+    const confirmedKeys = new Set(confirmedResults.map(researchResultKey));
+    const validatedCandidates = args.results.flatMap((result) => {
+      const existing = publishedByIndex.get(result.answerIndex);
+      const question = result.question.trim();
+      const answer = result.answer.trim();
+      if (
+        existing === undefined ||
+        existing.url !== result.url ||
+        question.length === 0 ||
+        answer.length === 0
+      ) {
+        return [];
+      }
+      return [{ question, answer, url: existing.url, language: existing.language }];
+    });
+    const languageByResult = new Map(
+      validatedCandidates.map((result) => [researchResultKey(result), result.language]),
+    );
+    const validatedPublished = deduplicateResearchResults(validatedCandidates)
+      .map((result) => {
+        const language = languageByResult.get(researchResultKey(result));
+        if (language === undefined) {
+          throw new Error("Validated venue answer is missing its research language");
+        }
+        return { ...result, language };
+      })
+      .filter((result) => !confirmedKeys.has(researchResultKey(result)))
+      .map((result) => ({ ...result, status: "published" as const }));
+    const results = [...validatedPublished, ...confirmedResults];
+    const counts = countAnswerStatuses(results);
+
+    await ctx.db.patch(args.venueId, {
+      answerCount: results.length,
+      ...counts,
+      updatedAt: Date.now(),
+    });
+    await replaceVenueAnswerRows(ctx, args.venueId, results);
+    return null;
   },
 });
 
@@ -128,33 +286,104 @@ export const saveReportToVenues = internalMutation({
   returns: v.null(),
   handler: async (ctx, args) => {
     const report = await ctx.db.get("reports", args.reportId);
-    if (report === null || (report.name === "" && report.results.length === 0)) return null;
+    if (
+      report === null ||
+      (report.name === "" && report.results.length === 0 && !report.contactEmail?.trim())
+    )
+      return null;
 
     const venue = await ctx.db
       .query("venues")
       .withIndex("by_url", (q) => q.eq("url", report.url))
       .unique();
     const name = report.name || venue?.name || "";
-    const results = report.results.map((result) => ({ ...result, status: "published" as const }));
+    const previousRows =
+      venue === null
+        ? []
+        : await ctx.db
+            .query("venueAnswers")
+            .withIndex("by_venue_and_answer_index", (q) => q.eq("venueId", venue._id))
+            .take(1001);
+    if (previousRows.length > 1000) {
+      throw new Error("Venue exceeds the supported answer count");
+    }
+    const confirmedResults = previousRows
+      .filter((row) => row.status === "confirmed")
+      .map(({ question, answer, url, language }) => ({
+        question,
+        answer,
+        url,
+        language,
+        status: "confirmed" as const,
+      }));
+    const confirmedKeys = new Set(confirmedResults.map(researchResultKey));
+    const publishedResults = deduplicateResearchResults(report.results)
+      .filter((result) => !confirmedKeys.has(researchResultKey(result)))
+      .map((result) => ({
+        ...result,
+        language: report.researchLanguage,
+        status: "published" as const,
+      }));
+    const results = [...publishedResults, ...confirmedResults];
     const counts = countAnswerStatuses(results);
+    const contactEmail = report.contactEmail?.trim() || venue?.contactEmail?.trim() || undefined;
     const metadata = {
       url: report.url,
+      seedUrl: report.seedUrl,
+      siteUrl: report.siteUrl,
+      researchLanguage: report.researchLanguage,
       name,
       updatedAt: Date.now(),
       answerCount: results.length,
       ...counts,
+      ...(contactEmail ? { contactEmail } : {}),
     };
     const venueId =
       venue === null
         ? await ctx.db.insert("venues", metadata)
         : (await ctx.db.replace(venue._id, metadata), venue._id);
 
+    const savedVenue = await ctx.db.get("venues", venueId);
+    if (savedVenue !== null) {
+      await upsertVenueSearch(ctx, savedVenue);
+    }
+
     await replaceVenueAnswerRows(ctx, venueId, results);
     return null;
   },
 });
 
+//#endregion Private functions
+
 // Utilities
+
+function toVenueSummary(venue: Doc<"venues">) {
+  return {
+    _id: venue._id,
+    _creationTime: venue._creationTime,
+    url: venue.url,
+    name: venue.name,
+    contactEmail: venue.contactEmail,
+    updatedAt: venue.updatedAt,
+    answerCount: venue.answerCount,
+    publishedCount: venue.publishedCount,
+    confirmedCount: venue.confirmedCount,
+  };
+}
+
+async function upsertVenueSearch(ctx: MutationCtx, venue: Doc<"venues">) {
+  const existing = await ctx.db
+    .query("venueSearch")
+    .withIndex("by_venue_id", (q) => q.eq("venueId", venue._id))
+    .unique();
+  const searchText = `${venue.name}\n${venue.url}`;
+
+  if (existing === null) {
+    await ctx.db.insert("venueSearch", { venueId: venue._id, searchText });
+  } else if (existing.searchText !== searchText) {
+    await ctx.db.patch(existing._id, { searchText });
+  }
+}
 
 function countAnswerStatuses(answers: Array<{ status: "published" | "confirmed" }>) {
   let publishedCount = 0;
@@ -173,6 +402,7 @@ async function replaceVenueAnswerRows(
     question: string;
     answer: string;
     url: string;
+    language: string;
     status: "published" | "confirmed";
   }>,
 ) {
