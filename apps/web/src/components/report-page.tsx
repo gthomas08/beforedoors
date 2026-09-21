@@ -11,6 +11,7 @@ import type { Doc, Id } from "@beforedoors/backend/convex/_generated/dataModel";
 import Header from "@/components/header";
 import { answerStatusMeta } from "@/components/answer-status";
 import { PageHero } from "@/components/page-hero";
+import { PasswordAuthDialog } from "@/components/password-auth-dialog";
 import { TrailheadSurface } from "@/components/trailhead-surface";
 import { Empty, EmptyDescription, EmptyHeader, EmptyTitle } from "@/components/ui/empty";
 import { Input } from "@/components/ui/input";
@@ -282,13 +283,14 @@ function VenueFavoriteButton({ venueId, venueName }: { venueId: Venue["_id"]; ve
   const { isAuthenticated, isLoading: isAuthLoading } = useConvexAuth();
   const favorite = useQuery(api.favorites.getVenueFavorite, isAuthenticated ? { venueId } : "skip");
   const setVenueFavorite = useMutation(api.favorites.setVenueFavorite);
+  const [authMode, setAuthMode] = useState<"signIn" | "signUp" | null>(null);
   const [isUpdating, setIsUpdating] = useState(false);
 
   const handleFavorite = async () => {
     if (isAuthLoading) return;
 
     if (!isAuthenticated) {
-      toast.error("Sign in to favorite venues.");
+      setAuthMode("signIn");
       return;
     }
 
@@ -310,25 +312,49 @@ function VenueFavoriteButton({ venueId, venueName }: { venueId: Venue["_id"]; ve
     }
   };
 
+  const favoriteAfterAuthentication = async () => {
+    setIsUpdating(true);
+    try {
+      await setVenueFavorite({ venueId, isFavorite: true });
+      toast.success("Venue added to favorites.");
+    } catch {
+      toast.error("We couldn’t update this favorite. Please try again.");
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
   const isFavorite = favorite?.isFavorite ?? false;
   const isChecking = isAuthLoading || (isAuthenticated && favorite === undefined);
 
   return (
-    <button
-      type="button"
-      aria-label={`${isFavorite ? "Remove favorite" : "Favorite"} ${venueName || "this venue"}`}
-      aria-pressed={isFavorite}
-      disabled={isChecking || isUpdating}
-      onClick={() => void handleFavorite()}
-      className={`inline-flex h-10 w-44 shrink-0 cursor-pointer items-center justify-center gap-2 border px-4 text-xs font-semibold tracking-[0.08em] uppercase transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--app-focus) disabled:cursor-wait disabled:opacity-60 motion-reduce:transition-none ${
-        isFavorite
-          ? "border-(--app-accent) bg-(--app-accent) text-(--app-accent-ink) hover:bg-(--app-accent-hover)"
-          : "border-(--app-field-border) bg-(--app-field) text-(--app-ink) hover:bg-[color-mix(in_oklch,var(--app-accent)_12%,var(--app-field))]"
-      }`}
-    >
-      <Heart aria-hidden="true" className={`size-4 ${isFavorite ? "fill-current" : ""}`} />
-      {isChecking ? "Checking…" : isFavorite ? "Favorited" : "Favorite venue"}
-    </button>
+    <>
+      <button
+        type="button"
+        aria-label={`${isFavorite ? "Remove favorite" : "Favorite"} ${venueName || "this venue"}`}
+        aria-pressed={isFavorite}
+        disabled={isChecking || isUpdating}
+        onClick={() => void handleFavorite()}
+        className={`inline-flex h-10 w-44 shrink-0 cursor-pointer items-center justify-center gap-2 border px-4 text-xs font-semibold tracking-[0.08em] uppercase transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--app-focus) disabled:cursor-wait disabled:opacity-60 motion-reduce:transition-none ${
+          isFavorite
+            ? "border-(--app-accent) bg-(--app-accent) text-(--app-accent-ink) hover:bg-(--app-accent-hover)"
+            : "border-(--app-field-border) bg-(--app-field) text-(--app-ink) hover:bg-[color-mix(in_oklch,var(--app-accent)_12%,var(--app-field))]"
+        }`}
+      >
+        <Heart aria-hidden="true" className={`size-4 ${isFavorite ? "fill-current" : ""}`} />
+        {isChecking ? "Checking…" : isFavorite ? "Favorited" : "Favorite venue"}
+      </button>
+
+      {authMode && (
+        <PasswordAuthDialog
+          key={authMode}
+          mode={authMode}
+          onClose={() => setAuthMode(null)}
+          onChangeMode={setAuthMode}
+          onAuthenticated={favoriteAfterAuthentication}
+        />
+      )}
+    </>
   );
 }
 

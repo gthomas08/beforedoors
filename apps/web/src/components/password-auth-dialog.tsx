@@ -56,10 +56,12 @@ export function PasswordAuthDialog({
   mode,
   onClose,
   onChangeMode,
+  onAuthenticated,
 }: {
   mode: AuthMode;
   onClose: () => void;
   onChangeMode: (mode: AuthMode) => void;
+  onAuthenticated?: () => void | Promise<void>;
 }) {
   const { signIn, pending: isSigningIn } = useSignInWithPassword(api.auth.signInWithPassword);
   const { signUp, pending: isSigningUp } = useSignUpWithPassword(api.auth.signUpWithPassword);
@@ -85,6 +87,7 @@ export function PasswordAuthDialog({
       return;
     }
 
+    await onAuthenticated?.();
     onClose();
   }
 
