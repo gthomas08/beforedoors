@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
   <title id="title">BeforeDoors — Know before you go</title>
-  <desc id="desc">An accessibility brief for the venue ahead.</desc>
+  <desc id="desc">A green outline of an open door with an orange knob beside the words Know before you go.</desc>
   <rect width="1200" height="630" fill="#f7f1e7"/>
 
   <g fill="none" stroke="#b9aa8f" stroke-width="2" opacity=".42">
@@ -22,12 +22,10 @@
     <circle cx="1194" cy="34" r="11" fill="#ed6e1d" stroke-width="6"/>
   </g>
 
-  <g transform="translate(92 86)">
-    <rect width="132" height="132" fill="#0f3c27"/>
-    <path d="M61 103V29h38v74" fill="none" stroke="#f7f1e7" stroke-width="6" stroke-linejoin="round"/>
-    <path d="M61 29 29 15v88l32-13Z" fill="#0f3c27" stroke="#f7f1e7" stroke-width="6" stroke-linejoin="round"/>
-    <circle cx="43" cy="61" r="5" fill="#ed6e1d"/>
-    <path d="M12 111c23-6 35-2 49 5s28 9 49 0" fill="none" stroke="#ed6e1d" stroke-width="6" stroke-linecap="round" stroke-dasharray="11 9"/>
+  <g transform="translate(50 77) scale(1.15)">
+    <path d="M67 116V28h45v88" fill="none" stroke="#0f3c27" stroke-linecap="square" stroke-width="5"/>
+    <path d="M67 28 35 10v116l32-10Z" fill="#f7f1e7" stroke="#0f3c27" stroke-linecap="round" stroke-linejoin="round" stroke-width="5"/>
+    <circle cx="45" cy="70" r="5" fill="#ed6e1d"/>
   </g>
 
   <text x="92" y="322" fill="#0f3c27" font-family="Inter, Arial, sans-serif" font-size="108" font-weight="700" letter-spacing="-4">BeforeDoors</text>

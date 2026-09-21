@@ -1,5 +1,5 @@
-import { api } from "@my-better-t-app/backend/convex/_generated/api";
-import type { Id } from "@my-better-t-app/backend/convex/_generated/dataModel";
+import { api } from "@beforedoors/backend/convex/_generated/api";
+import type { Id } from "@beforedoors/backend/convex/_generated/dataModel";
 import { Link, useLocation } from "@tanstack/react-router";
 import { useQuery } from "convex/react";
 import { ArrowRight, Check, X } from "lucide-react";

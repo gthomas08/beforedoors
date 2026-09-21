@@ -1,5 +1,5 @@
 {
-  "name": "my-better-t-app",
+  "name": "beforedoors",
   "private": true,
   "workspaces": [
     "apps/*",
@@ -11,8 +11,8 @@
     "build": "pnpm -r --if-present build",
     "check-types": "pnpm -r check-types",
     "dev:web": "pnpm --filter web dev",
-    "dev:server": "pnpm --filter @my-better-t-app/backend dev",
-    "dev:setup": "pnpm --filter @my-better-t-app/backend dev:setup",
+    "dev:server": "pnpm --filter @beforedoors/backend dev",
+    "dev:setup": "pnpm --filter @beforedoors/backend dev:setup",
     "check": "oxlint && oxfmt --write",
     "fix:tailwind": "oxlint --fix --fix-suggestions apps/web/src && oxfmt --write apps/web/src"
   },

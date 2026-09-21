@@ -1,5 +1,5 @@
-import { api } from "@my-better-t-app/backend/convex/_generated/api";
-import type { Id } from "@my-better-t-app/backend/convex/_generated/dataModel";
+import { api } from "@beforedoors/backend/convex/_generated/api";
+import type { Id } from "@beforedoors/backend/convex/_generated/dataModel";
 import { useConvexAuth } from "@convex-dev/auth/react";
 import { Link, createFileRoute } from "@tanstack/react-router";
 import {

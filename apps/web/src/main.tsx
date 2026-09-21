@@ -1,5 +1,5 @@
 import { env } from "@/env";
-import { api } from "@my-better-t-app/backend/convex/_generated/api";
+import { api } from "@beforedoors/backend/convex/_generated/api";
 import { ConvexAuthProvider } from "@convex-dev/auth/react";
 import { RouterProvider, createRouter } from "@tanstack/react-router";
 import { ConvexReactClient } from "convex/react";

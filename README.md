@@ -1,6 +1,6 @@
-# my-better-t-app
+# BeforeDoors
 
-This project was created with [Better-T-Stack](https://github.com/AmanVarshney01/create-better-t-stack), a modern TypeScript stack that combines React, TanStack Router, Convex, and more.
+BeforeDoors helps people make informed decisions about attending events by turning venue links into clear, evidence-based accessibility briefs.
 
 ## Features
 
@@ -73,7 +73,7 @@ If you want to add app-specific blocks instead of shared primitives, run the sha
 ## Project Structure
 
 ```
-my-better-t-app/
+beforedoors/
 ├── apps/
 │   ├── web/         # Frontend application and UI components
 ├── packages/

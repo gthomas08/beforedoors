@@ -84,7 +84,7 @@ importers:
       '@convex-dev/auth':
         specifier: 2.0.0-alpha.1
         version: 2.0.0-alpha.1(@standard-schema/spec@1.1.0)(convex@1.46.0(react@19.2.8))(hono@4.13.5)(react@19.2.8)(typescript@6.0.3)(zod@4.5.4)
-      '@my-better-t-app/backend':
+      '@beforedoors/backend':
         specifier: workspace:*
         version: link:../../packages/backend
       '@shadcn/react':

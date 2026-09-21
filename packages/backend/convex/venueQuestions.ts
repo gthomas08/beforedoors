@@ -94,13 +94,13 @@ export const sendVenueQuestions = authMutation({
       return { requestId: existingRequest._id, outboundId: existingRequest.outboundId };
     }
 
-    const fromEmail = env.BEFOREDOORS_EMAIL;
+    const inboxId = env.AGENTMAIL_INBOX_ID;
     const venue = await ctx.db
       .query("venues")
       .withIndex("by_url", (q) => q.eq("url", args.venueUrl))
       .unique();
     const toEmail = venue?.contactEmail?.trim();
-    if (!fromEmail) throw new Error("AgentMail is not configured: set BEFOREDOORS_EMAIL");
+    if (!inboxId) throw new Error("AgentMail is not configured: set AGENTMAIL_INBOX_ID");
     if (!isDeliverableContactEmail(toEmail))
       throw new Error(
         "This venue does not have a verified public contact email yet. Try again after the venue research is refreshed.",
@@ -109,7 +109,7 @@ export const sendVenueQuestions = authMutation({
     const recipientVenueName = venue?.name || args.venueName;
     const subject = `A question from BeforeDoors · ${recipientVenueName}`;
     const text = buildVenueQuestionEmail(recipientVenueName, args.questions);
-    const outboundId = await agentmail.sendMessage(ctx, fromEmail, {
+    const outboundId = await agentmail.sendMessage(ctx, inboxId, {
       to: toEmail,
       subject,
       text,
@@ -238,7 +238,7 @@ export const listMyEmailThreads = authQuery({
         const sentMessage: AccountMessage = {
           id: request.outboundId,
           direction: "sent",
-          from: env.BEFOREDOORS_EMAIL ?? null,
+          from: env.AGENTMAIL_INBOX_ID ?? null,
           to: [request.recipientEmail],
           subject,
           text: buildVenueQuestionEmail(request.venueName, request.questions),

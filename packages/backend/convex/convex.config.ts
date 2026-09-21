@@ -22,7 +22,7 @@ const app = defineApp({
     AGENTMAIL_API_KEY: v.string(),
     AGENTMAIL_WEBHOOK_SECRET: v.string(),
     AGENTMAIL_BASE_URL: v.optional(v.string()),
-    BEFOREDOORS_EMAIL: v.optional(v.string()),
+    AGENTMAIL_INBOX_ID: v.optional(v.string()),
   },
 });
 

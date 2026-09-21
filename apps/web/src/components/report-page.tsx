@@ -6,8 +6,8 @@ import { ArrowRight, ArrowUpRight, Heart, MessageCircleQuestion, Search, X } fro
 import { useEffect, useId, useRef, useState } from "react";
 import { toast } from "sonner";
 
-import { api } from "@my-better-t-app/backend/convex/_generated/api";
-import type { Doc, Id } from "@my-better-t-app/backend/convex/_generated/dataModel";
+import { api } from "@beforedoors/backend/convex/_generated/api";
+import type { Doc, Id } from "@beforedoors/backend/convex/_generated/dataModel";
 import Header from "@/components/header";
 import { answerStatusMeta } from "@/components/answer-status";
 import { PageHero } from "@/components/page-hero";

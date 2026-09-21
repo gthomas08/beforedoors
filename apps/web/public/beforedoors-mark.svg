@@ -1,9 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title desc">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="19 3 110 126" role="img" aria-labelledby="title desc">
   <title id="title">BeforeDoors mark</title>
-  <desc id="desc">An open door with a route leading toward it.</desc>
-  <rect width="64" height="64" fill="#f7f1e7"/>
-  <path d="M28 50V14h18v36" fill="none" stroke="#0f3c27" stroke-width="3" stroke-linejoin="round"/>
-  <path d="M28 14 14 8v42l14-5Z" fill="#f7f1e7" stroke="#0f3c27" stroke-width="3" stroke-linejoin="round"/>
-  <circle cx="20" cy="29" r="2.5" fill="#ed6e1d"/>
-  <path d="M7 54c10-2 15-1 21 2s12 4 20 0" fill="none" stroke="#ed6e1d" stroke-width="3" stroke-linecap="round" stroke-dasharray="6 5"/>
+  <desc id="desc">An open door with an orange knob.</desc>
+  <path d="M67 116V28h45v88" fill="#f7f1e7" stroke="#0f3c27" stroke-linecap="square" stroke-width="5"/>
+  <path d="M67 28 35 10v116l32-10Z" fill="#f7f1e7" stroke="#0f3c27" stroke-linecap="round" stroke-linejoin="round" stroke-width="5"/>
+  <circle cx="45" cy="70" r="5" fill="#ed6e1d"/>
 </svg>

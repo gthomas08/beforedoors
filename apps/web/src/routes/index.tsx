@@ -1,4 +1,4 @@
-import { api } from "@my-better-t-app/backend/convex/_generated/api";
+import { api } from "@beforedoors/backend/convex/_generated/api";
 import Header from "@/components/header";
 import { DoorApproachMark } from "@/components/door-approach-mark";
 import { TrailheadSurface } from "@/components/trailhead-surface";

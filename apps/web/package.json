@@ -12,8 +12,8 @@
   },
   "dependencies": {
     "@base-ui/react": "^1.6.0",
+    "@beforedoors/backend": "workspace:*",
     "@convex-dev/auth": "2.0.0-alpha.1",
-    "@my-better-t-app/backend": "workspace:*",
     "@shadcn/react": "^0.2.1",
     "@t3-oss/env-core": "^0.13.11",
     "@tailwindcss/vite": "^4.3.3",

@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { ArrowRight, ArrowUpRight, Plus } from "lucide-react";
 
-import type { Doc } from "@my-better-t-app/backend/convex/_generated/dataModel";
+import type { Doc } from "@beforedoors/backend/convex/_generated/dataModel";
 import { answerStatusMeta, type AnswerStatus } from "@/components/answer-status";
 import Header from "@/components/header";
 import { PageHero } from "@/components/page-hero";

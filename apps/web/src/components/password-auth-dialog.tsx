@@ -1,5 +1,5 @@
 import { Dialog } from "@base-ui/react/dialog";
-import { api } from "@my-better-t-app/backend/convex/_generated/api";
+import { api } from "@beforedoors/backend/convex/_generated/api";
 import {
   useSignInWithPassword,
   useSignUpWithPassword,

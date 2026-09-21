@@ -42,4 +42,4 @@ jobs:
         run: test -n "$CONVEX_DEPLOY_KEY" || { echo "::error::CONVEX_DEPLOY_KEY is not configured"; exit 1; }
 
       - name: Deploy Convex backend and web app
-        run: pnpm --filter @my-better-t-app/backend deploy:prod
+        run: pnpm --filter @beforedoors/backend deploy:prod

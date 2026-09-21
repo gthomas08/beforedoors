@@ -2,7 +2,8 @@ export const SITE_NAME = "BeforeDoors";
 export const SITE_TAGLINE = "Know before you go";
 export const SITE_DESCRIPTION =
   "Clear, evidence-based venue access information for planning with confidence.";
-export const SITE_SOCIAL_IMAGE = "/beforedoors-social-card.svg";
+export const SITE_SOCIAL_IMAGE = "/beforedoors-social-card.png";
+export const SITE_SOCIAL_IMAGE_ALT = `An open door with an orange knob. ${SITE_NAME} — ${SITE_TAGLINE}.`;
 
 type SiteMetaOptions = {
   title: string;
@@ -27,14 +28,14 @@ export function createSiteMeta({ title, description = SITE_DESCRIPTION }: SiteMe
     { property: "og:title", content: title },
     { property: "og:description", content: description },
     { property: "og:image", content: SITE_SOCIAL_IMAGE },
-    { property: "og:image:alt", content: `${SITE_NAME} — ${SITE_TAGLINE}` },
-    { property: "og:image:type", content: "image/svg+xml" },
+    { property: "og:image:alt", content: SITE_SOCIAL_IMAGE_ALT },
+    { property: "og:image:type", content: "image/png" },
     { property: "og:image:width", content: "1200" },
     { property: "og:image:height", content: "630" },
     { name: "twitter:card", content: "summary_large_image" },
     { name: "twitter:title", content: title },
     { name: "twitter:description", content: description },
     { name: "twitter:image", content: SITE_SOCIAL_IMAGE },
-    { name: "twitter:image:alt", content: `${SITE_NAME} — ${SITE_TAGLINE}` },
+    { name: "twitter:image:alt", content: SITE_SOCIAL_IMAGE_ALT },
   ] satisfies SiteMetaEntry[];
 }

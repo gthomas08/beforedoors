@@ -32,10 +32,10 @@ type Env = {
   readonly CONVEX_SITE_URL: string;
   readonly AGENTMAIL_API_KEY: string;
   readonly AGENTMAIL_BASE_URL: string | undefined;
+  readonly AGENTMAIL_INBOX_ID: string | undefined;
   readonly AGENTMAIL_WEBHOOK_SECRET: string;
   readonly AUTH_JWKS: string;
   readonly AUTH_PRIVATE_KEY: string;
-  readonly BEFOREDOORS_EMAIL: string | undefined;
   readonly FIRECRAWL_API_KEY: string;
   readonly OPENAI_API_KEY: string;
   readonly REPORT_MAX_MAPPED_URLS: string | undefined;
