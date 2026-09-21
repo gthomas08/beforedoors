@@ -7,7 +7,8 @@
   "scripts": {
     "dev": "convex dev",
     "dev:setup": "convex dev --configure --until-success",
-    "host:dev": "npx @convex-dev/static-hosting upload --build --dist ../../apps/web/dist --build-command \"pnpm --filter web build\""
+    "host:dev": "npx @convex-dev/static-hosting upload --build --dist ../../apps/web/dist --build-command \"pnpm --filter web build\"",
+    "deploy:prod": "npx @convex-dev/static-hosting deploy --dist ../../apps/web/dist --build-command \"pnpm --filter web build\""
   },
   "dependencies": {
     "@ai-sdk/openai": "^4.0.71",

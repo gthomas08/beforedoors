@@ -1,6 +1,7 @@
 import { Toaster } from "@/components/ui/sonner";
 import { HeadContent, Outlet, createRootRouteWithContext } from "@tanstack/react-router";
 
+import { ReportTaskStatus } from "@/components/report-task-status";
 import { createSiteMeta } from "@/lib/site-meta";
 import "../styles.css";
 
@@ -29,6 +30,7 @@ function RootComponent() {
     <>
       <HeadContent />
       <Outlet />
+      <ReportTaskStatus />
       <Toaster />
     </>
   );

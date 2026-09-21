@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import { PendingReportPage } from "@/components/pending-report-page";
 import { VenueInfoMessage, VenueInfoPage, VenueSelectionPage } from "@/components/report-page";
 import { createSiteMeta } from "@/lib/site-meta";
+import { forgetReport, rememberReport } from "@/lib/report-task-store";
 
 export const Route = createFileRoute("/report")({
   validateSearch: (search: Record<string, unknown>) => ({
@@ -53,11 +54,21 @@ function TrackedReport({ reportId }: { reportId: string }) {
   );
 
   useEffect(() => {
+    if (report === undefined || report === null) return;
+    rememberReport({ reportId, url: report.seedUrl });
+  }, [reportId, report?.seedUrl]);
+
+  useEffect(() => {
     if (!isResearchComplete) return;
 
     const completionTimer = window.setTimeout(() => setHasShownCompletion(true), 1000);
     return () => window.clearTimeout(completionTimer);
   }, [isResearchComplete]);
+
+  useEffect(() => {
+    if (!isResearchComplete || !hasShownCompletion || venue?.venue == null) return;
+    forgetReport(reportId);
+  }, [hasShownCompletion, isResearchComplete, reportId, venue?.venue?._id]);
 
   if (report === undefined) {
     return <PendingReportPage phase="queued" />;

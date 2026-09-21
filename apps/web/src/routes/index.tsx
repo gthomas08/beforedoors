@@ -5,6 +5,7 @@ import { TrailheadSurface } from "@/components/trailhead-surface";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { createSiteMeta } from "@/lib/site-meta";
+import { rememberReport } from "@/lib/report-task-store";
 import { useForm } from "@tanstack/react-form";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Result } from "better-result";
@@ -61,6 +62,7 @@ function HomeComponent() {
         try: async () => {
           const url = value.venueUrl.trim();
           const { reportId } = await startReport({ url });
+          rememberReport({ reportId, url });
 
           return navigate({
             to: "/report",
