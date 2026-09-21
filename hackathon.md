@@ -6,19 +6,19 @@
 - **Live app:** not deployed
 - **Repo:** https://github.com/gthomas08/beforedoors
 - **Frontend:** Convex static hosting
-- **Convex deployment:** not deployed
+- **Convex deployment:** https://adventurous-toad-482.convex.cloud
 - **Components:** @convex-dev/agent, @convex-dev/auth, @convex-dev/static-hosting, @convex-dev/workpool
 - **Convex features:** authentication, components, schema, tables, indexes, full-text search, queries, mutations, actions, HTTP actions, scheduled functions, realtime queries, paginated queries, queued background work, static hosting, AgentMail webhooks
 - **Auth:** Convex Auth
 - **AI models:** gpt-5.6-luna
 - **Started:** 2026-09-02T18:35:17Z
-- **Last updated:** 2026-09-20T19:27:20Z
+- **Last updated:** 2026-09-21T20:46:19Z
 
 ## Log
 
 ### 2026-09-02 - 7d404f2
 
-Initialized the Better T Stack application with a TanStack Router web frontend and Convex backend. Added the initial Convex schema and health-check query, plus the frontend health-status view (`packages/backend/convex/schema.ts`, `packages/backend/convex/healthCheck.ts`, `apps/web/src/routes/index.tsx`). Convex features: schema, query, realtime query.
+Initialized the application with a TanStack Router web frontend and Convex backend. Added the initial Convex schema and health-check query, plus the frontend health-status view (`packages/backend/convex/schema.ts`, `packages/backend/convex/healthCheck.ts`, `apps/web/src/routes/index.tsx`). Convex features: schema, query, realtime query.
 
 ### 2026-09-02 - b03a277
 
@@ -87,3 +87,15 @@ Expanded the private account record with required usernames, paginated sent and 
 Turned research into a venue-specific, language-aware workflow that resolves a canonical target, ranks candidate pages with `gpt-5.6-luna` through the Convex Agent component, caches and queues Firecrawl work with Workpool, validates and deduplicates extracted answers, and reports finalization progress (`packages/backend/convex/reports.ts`, `packages/backend/convex/urlRanking.ts`, `packages/backend/convex/answerDeduplication.ts`, `packages/backend/convex/researchPageCache.ts`).
 
 Made contact email optional, added AgentMail reply extraction into confirmed venue answers, and shipped indexed venue search plus paginated favorites and email activity (`packages/backend/convex/venueReplyExtraction.ts`, `packages/backend/convex/venueQuestions.ts`, `packages/backend/convex/venues.ts`, `packages/backend/convex/schema.ts`). Unified the responsive frontend with shared page heroes, clearer answer states, and consistent filters, then registered Convex static hosting and added public social metadata (`apps/web/src/components/page-hero.tsx`, `apps/web/src/components/answer-status.ts`, `packages/backend/convex/convex.config.ts`, `apps/web/src/lib/site-meta.ts`).
+
+### 2026-09-21 - 6602c8b
+
+Persisted report progress in browser storage so background research remains visible while users navigate, hides the status surface on the active report, and clears it when the completed report is opened. Added a GitHub Actions workflow that deploys the Convex backend and static frontend on pushes to `master` (`apps/web/src/lib/report-task-store.ts`, `apps/web/src/components/report-task-status.tsx`, `.github/workflows/deploy-production.yml`). Convex features: realtime query, static hosting, queued background work.
+
+### 2026-09-21 - 2ce4264
+
+Completed the BeforeDoors product rename and unified AgentMail configuration around `AGENTMAIL_INBOX_ID`. Updated the app mark, social card metadata, workspace package references, and README (`README.md`, `apps/web/public/beforedoors-mark.svg`, `apps/web/public/beforedoors-social-card.svg`, `packages/backend/convex/venueQuestions.ts`).
+
+### 2026-09-21 - f7f1264
+
+Changed venue favorites so signed-out users see the Convex Auth dialog instead of an error toast, and the venue is automatically favorited after sign-in or sign-up (`apps/web/src/components/password-auth-dialog.tsx`, `apps/web/src/components/report-page.tsx`). Convex features: authentication, authenticated mutation.
